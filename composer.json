@@ -1,0 +1,20 @@
+{
+    "name": "jolicode/jane",
+    "description": "Generate a serializable / deserializable object model given a json schema",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joel Wurtz",
+            "email": "jwurtz@jolicode.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Joli\\Jane\\": "src/"
+        }
+    },
+    "require": {
+        "jms/serializer": "^1.0",
+        "symfony/yaml": "^2.7"
+    }
+}

@@ -1,0 +1,4 @@
+Joli\Jane\Schema\Schema:
+    properties:
+        title:
+            type: string

@@ -13,8 +13,15 @@
             "Joli\\Jane\\": "src/"
         }
     },
+    "config": {
+        "bin-dir": "bin"
+    },
     "require": {
-        "jms/serializer": "^1.0",
-        "symfony/yaml": "^2.7"
+        "symfony/yaml": "^2.7",
+        "symfony/serializer": "^2.7",
+        "symfony/property-access": "^2.7"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^2.2"
     }
 }

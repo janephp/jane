@@ -2,3 +2,23 @@ Joli\Jane\Schema\Schema:
     properties:
         title:
             type: string
+        type:
+            type: string
+        description:
+            type: string
+        default:
+            type: string
+        schema:
+            type: string
+            serialized_name: $schema
+        id:
+            type: string
+        required:
+            type: array<string>
+        additionalProperties:
+            type: bool
+            default: false
+        properties:
+            type: array<string, Joli\Jane\Schema\Schema>
+        definitions:
+            type: array<string, Joli\Jane\Schema\Schema>

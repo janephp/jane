@@ -40,16 +40,22 @@ class Reference
     private $fragment;
 
     /**
+     * @var string
+     */
+    private $reference;
+
+    /**
      * @param $ref
      */
     public function __construct($ref)
     {
-        $this->scheme   = parse_url($ref, PHP_URL_SCHEME);
-        $this->host     = parse_url($ref, PHP_URL_HOST);
-        $this->port     = parse_url($ref, PHP_URL_PORT);
-        $this->path     = parse_url($ref, PHP_URL_PATH);
-        $this->query    = parse_url($ref, PHP_URL_QUERY);
-        $this->fragment = parse_url($ref, PHP_URL_FRAGMENT);
+        $this->reference = $ref;
+        $this->scheme    = parse_url($ref, PHP_URL_SCHEME);
+        $this->host      = parse_url($ref, PHP_URL_HOST);
+        $this->port      = parse_url($ref, PHP_URL_PORT);
+        $this->path      = parse_url($ref, PHP_URL_PATH);
+        $this->query     = parse_url($ref, PHP_URL_QUERY);
+        $this->fragment  = parse_url($ref, PHP_URL_FRAGMENT);
 
         // Differentiate, root fragment and none existent fragment
         if ($this->fragment === null && preg_match('/#/', $ref)) {
@@ -103,6 +109,14 @@ class Reference
     public function getScheme()
     {
         return $this->scheme;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReference()
+    {
+        return $this->reference;
     }
 
     /**

@@ -20,7 +20,7 @@ class Resolver
     public function resolve(Reference $reference, Schema $root)
     {
         if (!$reference->isInCurrentDocument() || !$reference->hasFragment()) {
-            throw new UnsupportedException("Only json pointer to the current document is supported at this time");
+            throw new UnsupportedException(sprintf("Only json pointer to the current document is supported at this time, %s given", $reference->getReference()));
         }
 
         return $this->resolveJSONPointer($reference->getFragment(), $root);

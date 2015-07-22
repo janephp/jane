@@ -31,7 +31,7 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
         $replacer = new Replacer(new Resolver());
         $schema   = $this->createSchema($data, $replacer);
 
-        $replacer->replace($schema);
+        //$replacer->replace($schema);
 
         return $schema;
     }

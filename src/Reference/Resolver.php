@@ -41,6 +41,7 @@ class Resolver
 
         // Separate pointer into tokens
         $tokens = explode('/', $pointer);
+        //
         array_shift($tokens);
         // Unescape token
         $tokens = array_map(function ($token) {

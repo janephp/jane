@@ -2,13 +2,13 @@
 
 namespace Joli\Jane\Generator;
 
+use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Schema\Schema;
 
 class TypeManager
 {
-    private $referencedType = [];
     private $resolver;
 
     public function __construct(Resolver $resolver)
@@ -19,19 +19,18 @@ class TypeManager
     /**
      * Get type of an object in the @var format
      *
-     * @param Schema           $rootSchema
      * @param Schema|Reference $object
      * @param string           $key
-     * @param string           $namespace
+     * @param Context          $context
      *
      * @return string
      */
-    public function getVariableTagString(Schema $rootSchema, $object, $key, $namespace)
+    public function getVariableTagString($object, $key, Context $context)
     {
-        $types = $this->getTypes($rootSchema, $object);
+        $types = $this->getTypes($object, $context);
 
         if (($objectKey = array_search('object', $types)) !== false) {
-            $types[$objectKey] = $namespace . "\\" . ucfirst($key);
+            $types[$objectKey] = "\\" . $context->getNamespace() . "\\" . ucfirst($key);
         }
 
         return implode('|', $types);
@@ -40,26 +39,30 @@ class TypeManager
     /**
      * Get all types for a schema
      *
-     * @param Schema           $rootSchema
      * @param Schema|Reference $object
+     * @param Context          $context
      *
      * @return array
      */
-    public function getTypes(Schema $rootSchema, $object)
+    public function getTypes($object, Context $context)
     {
         $schema = $object;
 
         if ($object instanceof Reference) {
             // Does this reference refer to a created object ?
-            $schema = $this->resolver->resolve($object, $rootSchema);
+            $schema = $this->resolver->resolve($object, $context->getRootSchema());
+
+            if ($context->getSchemaObjectMap()->hasSchema($schema)) {
+                return ["\\" . $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName()];
+            }
         }
 
-        $types = $this->resolveTypes($rootSchema, $schema);
+        $types = $this->resolveTypes($schema, $context);
 
         return $types;
     }
 
-    protected function resolveTypes(Schema $rootSchema, Schema $schema)
+    protected function resolveTypes(Schema $schema, Context $context)
     {
         if ($schema->getType() !== null) {
             return is_array($schema->getType()) ? $schema->getType() : [$schema->getType()];
@@ -69,7 +72,7 @@ class TypeManager
             $types = [];
 
             foreach ($schema->getAnyOf() as $subSchema) {
-                $types = array_merge($types, $this->getTypes($rootSchema, $subSchema));
+                $types = array_merge($types, $this->getTypes($subSchema, $context));
             }
 
             return $types;
@@ -79,7 +82,7 @@ class TypeManager
             $types = [];
 
             foreach ($schema->getAllOf() as $subSchema) {
-                $types += $this->getTypes($rootSchema, $subSchema);
+                $types += $this->getTypes($subSchema, $context);
             }
 
             return $types;
@@ -89,7 +92,7 @@ class TypeManager
             $types = [];
 
             foreach ($schema->getOneOf() as $subSchema) {
-                $types += $this->getTypes($rootSchema, $subSchema);
+                $types += $this->getTypes($subSchema, $context);
             }
 
             return $types;
@@ -98,9 +101,18 @@ class TypeManager
         return ['mixed'];
     }
 
-    public function isObjectOfType(Schema $rootSchema, $object, $type)
+    /**
+     * Whether an object is of type wanted
+     *
+     * @param Schema|Reference $object
+     * @param string           $type
+     * @param Context          $context
+     *
+     * @return bool
+     */
+    public function isObjectOfType($object, $type, Context $context)
     {
-        return in_array($type, $this->getTypes($rootSchema, $object));
+        return in_array($type, $this->getTypes($object, $context));
     }
 }
  

@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Generator;
+namespace Joli\Jane\Generator\Context;
 
 use Joli\Jane\Schema\Schema;
 use Memio\Model\Object;
@@ -13,8 +13,8 @@ class SchemaObjectMap
     private $references;
 
     /**
-     * @param Schema $schema
-     * @param Object $object
+     * @param Schema              $schema
+     * @param \Memio\Model\Object $object
      */
     public function addSchemaObject(Schema $schema, Object $object)
     {
@@ -34,7 +34,7 @@ class SchemaObjectMap
     /**
      * @param Schema $schema
      *
-     * @return Object
+     * @return \Memio\Model\Object
      */
     public function getObject(Schema $schema)
     {

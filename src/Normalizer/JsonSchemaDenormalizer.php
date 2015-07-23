@@ -18,9 +18,15 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      */
     private $propertyAccessor;
 
-    public function __construct()
+    /**
+     * @var Replacer
+     */
+    private $replacer;
+
+    public function __construct(Replacer $replacer)
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->replacer         = $replacer;
     }
 
     /**
@@ -28,10 +34,9 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $replacer = new Replacer(new Resolver());
-        $schema   = $this->createSchema($data, $replacer);
+        $schema   = $this->createSchema($data);
 
-        //$replacer->replace($schema);
+        //$this->replacer->replace($schema);
 
         return $schema;
     }
@@ -40,11 +45,10 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      * Create a Schema given a set of data
      *
      * @param $data
-     * @param Replacer $replacer
      *
      * @return Reference|EmptySchema|Schema
      */
-    protected function createSchema($data, Replacer $replacer)
+    protected function createSchema($data)
     {
         $emptySchema = new EmptySchema();
         $schema      = new Schema();
@@ -72,7 +76,7 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
 
         if (isset($data->additionalItems)) {
             if (is_object($data->additionalItems)) {
-                $schema->setAdditionalItems($this->createSchema($data->additionalItems, $replacer));
+                $schema->setAdditionalItems($this->createSchema($data->additionalItems));
             }
 
             if (is_bool($data->additionalItems)) {
@@ -84,14 +88,14 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
 
         if (isset($data->items)) {
             if (is_object($data->items)) {
-                $schema->setItems($this->createSchema($data->items, $replacer));
+                $schema->setItems($this->createSchema($data->items));
             }
 
             if (is_array($data->items)) {
                 $schemaArray = new \ArrayObject([]);
 
                 foreach ($data->items as $item) {
-                    $schemaArray[] = $this->createSchema($item, $replacer);
+                    $schemaArray[] = $this->createSchema($item);
                 }
 
                 $schema->setItems($schemaArray);
@@ -102,7 +106,7 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
 
         if (isset($data->additionalProperties)) {
             if (is_object($data->additionalProperties)) {
-                $schema->setAdditionalItems($this->createSchema($data->additionalProperties, $replacer));
+                $schema->setAdditionalItems($this->createSchema($data->additionalProperties));
             }
 
             if (is_bool($data->additionalProperties)) {
@@ -110,16 +114,16 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
             }
         }
 
-        $this->hydrateSchemaArrayAssoc('definitions', $data, $schema, $replacer, clone $emptySchema);
-        $this->hydrateSchemaArrayAssoc('properties', $data, $schema, $replacer, clone $emptySchema);
-        $this->hydrateSchemaArrayAssoc('patternProperties', $data, $schema, $replacer, clone $emptySchema);
+        $this->hydrateSchemaArrayAssoc('definitions', $data, $schema, clone $emptySchema);
+        $this->hydrateSchemaArrayAssoc('properties', $data, $schema, clone $emptySchema);
+        $this->hydrateSchemaArrayAssoc('patternProperties', $data, $schema, clone $emptySchema);
 
         if (isset($data->dependencies)) {
             $schemaArray = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
 
             foreach ($data->dependencies as $key => $dependency) {
                 if (is_object($dependency)) {
-                    $schemaArray[$key] = $this->createSchema($dependency, $replacer);
+                    $schemaArray[$key] = $this->createSchema($dependency);
                 }
 
                 if (is_array($dependency)) {
@@ -130,12 +134,12 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
             $schema->setDependencies($schemaArray);
         }
 
-        $this->hydrateSchemaArrayAssoc('allOf', $data, $schema, $replacer);
-        $this->hydrateSchemaArrayAssoc('anyOf', $data, $schema, $replacer);
-        $this->hydrateSchemaArrayAssoc('oneOf', $data, $schema, $replacer);
+        $this->hydrateSchemaArrayAssoc('allOf', $data, $schema);
+        $this->hydrateSchemaArrayAssoc('anyOf', $data, $schema);
+        $this->hydrateSchemaArrayAssoc('oneOf', $data, $schema);
 
         if (isset($data->not)) {
-            $schema->setNot($this->createSchema($data->not, $replacer));
+            $schema->setNot($this->createSchema($data->not));
         }
 
         return $schema;
@@ -147,10 +151,9 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      * @param $field
      * @param $data
      * @param $schema
-     * @param $replacer
      * @param null $default
      */
-    protected function hydrateSchemaArray($field, $data, $schema, $replacer, $default = null)
+    protected function hydrateSchemaArray($field, $data, $schema, $default = null)
     {
         if (!$this->propertyAccessor->isWritable($schema, $field)) {
             return;
@@ -162,7 +165,7 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
             $schemaArray = new \ArrayObject([]);
 
             foreach ($data->{$field} as $value) {
-                $schemaArray[] = $this->createSchema($value, $replacer);
+                $schemaArray[] = $this->createSchema($value);
             }
 
             $this->propertyAccessor->setValue($schema, $field, $schemaArray);
@@ -175,10 +178,9 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      * @param $field
      * @param $data
      * @param $schema
-     * @param $replacer
      * @param null $default
      */
-    protected function hydrateSchemaArrayAssoc($field, $data, $schema, $replacer, $default = null)
+    protected function hydrateSchemaArrayAssoc($field, $data, $schema, $default = null)
     {
         if (!$this->propertyAccessor->isWritable($schema, $field)) {
             return;
@@ -190,7 +192,7 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
             $schemaArray = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
 
             foreach ($data->{$field} as $key => $value) {
-                $schemaArray[$key] = $this->createSchema($value, $replacer);
+                $schemaArray[$key] = $this->createSchema($value);
             }
 
             $this->propertyAccessor->setValue($schema, $field, $schemaArray);

@@ -2,6 +2,7 @@
 
 namespace Joli\Jane\Generator;
 
+use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Schema\Schema;
 use Memio\Model\File;
 use Memio\Model\FullyQualifiedName;
@@ -25,36 +26,34 @@ class ModelGenerator implements GeneratorInterface
     /**
      * Generate a model given a schema
      *
-     * @param Schema $rootSchema     Root schema to generate from
-     * @param Schema $schema         Schema to generate from
-     * @param string $modelName      Model class root name to generate
-     * @param string $modelNamespace Namespace of model to generate
-     * @param string $directory      Directory where files are generated
+     * @param Schema  $schema     Schema to generate from
+     * @param string  $className  Class to generate
+     * @param Context $context    Context for generation
      *
      * @return \Memio\Model\File[]
      */
-    public function generate(Schema $rootSchema, Schema $schema, $modelName, $modelNamespace, $directory)
+    public function generate(Schema $schema, $className, Context $context)
     {
         $files = [];
 
         foreach ($schema->getDefinitions() as $key => $definition) {
             if ($definition instanceof Schema) {
-                $files = array_merge($files, $this->generate($rootSchema, $definition, ucfirst($key), $modelNamespace, $directory));
+                $files = array_merge($files, $this->generate($definition, ucfirst($key), $context));
             }
         }
 
         $object  = null;
 
-        if ($this->typeManager->isObjectOfType($rootSchema, $schema, 'object')) {
-            $object = $this->generateObject($rootSchema, $schema, $modelName, $modelNamespace, $directory);
+        if ($this->typeManager->isObjectOfType($schema, 'object', $context)) {
+            $object = $this->generateObject($schema, $className, $context);
         }
 
-        if ($this->typeManager->isObjectOfType($rootSchema, $schema, 'array')) {
-            $object = $this->generateArrayObject($rootSchema, $schema, $modelName, $modelNamespace, $directory);
+        if ($this->typeManager->isObjectOfType($schema, 'array', $context)) {
+            $object = $this->generateArrayObject($schema, $className, $context);
         }
 
         if ($object !== null) {
-            $schemaFile = File::make($directory . DIRECTORY_SEPARATOR . $modelName . '.php');
+            $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . $className . '.php');
             $schemaFile->setStructure($object);
 
             if ($object->hasParent()) {
@@ -70,17 +69,16 @@ class ModelGenerator implements GeneratorInterface
     /**
      * Generate a object model given a schema
      *
-     * @param Schema $rootSchema     Root schema to generate from
-     * @param Schema $schema         Schema to generate from
-     * @param string $modelName      Model class root name to generate
-     * @param string $modelNamespace Namespace of model to generate
-     * @param string $directory      Directory where files are generated
+     * @param Schema  $schema     Schema to generate from
+     * @param string  $className  Class to generate
+     * @param Context $context    Context for generation
      *
      * @return \Memio\Model\Object
      */
-    public function generateObject(Schema $rootSchema, Schema $schema, $modelName, $modelNamespace, $directory)
+    public function generateObject(Schema $schema, $className, Context $context)
     {
-        $class = Object::make($modelNamespace . "\\". $modelName);
+        $class = Object::make($context->getNamespace() . "\\". $className);
+        $context->getSchemaObjectMap()->addSchemaObject($schema, $class);
 
         foreach ($schema->getProperties() as $key => $property) {
             if (preg_match('/\$/', $key)) {
@@ -90,7 +88,7 @@ class ModelGenerator implements GeneratorInterface
             }
 
             $phpDoc = new PropertyPhpdoc();
-            $phpDoc->setVariableTag(VariableTag::make($this->typeManager->getVariableTagString($schema, $property, $key, $modelNamespace)));
+            $phpDoc->setVariableTag(VariableTag::make($this->typeManager->getVariableTagString($property, $key, $context)));
 
             $prop = new Property($key);
             $prop->makeProtected();
@@ -109,17 +107,16 @@ class ModelGenerator implements GeneratorInterface
     /**
      * Generate a array object model given a schema
      *
-     * @param Schema $rootSchema     Root schema to generate from
-     * @param Schema $schema         Schema to generate from
-     * @param string $modelName      Model class root name to generate
-     * @param string $modelNamespace Namespace of model to generate
-     * @param string $directory      Directory where files are generated
+     * @param Schema  $schema     Schema to generate from
+     * @param string  $className  Class to generate
+     * @param Context $context    Context for generation
      *
      * @return \Memio\Model\Object
      */
-    public function generateArrayObject(Schema $rootSchema, Schema $schema, $modelName, $modelNamespace, $directory)
+    public function generateArrayObject(Schema $schema, $className, Context $context)
     {
-        $class  = Object::make($modelNamespace . "\\". $modelName);
+        $class  = Object::make($context->getNamespace() . "\\". $className);
+        $context->getSchemaObjectMap()->addSchemaObject($schema, $class);
         $class->extend(new Object('ArrayObject'));
 
         return $class;

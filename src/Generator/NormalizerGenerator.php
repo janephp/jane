@@ -5,7 +5,7 @@ namespace Joli\Jane\Generator;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Model\JsonSchema;
 
-class ModelGenerator implements GeneratorInterface
+class NormalizerGenerator implements GeneratorInterface
 {
     /**
      * @var TypeDecisionManager
@@ -18,18 +18,19 @@ class ModelGenerator implements GeneratorInterface
     }
 
     /**
-     * Generate a model given a schema
+     * Generate a set of files given a schema
      *
-     * @param JsonSchema  $schema     Schema to generate from
-     * @param string  $className  Class to generate
-     * @param Context $context    Context for generation
+     * @param JsonSchema $schema Schema to generate from
+     * @param string $className Class to generate
+     * @param Context $context Context for generation
      *
      * @return \Memio\Model\File[]
      */
     public function generate(JsonSchema $schema, $className, Context $context)
     {
-        $this->typeDecisionManager->resolveType($schema)->generateObject($schema, $className, $context);
+        $this->typeDecisionManager->resolveType($schema)->generateNormalizer($schema, $className, $context);
 
         return $context->getFiles();
     }
 }
+ 

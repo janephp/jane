@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Reference;
 
-use Joli\Jane\Schema\Schema;
+use Joli\Jane\Model\JsonSchema;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class Resolver
@@ -11,13 +11,13 @@ class Resolver
      * Resolve a JSON Reference for a Schema
      *
      * @param Reference $reference
-     * @param Schema $root
+     * @param JsonSchema $root
      *
      * @throws UnsupportedException
      *
      * @return mixed Return the json value (deserialized) referenced
      */
-    public function resolve(Reference $reference, Schema $root)
+    public function resolve(Reference $reference, JsonSchema $root)
     {
         if (!$reference->isInCurrentDocument() || !$reference->hasFragment()) {
             throw new UnsupportedException(sprintf("Only json pointer to the current document is supported at this time, %s given", $reference->getReference()));
@@ -29,11 +29,11 @@ class Resolver
      * Resolve a JSON Pointer for a Schema
      *
      * @param string $pointer
-     * @param Schema $root
+     * @param JsonSchema $root
      *
      * @return mixed Return the json value (deserialized) referenced
      */
-    protected function resolveJSONPointer($pointer, Schema $root)
+    protected function resolveJSONPointer($pointer, JsonSchema $root)
     {
         if (empty($pointer)) {
             return $root;

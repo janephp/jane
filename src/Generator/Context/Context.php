@@ -2,7 +2,8 @@
 
 namespace Joli\Jane\Generator\Context;
 
-use Joli\Jane\Schema\Schema;
+use Joli\Jane\Model\JsonSchema;
+use Memio\Model\File;
 
 /**
  * Context when generating a library base on a Schema
@@ -20,7 +21,7 @@ class Context
     private $directory;
 
     /**
-     * @var \Joli\Jane\Schema\Schema
+     * @var \Joli\Jane\Model\JsonSchema
      */
     private $rootSchema;
 
@@ -30,16 +31,37 @@ class Context
     private $schemaObjectMap;
 
     /**
-     * @param Schema $rootSchema
+     * @var SchemaObjectMap
+     */
+    private $schemaObjectNormalizerMap;
+
+    /**
+     * @var File
+     */
+    private $files = [];
+
+    /**
+     * @param JsonSchema $rootSchema
      * @param string $namespace
      * @param string $directory
      */
-    public function __construct(Schema $rootSchema, $namespace, $directory)
+    public function __construct(JsonSchema $rootSchema, $namespace, $directory)
     {
         $this->rootSchema      = $rootSchema;
         $this->namespace       = $namespace;
         $this->directory       = $directory;
         $this->schemaObjectMap = new SchemaObjectMap();
+        $this->schemaObjectNormalizerMap = new SchemaObjectMap();
+    }
+
+    public function addFile(File $file)
+    {
+        $this->files[] = $file;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
     }
 
     /**
@@ -59,7 +81,7 @@ class Context
     }
 
     /**
-     * @return Schema
+     * @return JsonSchema
      */
     public function getRootSchema()
     {
@@ -72,6 +94,14 @@ class Context
     public function getSchemaObjectMap()
     {
         return $this->schemaObjectMap;
+    }
+
+    /**
+     * @return SchemaObjectMap
+     */
+    public function getSchemaObjectNormalizerMap()
+    {
+        return $this->schemaObjectNormalizerMap;
     }
 }
  

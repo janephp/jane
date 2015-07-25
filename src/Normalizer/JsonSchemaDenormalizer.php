@@ -3,10 +3,7 @@
 namespace Joli\Jane\Normalizer;
 
 use Joli\Jane\Reference\Reference;
-use Joli\Jane\Reference\Replacer;
-use Joli\Jane\Reference\Resolver;
-use Joli\Jane\Schema\EmptySchema;
-use Joli\Jane\Schema\Schema;
+use Joli\Jane\Model\JsonSchema;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -18,15 +15,9 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      */
     private $propertyAccessor;
 
-    /**
-     * @var Replacer
-     */
-    private $replacer;
-
-    public function __construct(Replacer $replacer)
+    public function __construct()
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->replacer         = $replacer;
     }
 
     /**
@@ -36,8 +27,6 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
     {
         $schema   = $this->createSchema($data);
 
-        //$this->replacer->replace($schema);
-
         return $schema;
     }
 
@@ -46,21 +35,20 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      *
      * @param $data
      *
-     * @return Reference|EmptySchema|Schema
+     * @return Reference|JsonSchema
      */
     protected function createSchema($data)
     {
-        $emptySchema = new EmptySchema();
-        $schema      = new Schema();
-
         // Case of empty schema (maybe use a specific class ?)
         if (empty($data)) {
-            return clone $emptySchema;
+            return null;
         }
 
         if (isset($data->{'$ref'})) {
             return new Reference($data->{'$ref'});
         }
+
+        $schema      = new JsonSchema();
 
         $this->setFields([
             'id', 'title', 'description', 'default', 'multipleOf', 'maximum', 'exclusiveMaximum',
@@ -69,10 +57,8 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
         ], $data, $schema);
 
         if (isset($data->{'$schema'})) {
-            $schema->setSchema($data->{'$schema'});
+            $schema->setDollarSchema($data->{'$schema'});
         }
-
-        $schema->setAdditionalItems(clone $emptySchema);
 
         if (isset($data->additionalItems)) {
             if (is_object($data->additionalItems)) {
@@ -83,8 +69,6 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
                 $schema->setAdditionalItems($data->additionalItems);
             }
         }
-
-        $schema->setItems(clone $emptySchema);
 
         if (isset($data->items)) {
             if (is_object($data->items)) {
@@ -102,21 +86,19 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
             }
         }
 
-        $schema->setAdditionalProperties(clone $emptySchema);
-
         if (isset($data->additionalProperties)) {
             if (is_object($data->additionalProperties)) {
-                $schema->setAdditionalItems($this->createSchema($data->additionalProperties));
+                $schema->setAdditionalProperties($this->createSchema($data->additionalProperties));
             }
 
             if (is_bool($data->additionalProperties)) {
-                $schema->setAdditionalItems($data->additionalProperties);
+                $schema->setAdditionalProperties($data->additionalProperties);
             }
         }
 
-        $this->hydrateSchemaArrayAssoc('definitions', $data, $schema, clone $emptySchema);
-        $this->hydrateSchemaArrayAssoc('properties', $data, $schema, clone $emptySchema);
-        $this->hydrateSchemaArrayAssoc('patternProperties', $data, $schema, clone $emptySchema);
+        $this->hydrateSchemaArrayAssoc('definitions', $data, $schema);
+        $this->hydrateSchemaArrayAssoc('properties', $data, $schema);
+        $this->hydrateSchemaArrayAssoc('patternProperties', $data, $schema);
 
         if (isset($data->dependencies)) {
             $schemaArray = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
@@ -219,7 +201,7 @@ class JsonSchemaDenormalizer implements DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== Schema::class) {
+        if ($type !== JsonSchema::class) {
             return false;
         }
 

@@ -8,15 +8,20 @@ class JsonSchemaNormalizer implements DenormalizerInterface
 {
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+
         if (empty($data)) {
             return null;
         }
 
         if (isset($data->{'$ref'})) {
-            return new Reference($data->{'$ref'});
+            return new Reference($data->{'$ref'}, $context['rootSchema'] ?: null);
         }
 
         $object = new \Joli\Jane\Model\JsonSchema();
+
+        if (!isset($context['rootSchema'])) {
+            $context['rootSchema'] = $object;
+        }
 
         if (isset($data->{'id'})) {
             $object->setId($data->{'id'});
@@ -83,21 +88,21 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             }
 
             if (is_object($data->{'additionalItems'})) {
-                $object->setAdditionalItems($this->denormalize($data->{'additionalItems'}, '\Joli\Jane\Model\JsonSchema', 'json'));
+                $object->setAdditionalItems($this->denormalize($data->{'additionalItems'}, '\Joli\Jane\Model\JsonSchema', 'json', $context));
             }
 
         }
 
         if (isset($data->{'items'})) {
             if (is_object($data->{'items'})) {
-                $object->setItems($this->denormalize($data->{'items'}, '\Joli\Jane\Model\JsonSchema', 'json'));
+                $object->setItems($this->denormalize($data->{'items'}, '\Joli\Jane\Model\JsonSchema', 'json', $context));
             }
 
             if (is_array($data->{'items'})) {
                 $values = [];
 
                 foreach ($data->{'items'} as $value) {
-                    $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                    $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
                 }
 
                 $object->setItems($values);
@@ -157,7 +162,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             }
 
             if (is_object($data->{'additionalProperties'})) {
-                $object->setAdditionalProperties($this->denormalize($data->{'additionalProperties'}, '\Joli\Jane\Model\JsonSchema', 'json'));
+                $object->setAdditionalProperties($this->denormalize($data->{'additionalProperties'}, '\Joli\Jane\Model\JsonSchema', 'json', $context));
             }
 
         }
@@ -166,7 +171,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             $values = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
 
             foreach ($data->{'definitions'} as $key => $value) {
-                $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
             }
 
             $object->setDefinitions($values);
@@ -176,7 +181,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             $values = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
 
             foreach ($data->{'properties'} as $key => $value) {
-                $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
             }
 
             $object->setProperties($values);
@@ -186,7 +191,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             $values = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
 
             foreach ($data->{'patternProperties'} as $key => $value) {
-                $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
             }
 
             $object->setPatternProperties($values);
@@ -197,7 +202,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
 
             foreach ($data->{'dependencies'} as $key => $value) {
                 if (is_object($value)) {
-                    $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                    $values[$key] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
                 }
 
                 if (is_array($value)) {
@@ -246,7 +251,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             $values = [];
 
             foreach ($data->{'allOf'} as $value) {
-                $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
             }
 
             $object->setAllOf($values);
@@ -257,7 +262,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             $values = [];
 
             foreach ($data->{'anyOf'} as $value) {
-                $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
             }
 
             $object->setAnyOf($values);
@@ -268,7 +273,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
             $values = [];
 
             foreach ($data->{'oneOf'} as $value) {
-                $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json');
+                $values[] = $this->denormalize($value, '\Joli\Jane\Model\JsonSchema', 'json', $context);
             }
 
             $object->setOneOf($values);
@@ -276,7 +281,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
         }
 
         if (isset($data->{'not'})) {
-            $object->setNot($this->denormalize($data->{'not'}, '\Joli\Jane\Model\JsonSchema', 'json'));
+            $object->setNot($this->denormalize($data->{'not'}, '\Joli\Jane\Model\JsonSchema', 'json', $context));
         }
 
         return $object;

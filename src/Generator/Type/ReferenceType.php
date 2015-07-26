@@ -63,9 +63,13 @@ class ReferenceType extends AbstractType
         $schema = $this->resolver->resolve($schema, $context->getRootSchema());
 
         if ($context->getSchemaObjectMap()->hasSchema($schema)) {
+            if (!$context->getSchemaObjectNormalizerMap()->hasSchema($schema)) {
+                $this->typeDecisionManager->resolveType($schema)->generateNormalizer($schema, $context->getSchemaObjectMap()->getObject($schema)->getName(), $context);
+            }
+
             $fqdn = "\\" . $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName();
 
-            return sprintf('$this->denormalize(%%s, \'%s\', \'json\')', $fqdn);
+            return sprintf('$this->serializer->denormalize(%%s, \'%s\', \'json\', $context)', $fqdn);
         }
 
         return $this->typeDecisionManager->resolveType($schema)->getDenormalizationValuePattern($schema, $name, $context);
@@ -86,13 +90,13 @@ class ReferenceType extends AbstractType
      */
     public function getPhpTypes($schema, $name, Context $context)
     {
-        $schema = $this->resolver->resolve($schema, $context->getRootSchema());
+        $newSchema = $this->resolver->resolve($schema, $context->getRootSchema());
 
-        if ($context->getSchemaObjectMap()->hasSchema($schema)) {
-            return ["\\" . $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName()];
+        if ($context->getSchemaObjectMap()->hasSchema($newSchema)) {
+            return ["\\" . $context->getSchemaObjectMap()->getObject($newSchema)->getFullyQualifiedName()];
         }
 
-        return $this->typeDecisionManager->resolveType($schema)->getPhpTypes($schema, $name, $context);
+        return $this->typeDecisionManager->resolveType($newSchema)->getPhpTypes($newSchema, $name, $context);
     }
 }
  

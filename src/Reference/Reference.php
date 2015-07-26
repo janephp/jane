@@ -1,6 +1,7 @@
 <?php
 
 namespace Joli\Jane\Reference;
+use Joli\Jane\Model\JsonSchema;
 
 /**
  * Deal with Json Reference (only support internal pointer for the moment)
@@ -45,9 +46,15 @@ class Reference
     private $reference;
 
     /**
-     * @param $ref
+     * @var JsonSchema
      */
-    public function __construct($ref)
+    private $currentSchema;
+
+    /**
+     * @param $ref
+     * @param JsonSchema $currentSchema
+     */
+    public function __construct($ref, JsonSchema $currentSchema)
     {
         $this->reference = $ref;
         $this->scheme    = parse_url($ref, PHP_URL_SCHEME);
@@ -56,6 +63,7 @@ class Reference
         $this->path      = parse_url($ref, PHP_URL_PATH);
         $this->query     = parse_url($ref, PHP_URL_QUERY);
         $this->fragment  = parse_url($ref, PHP_URL_FRAGMENT);
+        $this->currentSchema = $currentSchema;
 
         // Differentiate, root fragment and none existent fragment
         if ($this->fragment === null && preg_match('/#/', $ref)) {
@@ -147,6 +155,14 @@ class Reference
     public function hasFragment()
     {
         return $this->fragment !== null;
+    }
+
+    /**
+     * @return JsonSchema
+     */
+    public function getCurrentSchema()
+    {
+        return $this->currentSchema;
     }
 }
  

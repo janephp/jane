@@ -30,23 +30,27 @@ class ObjectType extends AbstractType
      */
     public function generateObject($schema, $name, Context $context)
     {
-        foreach ($schema->getDefinitions() as $key => $definition) {
-            $this->typeDecisionManager->resolveType($definition)->generateObject($definition, $key, $context);
+        if ($schema->getDefinitions() !== null) {
+            foreach ($schema->getDefinitions() as $key => $definition) {
+                $this->typeDecisionManager->resolveType($definition)->generateObject($definition, $key, $context);
+            }
         }
 
-        $object = Object::make($context->getNamespace() . "\\Model\\". $name);
+        $object = Object::make($context->getNamespace() . "\\Model\\". ucfirst($name));
         $context->getSchemaObjectMap()->addSchemaObject($schema, $object);
 
-        foreach ($schema->getProperties() as $key => $property) {
-            $subType  = $this->typeDecisionManager->resolveType($property);
-            $propGenerated = $subType->generateProperty($property, $key, $context);
+        if ($schema->getProperties() !== null) {
+            foreach ($schema->getProperties() as $key => $property) {
+                $subType = $this->typeDecisionManager->resolveType($property);
+                $propGenerated = $subType->generateProperty($property, $key, $context);
 
-            if ($propGenerated instanceof Property) {
-                $object->addProperty($propGenerated);
-            }
+                if ($propGenerated instanceof Property) {
+                    $object->addProperty($propGenerated);
+                }
 
-            foreach ($subType->generateMethods($property, $key, $context) as $method) {
-                $object->addMethod($method);
+                foreach ($subType->generateMethods($property, $key, $context) as $method) {
+                    $object->addMethod($method);
+                }
             }
         }
 
@@ -54,7 +58,7 @@ class ObjectType extends AbstractType
             $object->extend(new Object('\\ArrayObject'));
         }
 
-        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Model' . DIRECTORY_SEPARATOR . $name . '.php');
+        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Model' . DIRECTORY_SEPARATOR . ucfirst($name) . '.php');
         $schemaFile->setStructure($object);
 
         if ($object->hasParent()) {
@@ -69,9 +73,16 @@ class ObjectType extends AbstractType
      */
     public function generateNormalizer($schema, $name, Context $context)
     {
-        $object = Object::make($context->getNamespace() . "\\Normalizer\\". $name.'Normalizer');
+        $object = Object::make($context->getNamespace() . "\\Normalizer\\". ucfirst($name).'Normalizer');
         $context->getSchemaObjectNormalizerMap()->addSchemaObject($schema, $object);
         $object->implement(Contract::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
+        $object->implement(Contract::make('Symfony\Component\Serializer\SerializerAwareInterface'));
+        $object->addProperty(Property::make('serializer'));
+        $object->addMethod(
+            Method::make('setSerializer')
+                ->addArgument(Argument::make('Symfony\Component\Serializer\SerializerInterface', 'serializer'))
+                ->setBody('        $this->serializer = $serializer;')
+        );
 
         $denormalizeMethod = Method::make('denormalize')
             ->addArgument(
@@ -124,13 +135,17 @@ EOC
         }
 
         if (isset(\$data->{'\$ref'})) {
-            return new Reference(\$data->{'\$ref'});
+            return new Reference(\$data->{'\$ref'}, \$context['rootSchema'] ?: null);
         }
 
         \$object = new \\%s\\Model\\%s();
 
+        if (!isset(\$context['rootSchema'])) {
+            \$context['rootSchema'] = \$object;
+        }
+
 EOC
-            , $context->getNamespace(), $name)
+            , $context->getNamespace(), ucfirst($name))
         ];
 
         foreach ($schema->getProperties() as $key => $property) {
@@ -152,12 +167,26 @@ EOC
 
         $denormalizeMethod->setBody(implode("\n", $lines));
 
-        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Normalizer' . DIRECTORY_SEPARATOR . $name . 'Normalizer.php');
+        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Normalizer' . DIRECTORY_SEPARATOR . ucfirst($name) . 'Normalizer.php');
         $schemaFile->setStructure($object);
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
         $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Joli\Jane\Reference\Reference'));
+        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
+        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\SerializerAwareInterface'));
+        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\SerializerInterface'));
 
         $context->addFile($schemaFile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    {
+        if (!$context->getSchemaObjectNormalizerMap()->hasSchema($schema)) {
+            $this->typeDecisionManager->resolveType($schema)->generateNormalizer($schema, $name, $context);
+        }
+
+        return parent::generateDenormalizationLine($schema, $name, $context, $mode);
     }
 
     /**
@@ -181,7 +210,7 @@ EOC
      */
     public function getPhpTypes($schema, $name, Context $context)
     {
-        return ['object'];
+        return ["\\". $context->getNamespace()."\\".ucfirst($name)];
     }
 }
  

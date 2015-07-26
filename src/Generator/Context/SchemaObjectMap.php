@@ -40,5 +40,13 @@ class SchemaObjectMap
     {
         return $this->references[spl_object_hash($schema)];
     }
+
+    /**
+     * @return \Object[]
+     */
+    public function getReferences()
+    {
+        return $this->references;
+    }
 }
  

@@ -38,26 +38,48 @@ class ArrayObjectType extends AbstractType
     public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
     {
         $additionalProperties = $schema->getAdditionalProperties();
+        $patternProperties = $schema->getPatternProperties();
 
-        if ($additionalProperties === null || $additionalProperties === true) {
+        if (($additionalProperties === null || $additionalProperties === false) && ($patternProperties === null || $patternProperties === false)) {
             return parent::generateDenormalizationLine($schema, $name, $context);
         }
 
         $propertyName = $this->encodePropertyName($name);
 
-        return sprintf(<<<EOC
+        $lines = [sprintf(<<<EOC
             \$values = new \\ArrayObject([], \\ArrayObject::ARRAY_AS_PROPS);
 
             foreach (\$data->{'%s'} as \$key => \$value) {
-                %s
+EOC
+        , $name)];
+
+        if (!empty($patternProperties)) {
+            foreach ($patternProperties as $pattern => $schema) {
+                $lines[] = sprintf(<<<EOC
+                if (preg_match('/%s/', \$key)) {
+                    %s
+                    continue;
+                }
+
+EOC
+                , str_replace('/', '\\/', $pattern)
+                , $this->typeDecisionManager->resolveType($schema)->generateDenormalizationLine($schema, $name, $context, TypeInterface::SET_ARRAY));
+            }
+        }
+
+        if ($additionalProperties !== null && $additionalProperties !== false) {
+            $lines[] = $this->typeDecisionManager->resolveType($additionalProperties)->generateDenormalizationLine($additionalProperties, $name, $context, TypeInterface::SET_ARRAY);
+        }
+
+        $lines[] = sprintf(<<<EOC
             }
 
             \$object->set%s(\$values);
 EOC
-            , $name
-            , $this->typeDecisionManager->resolveType($additionalProperties)->generateDenormalizationLine($additionalProperties, $name, $context, TypeInterface::SET_ARRAY)
             , ucfirst($propertyName)
         );
+
+        return implode("\n", $lines);
     }
 
     /**
@@ -77,7 +99,7 @@ EOC
             return false;
         }
 
-        if ($schema->getAdditionalProperties() === false) {
+        if ($schema->getAdditionalProperties() === false && ($schema->getPatternProperties() === false || $schema->getPatternProperties() === null)) {
             return false;
         }
 
@@ -98,12 +120,24 @@ EOC
     public function getPhpTypes($schema, $name, Context $context)
     {
         $additionalProperties = $schema->getAdditionalProperties();
+        $patternProperties    = $schema->getPatternProperties();
 
-        if ($additionalProperties === true || $additionalProperties === null) {
+        if (($additionalProperties === null || $additionalProperties === true) && ($patternProperties === null || $patternProperties === false)) {
             return ['array'];
         }
 
-        $types = $this->typeDecisionManager->resolveType($additionalProperties)->getPhpTypes($additionalProperties, $name, $context);
+        $types = [];
+
+        if (is_object($additionalProperties)) {
+            $types = array_merge($types, $this->typeDecisionManager->resolveType($additionalProperties)->getPhpTypes($additionalProperties, $name, $context));
+        }
+
+        if (is_object($patternProperties)) {
+            foreach ($patternProperties as $patternSchema) {
+                $types = array_merge($types, $this->typeDecisionManager->resolveType($patternSchema)->getPhpTypes($patternSchema, $name, $context));
+            }
+        }
+
         $types = array_map(function ($type) {
             return $type.'[]';
         }, $types);

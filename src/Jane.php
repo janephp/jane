@@ -56,7 +56,7 @@ class Jane
         $encoders       = [new JsonEncoder(new JsonEncode(), new JsonDecode(false))];
         $normalizers    = [new JsonSchemaNormalizer()];
         $serializer     = new Serializer($normalizers, $encoders);
-        $typeDecision   = TypeDecisionManager::build();
+        $typeDecision   = TypeDecisionManager::build($serializer);
         $modelGenerator = new ModelGenerator($typeDecision);
         $normGenerator  = new NormalizerGenerator($typeDecision);
 

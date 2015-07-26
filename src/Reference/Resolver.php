@@ -4,39 +4,105 @@ namespace Joli\Jane\Reference;
 
 use Joli\Jane\Model\JsonSchema;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Serializer\Serializer;
 
 class Resolver
 {
+    private $schemaCache = [];
+
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    public function __construct(Serializer $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
     /**
      * Resolve a JSON Reference for a Schema
      *
      * @param Reference $reference
-     * @param JsonSchema $root
      *
      * @throws UnsupportedException
      *
      * @return mixed Return the json value (deserialized) referenced
      */
-    public function resolve(Reference $reference, JsonSchema $root)
+    public function resolve(Reference $reference)
     {
-        if (!$reference->isInCurrentDocument() || !$reference->hasFragment()) {
-            throw new UnsupportedException(sprintf("Only json pointer to the current document is supported at this time, %s given", $reference->getReference()));
+        $referencedSchema = $this->resolveSchema($reference, $reference->getCurrentSchema());
+
+        if ($reference->hasFragment()) {
+            $schema = $this->resolveJSONPointer($reference->getFragment(), $referencedSchema);
+        } else {
+            $schema = $referencedSchema;
         }
 
-        return $this->resolveJSONPointer($reference->getFragment(), $root);
+        if ($schema instanceof Reference) {
+            return $this->resolve($schema, $referencedSchema);
+        }
+
+        return $schema;
     }
+
+    /**
+     * Resolve JSON Schema for the reference
+     *
+     * @param Reference $reference
+     * @param JsonSchema $currentSchema
+     *
+     * @throws UnsupportedException
+     *
+     * @return JsonSchema Return the json schema referenced
+     */
+    protected function resolveSchema(Reference $reference, JsonSchema $currentSchema)
+    {
+        if ($reference->isRelative() && !$currentSchema->getId()) {
+            throw new UnsupportedException(sprintf("Reference is relative and no id found in current schema, cannot resolve reference %s", $reference->getReference()));
+        }
+
+        if ($reference->isInCurrentDocument() && $reference->hasFragment()) {
+            return $currentSchema;
+        }
+
+        // Build url
+        $schemaUrl = sprintf('%s://%s:%s', $reference->getScheme() ?: 'http', $reference->getHost(), $reference->getPort() ?: '80');
+
+        if ($reference->isRelative()) {
+            $parsedUrl = parse_url($currentSchema->getId());
+            $schemaUrl = sprintf('%s://%s:%s', $parsedUrl['scheme'] ?: 'http', $parsedUrl['host'], $parsedUrl['port'] ?: '80');
+        }
+
+        if ($reference->getPath()) {
+            $schemaUrl = sprintf("%s/%s", $schemaUrl, $reference->getPath());
+        }
+
+        if ($reference->getQuery()) {
+            $schemaUrl = sprintf("%s?%s", $schemaUrl, $reference->getQuery());
+        }
+
+        if (!isset($this->schemaCache[$schemaUrl])) {
+            $schema = $this->serializer->deserialize($this->getJsonSchemaContent($schemaUrl), JsonSchema::class, 'json');
+
+            $this->schemaCache[$schemaUrl] = $schema;
+        }
+
+        return $this->schemaCache[$schemaUrl];
+    }
+
     /**
      * Resolve a JSON Pointer for a Schema
      *
      * @param string $pointer
-     * @param JsonSchema $root
+     * @param JsonSchema $schema
      *
      * @return mixed Return the json value (deserialized) referenced
      */
-    protected function resolveJSONPointer($pointer, JsonSchema $root)
+    protected function resolveJSONPointer($pointer, JsonSchema $schema)
     {
         if (empty($pointer)) {
-            return $root;
+            return $schema;
         }
 
         // Separate pointer into tokens
@@ -54,7 +120,12 @@ class Resolver
         $propertyPath     = implode(".", $tokens);
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-        return $propertyAccessor->getValue($root, $propertyPath);
+        return $propertyAccessor->getValue($schema, $propertyPath);
+    }
+
+    private function getJsonSchemaContent($schemaUrl)
+    {
+        return file_get_contents($schemaUrl);
     }
 }
  

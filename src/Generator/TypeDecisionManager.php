@@ -17,6 +17,7 @@ use Joli\Jane\Generator\Type\UndefinedType;
 use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Model\JsonSchema;
+use Symfony\Component\Serializer\Serializer;
 
 class TypeDecisionManager
 {
@@ -53,7 +54,7 @@ class TypeDecisionManager
         return null;
     }
 
-    public static function build()
+    public static function build(Serializer $serializer)
     {
         $typeDecision = new self();
 
@@ -66,7 +67,7 @@ class TypeDecisionManager
         $typeDecision->addType(new ArrayType($typeDecision));
         $typeDecision->addType(new ArrayObjectType($typeDecision));
         $typeDecision->addType(new ObjectType($typeDecision));
-        $typeDecision->addType(new ReferenceType(new Resolver(), $typeDecision));
+        $typeDecision->addType(new ReferenceType(new Resolver($serializer), $typeDecision));
         $typeDecision->addType(new UndefinedType($typeDecision));
 
         return $typeDecision;

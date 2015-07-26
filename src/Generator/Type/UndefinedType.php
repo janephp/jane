@@ -46,7 +46,7 @@ class UndefinedType extends AbstractType
     public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
     {
         if ($schema->getAnyOf() === null && $schema->getAllOf() === null && $schema->getOneOf() === null) {
-            return parent::generateDenormalizationLine($schema, $name, $context);
+            return parent::generateDenormalizationLine($schema, $name, $context, $mode);
         }
 
         $rawValue = $mode == self::SET_OBJECT ? sprintf("\$data->{'%s'}", $name) : '$value';

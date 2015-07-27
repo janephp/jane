@@ -34,7 +34,7 @@ class Resolver
         $referencedSchema = $this->resolveSchema($reference, $reference->getCurrentSchema());
 
         if ($reference->hasFragment()) {
-            $schema = $this->resolveJSONPointer($reference->getFragment(), $referencedSchema);
+            $schema = $this->resolveJSONPointer($reference, $referencedSchema);
         } else {
             $schema = $referencedSchema;
         }
@@ -58,12 +58,12 @@ class Resolver
      */
     protected function resolveSchema(Reference $reference, JsonSchema $currentSchema)
     {
-        if ($reference->isRelative() && !$currentSchema->getId()) {
-            throw new UnsupportedException(sprintf("Reference is relative and no id found in current schema, cannot resolve reference %s", $reference->getReference()));
-        }
-
         if ($reference->isInCurrentDocument() && $reference->hasFragment()) {
             return $currentSchema;
+        }
+
+        if ($reference->isRelative() && !$currentSchema->getId()) {
+            throw new UnsupportedException(sprintf("Reference is relative and no id found in current schema, cannot resolve reference %s", $reference->getReference()));
         }
 
         // Build url
@@ -94,13 +94,15 @@ class Resolver
     /**
      * Resolve a JSON Pointer for a Schema
      *
-     * @param string $pointer
+     * @param Reference  $reference
      * @param JsonSchema $schema
      *
      * @return mixed Return the json value (deserialized) referenced
      */
-    protected function resolveJSONPointer($pointer, JsonSchema $schema)
+    protected function resolveJSONPointer(Reference $reference, JsonSchema $schema)
     {
+        $pointer = $reference->getFragment();
+
         if (empty($pointer)) {
             return $schema;
         }

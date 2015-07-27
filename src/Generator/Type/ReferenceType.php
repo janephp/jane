@@ -49,6 +49,10 @@ class ReferenceType extends AbstractType
         $newSchema = $this->resolver->resolve($schema, $context->getRootSchema());
 
         if ($context->getSchemaObjectMap()->hasSchema($newSchema)) {
+            if (!$context->getSchemaObjectNormalizerMap()->hasSchema($newSchema)) {
+                $this->typeDecisionManager->resolveType($newSchema)->generateNormalizer($newSchema, $context->getSchemaObjectMap()->getObject($newSchema)->getName(), $context);
+            }
+
             return parent::generateDenormalizationLine($schema, $name, $context, $mode);
         }
 
@@ -60,16 +64,12 @@ class ReferenceType extends AbstractType
      */
     public function getDenormalizationValuePattern($schema, $name, Context $context)
     {
-        $schema = $this->resolver->resolve($schema, $context->getRootSchema());
+        $schema = $this->resolver->resolve($schema);
 
         if ($context->getSchemaObjectMap()->hasSchema($schema)) {
-            if (!$context->getSchemaObjectNormalizerMap()->hasSchema($schema)) {
-                $this->typeDecisionManager->resolveType($schema)->generateNormalizer($schema, $context->getSchemaObjectMap()->getObject($schema)->getName(), $context);
-            }
-
             $fqdn = "\\" . $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName();
 
-            return sprintf('$this->serializer->denormalize(%%s, \'%s\', \'json\', $context)', $fqdn);
+            return sprintf('$this->normalizerChain->denormalize(%%s, \'%s\', \'json\', $context)', $fqdn);
         }
 
         return $this->typeDecisionManager->resolveType($schema)->getDenormalizationValuePattern($schema, $name, $context);

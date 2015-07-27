@@ -54,7 +54,7 @@ class ObjectType extends AbstractType
             }
         }
 
-        if ($schema->getAdditionalProperties()) {
+        if ($schema->getAdditionalProperties() || is_array($schema->getPatternProperties())) {
             $object->extend(new Object('\\ArrayObject'));
         }
 
@@ -76,12 +76,11 @@ class ObjectType extends AbstractType
         $object = Object::make($context->getNamespace() . "\\Normalizer\\". ucfirst($name).'Normalizer');
         $context->getSchemaObjectNormalizerMap()->addSchemaObject($schema, $object);
         $object->implement(Contract::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
-        $object->implement(Contract::make('Symfony\Component\Serializer\SerializerAwareInterface'));
-        $object->addProperty(Property::make('serializer'));
+        $object->addProperty(Property::make('normalizerChain'));
         $object->addMethod(
-            Method::make('setSerializer')
-                ->addArgument(Argument::make('Symfony\Component\Serializer\SerializerInterface', 'serializer'))
-                ->setBody('        $this->serializer = $serializer;')
+            Method::make('setNormalizerChain')
+                ->addArgument(Argument::make($context->getNamespace() . "\\Normalizer\\NormalizerChain", 'normalizerChain'))
+                ->setBody('        $this->normalizerChain = $normalizerChain;')
         );
 
         $denormalizeMethod = Method::make('denormalize')
@@ -160,6 +159,10 @@ EOC
             , $key, $subType->generateDenormalizationLine($property, $key, $context));
         }
 
+        if ($schema->getPatternProperties()) {
+
+        }
+
         $lines[] = sprintf(<<<EOC
         return \$object;
 EOC
@@ -171,8 +174,7 @@ EOC
         $schemaFile->setStructure($object);
         $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Joli\Jane\Reference\Reference'));
         $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\SerializerAwareInterface'));
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\SerializerInterface'));
+        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make($context->getNamespace() . "\\Normalizer\\NormalizerChain"));
 
         $context->addFile($schemaFile);
     }

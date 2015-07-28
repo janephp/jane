@@ -1,5 +1,5 @@
 {
-    "name": "jolicode/jane",
+    "name": "jane/jane",
     "description": "Generate a serializable / deserializable object model given a json schema",
     "license": "MIT",
     "authors": [
@@ -25,7 +25,6 @@
         "fabpot/php-cs-fixer": "^1.10"
     },
     "require-dev": {
-        "phpspec/phpspec": "^2.2",
         "phpunit/phpunit": "^4.7"
     }
 }

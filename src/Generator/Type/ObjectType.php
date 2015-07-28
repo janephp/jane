@@ -160,7 +160,6 @@ EOC
         }
 
         if ($schema->getPatternProperties()) {
-
         }
 
         $lines[] = sprintf(<<<EOC

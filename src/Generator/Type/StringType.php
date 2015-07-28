@@ -30,4 +30,3 @@ class StringType extends SimpleType
         return 'is_string(%s)';
     }
 }
- 

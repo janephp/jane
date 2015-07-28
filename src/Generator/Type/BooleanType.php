@@ -30,4 +30,3 @@ class BooleanType extends SimpleType
         return 'is_bool(%s)';
     }
 }
- 

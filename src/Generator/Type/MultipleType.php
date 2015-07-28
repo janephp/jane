@@ -72,4 +72,3 @@ class MultipleType extends AbstractType
         return $types;
     }
 }
- 

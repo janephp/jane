@@ -30,4 +30,3 @@ class NullType extends SimpleType
         return 'is_null(%s)';
     }
 }
- 

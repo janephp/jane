@@ -49,4 +49,3 @@ class SchemaObjectMap
         return $this->references;
     }
 }
- 

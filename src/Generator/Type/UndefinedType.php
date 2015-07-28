@@ -60,8 +60,7 @@ class UndefinedType extends AbstractType
             }
 
 EOC
-                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode))
-                    , $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
+                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode)), $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
                 );
             }
         }
@@ -74,8 +73,7 @@ EOC
             }
 
 EOC
-                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode))
-                    , $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
+                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode)), $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
                 );
             }
         }
@@ -88,8 +86,7 @@ EOC
             }
 
 EOC
-                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode))
-                    , $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
+                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode)), $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
                 );
             }
         }
@@ -137,4 +134,3 @@ EOC
         return $types;
     }
 }
- 

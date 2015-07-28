@@ -8,7 +8,6 @@ use Joli\Jane\Generator\NormalizerGenerator;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Normalizer\NormalizerChain;
-
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;

@@ -1,6 +1,7 @@
 <?php
 
 namespace Joli\Jane\Reference;
+
 use Joli\Jane\Model\JsonSchema;
 
 /**
@@ -165,4 +166,3 @@ class Reference
         return $this->currentSchema;
     }
 }
- 

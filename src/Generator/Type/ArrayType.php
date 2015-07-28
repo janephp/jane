@@ -60,8 +60,7 @@ EOC
                 }
 
 EOC
-                , $this->typeDecisionManager->resolveType($item)->getRawCheck($item, $name, $context)
-                , sprintf(
+                , $this->typeDecisionManager->resolveType($item)->getRawCheck($item, $name, $context), sprintf(
                     $this->typeDecisionManager->resolveType($item)->getDenormalizationValuePattern($item, $name, $context),
                     '$value'
                 ));

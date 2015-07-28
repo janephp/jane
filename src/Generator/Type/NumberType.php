@@ -30,4 +30,3 @@ class NumberType extends SimpleType
         return 'is_float(%s)';
     }
 }
- 

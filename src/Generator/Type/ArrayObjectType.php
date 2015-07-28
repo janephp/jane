@@ -62,8 +62,7 @@ EOC
                 }
 
 EOC
-                , str_replace('/', '\\/', $pattern)
-                , $this->typeDecisionManager->resolveType($schema)->generateDenormalizationLine($schema, $name, $context, TypeInterface::SET_ARRAY));
+                , str_replace('/', '\\/', $pattern), $this->typeDecisionManager->resolveType($schema)->generateDenormalizationLine($schema, $name, $context, TypeInterface::SET_ARRAY));
             }
         }
 
@@ -144,6 +143,4 @@ EOC
 
         return $types;
     }
-
 }
- 

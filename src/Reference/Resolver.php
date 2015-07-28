@@ -130,4 +130,3 @@ class Resolver
         return file_get_contents($schemaUrl);
     }
 }
- 

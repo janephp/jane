@@ -110,4 +110,3 @@ interface TypeInterface
      */
     public function getPhpTypes($schema, $name, Context $context);
 }
- 

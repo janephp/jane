@@ -18,4 +18,3 @@ interface GeneratorInterface
      */
     public function generate(JsonSchema $schema, $className, Context $context);
 }
- 

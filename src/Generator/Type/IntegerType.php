@@ -30,4 +30,3 @@ class IntegerType extends SimpleType
         return 'is_int(%s)';
     }
 }
- 

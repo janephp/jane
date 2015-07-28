@@ -17,7 +17,7 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Unique test with ~100% coverage, library generated from json schema must be the same as the library used
+     * Unique test with ~70% coverage, library generated from json schema must be the same as the library used
      */
     public function testLibrary()
     {

@@ -85,9 +85,7 @@ abstract class AbstractType implements TypeInterface
 
         if ($mode == TypeInterface::SET_OBJECT) {
             return sprintf(
-                "\$object->set%s(%s);"
-                , ucfirst($propertyName)
-                , sprintf(
+                "\$object->set%s(%s);", ucfirst($propertyName), sprintf(
                     $this->getDenormalizationValuePattern($schema, $name, $context),
                     sprintf("\$data->{'%s'}", $name)
                 )
@@ -96,8 +94,7 @@ abstract class AbstractType implements TypeInterface
 
         if ($name === null) {
             return sprintf(
-                "\$values[] = %s;"
-                , sprintf(
+                "\$values[] = %s;", sprintf(
                     $this->getDenormalizationValuePattern($schema, $name, $context),
                     sprintf("\$value", $name)
                 )
@@ -105,8 +102,7 @@ abstract class AbstractType implements TypeInterface
         }
 
         return sprintf(
-            "\$values[\$key] = %s;"
-            , sprintf(
+            "\$values[\$key] = %s;", sprintf(
                 $this->getDenormalizationValuePattern($schema, $name, $context),
                 sprintf("\$value", $name)
             )
@@ -162,4 +158,3 @@ abstract class AbstractType implements TypeInterface
         return $type;
     }
 }
- 

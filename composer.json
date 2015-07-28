@@ -11,7 +11,7 @@
     "autoload": {
         "psr-4": {
             "Joli\\Jane\\": "src/",
-            "Joli\\Jane\\Tests": "tests/"
+            "Joli\\Jane\\Tests\\": "tests/"
         }
     },
     "config": {

@@ -20,7 +20,8 @@
         "symfony/yaml": "^2.7",
         "symfony/serializer": "^2.7",
         "symfony/property-access": "^2.7",
-        "memio/memio": "^1.1"
+        "memio/memio": "^1.1",
+        "fabpot/php-cs-fixer": "^1.10"
     },
     "require-dev": {
         "phpspec/phpspec": "^2.2"

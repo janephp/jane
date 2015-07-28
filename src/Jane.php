@@ -14,6 +14,9 @@ use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\CS\Config\Config;
+use Symfony\CS\ConfigurationResolver;
+use Symfony\CS\Fixer;
 
 class Jane
 {
@@ -23,11 +26,14 @@ class Jane
 
     private $normalizerGenerator;
 
-    public function __construct(Serializer $serializer, ModelGenerator $modelGenerator, NormalizerGenerator $normalizerGenerator)
+    private $fixer;
+
+    public function __construct(Serializer $serializer, ModelGenerator $modelGenerator, NormalizerGenerator $normalizerGenerator, Fixer $fixer = null)
     {
         $this->serializer          = $serializer;
         $this->modelGenerator      = $modelGenerator;
         $this->normalizerGenerator = $normalizerGenerator;
+        $this->fixer               = $fixer;
     }
 
 
@@ -49,6 +55,24 @@ class Jane
         foreach ($normalizerFiles as $file) {
             file_put_contents($file->getFilename(), $prettyPrinter->generateCode($file));
         }
+
+        if ($this->fixer !== null) {
+            $config = new Config();
+            $config->setDir($directory);
+
+            $resolver = new ConfigurationResolver();
+            $resolver
+                ->setAllFixers($this->fixer->getFixers())
+                ->setConfig($config)
+                ->setOptions(array(
+                    'level' => 'psr2'
+                ))
+                ->resolve();
+
+            $config->fixers($resolver->getFixers());
+
+            $this->fixer->fix($config);
+        }
     }
 
     public static function build()
@@ -59,8 +83,9 @@ class Jane
         $typeDecision   = TypeDecisionManager::build($serializer);
         $modelGenerator = new ModelGenerator($typeDecision);
         $normGenerator  = new NormalizerGenerator($typeDecision);
+        $fixer          = new Fixer();
+        $fixer->registerBuiltInFixers();
 
-        return new self($serializer, $modelGenerator, $normGenerator);
+        return new self($serializer, $modelGenerator, $normGenerator, $fixer);
     }
 }
- 

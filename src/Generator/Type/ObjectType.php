@@ -215,4 +215,3 @@ EOC
         return ["\\". $context->getNamespace()."\\".ucfirst($name)];
     }
 }
- 

@@ -6,10 +6,9 @@ use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\ModelGenerator;
 use Joli\Jane\Generator\NormalizerGenerator;
 use Joli\Jane\Generator\TypeDecisionManager;
-use Joli\Jane\Normalizer\JsonSchemaDenormalizer;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Normalizer\NormalizerChain;
 
-use Joli\Jane\Normalizer\JsonSchemaNormalizer;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -48,6 +47,14 @@ class Jane
         $prettyPrinter = \Memio\Memio\Config\Build::prettyPrinter();
         $prettyPrinter->addTemplatePath(__DIR__ . '/../resources/templates');
 
+        if (!file_exists(($directory . DIRECTORY_SEPARATOR . 'Model'))) {
+            mkdir($directory . DIRECTORY_SEPARATOR . 'Model', 0755, true);
+        }
+
+        if (!file_exists(($directory . DIRECTORY_SEPARATOR . 'Normalizer'))) {
+            mkdir($directory . DIRECTORY_SEPARATOR . 'Normalizer', 0755, true);
+        }
+
         foreach ($modelFiles as $file) {
             file_put_contents($file->getFilename(), $prettyPrinter->generateCode($file));
         }
@@ -78,7 +85,7 @@ class Jane
     public static function build()
     {
         $encoders       = [new JsonEncoder(new JsonEncode(), new JsonDecode(false))];
-        $normalizers    = [new JsonSchemaNormalizer()];
+        $normalizers    = [NormalizerChain::build()];
         $serializer     = new Serializer($normalizers, $encoders);
         $typeDecision   = TypeDecisionManager::build($serializer);
         $modelGenerator = new ModelGenerator($typeDecision);

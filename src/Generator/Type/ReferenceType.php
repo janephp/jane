@@ -67,7 +67,7 @@ class ReferenceType extends AbstractType
         $schema = $this->resolver->resolve($schema);
 
         if ($context->getSchemaObjectMap()->hasSchema($schema)) {
-            $fqdn = "\\" . $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName();
+            $fqdn = $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName();
 
             return sprintf('$this->normalizerChain->denormalize(%%s, \'%s\', \'json\', $context)', $fqdn);
         }
@@ -99,4 +99,3 @@ class ReferenceType extends AbstractType
         return $this->typeDecisionManager->resolveType($newSchema)->getPhpTypes($newSchema, $name, $context);
     }
 }
- 

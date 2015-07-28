@@ -577,7 +577,7 @@ class JsonSchema
     }
 
     /**
-     * @param Schema[]|string[][] $dependencies
+     * @param JsonSchema[]|string[][] $dependencies
      */
     public function setDependencies($dependencies)
     {

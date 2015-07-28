@@ -68,7 +68,7 @@ EOC
             ->setBody(sprintf(<<<EOC
         foreach (\$this->normalizers as \$normalizer) {
             if (\$normalizer->supportsDenormalization(\$data, \$class, \$format)) {
-                return \$this->denormalizer(\$data, \$class, \$format, \$context);
+                return \$normalizer->denormalize(\$data, \$class, \$format, \$context);
             }
         }
 
@@ -135,4 +135,3 @@ EOC
         return $context->getFiles();
     }
 }
- 

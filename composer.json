@@ -10,7 +10,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "Joli\\Jane\\": "src/"
+            "Joli\\Jane\\": "src/",
+            "Joli\\Jane\\Tests": "tests/"
         }
     },
     "config": {
@@ -24,6 +25,7 @@
         "fabpot/php-cs-fixer": "^1.10"
     },
     "require-dev": {
-        "phpspec/phpspec": "^2.2"
+        "phpspec/phpspec": "^2.2",
+        "phpunit/phpunit": "^4.7"
     }
 }

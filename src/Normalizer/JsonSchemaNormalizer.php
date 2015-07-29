@@ -26,7 +26,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         if (empty($data)) {
-            return;
+            return null;
         }
         if (isset($data->{'$ref'})) {
             return new Reference($data->{'$ref'}, $context['rootSchema'] ?: null);
@@ -70,7 +70,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
         }
         if (isset($data->{'minLength'})) {
             $value = null;
-            if (is_array($data->{'minLength'})) {
+            if (is_int($data->{'minLength'})) {
                 $value = $data->{'minLength'};
             }
             if (isset($data->{'minLength'})) {
@@ -110,7 +110,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
         }
         if (isset($data->{'minItems'})) {
             $value_3 = null;
-            if (is_array($data->{'minItems'})) {
+            if (is_int($data->{'minItems'})) {
                 $value_3 = $data->{'minItems'};
             }
             if (isset($data->{'minItems'})) {
@@ -126,7 +126,7 @@ class JsonSchemaNormalizer implements DenormalizerInterface
         }
         if (isset($data->{'minProperties'})) {
             $value_4 = null;
-            if (is_array($data->{'minProperties'})) {
+            if (is_int($data->{'minProperties'})) {
                 $value_4 = $data->{'minProperties'};
             }
             if (isset($data->{'minProperties'})) {

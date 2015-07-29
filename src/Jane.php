@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\CS\Config\Config;
 use Symfony\CS\ConfigurationResolver;
 use Symfony\CS\Fixer;
+use Symfony\CS\FixerInterface;
 
 class Jane
 {
@@ -64,17 +65,17 @@ class Jane
         if ($this->fixer !== null) {
             $config = new Config();
             $config->setDir($directory);
+            $config->level(FixerInterface::PSR0_LEVEL | FixerInterface::PSR1_LEVEL | FixerInterface::PSR2_LEVEL);
 
             $resolver = new ConfigurationResolver();
             $resolver
                 ->setAllFixers($this->fixer->getFixers())
                 ->setConfig($config)
-                ->setOptions(array(
-                    'level' => 'symfony'
-                ))
                 ->resolve();
 
-            $config->fixers($resolver->getFixers());
+            $config->fixers(array_merge($resolver->getFixers(), [
+                new Fixer\Symfony\ReturnFixer()
+            ]));
 
             $this->fixer->fix($config);
         }

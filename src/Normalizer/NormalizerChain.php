@@ -20,7 +20,7 @@ class NormalizerChain implements DenormalizerInterface
             }
         }
 
-        return;
+        return null;
     }
     public function supportsDenormalization($data, $type, $format = null)
     {

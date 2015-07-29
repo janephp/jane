@@ -30,6 +30,6 @@ class IntegerType extends SimpleType
      */
     public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return new Expr\FuncCall(new Name('is_array'), [new Arg($input)]);
+        return new Expr\FuncCall(new Name('is_int'), [new Arg($input)]);
     }
 }

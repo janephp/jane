@@ -24,7 +24,7 @@ class ModelGenerator implements GeneratorInterface
      * @param string  $className  Class to generate
      * @param Context $context    Context for generation
      *
-     * @return \Memio\Model\File[]
+     * @return File[]
      */
     public function generate(JsonSchema $schema, $className, Context $context)
     {

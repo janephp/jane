@@ -6,6 +6,11 @@ use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
 
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
+
 class ArrayType extends AbstractType
 {
     /**
@@ -35,70 +40,58 @@ class ArrayType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
         $items = $schema->getItems();
 
         if ($items === null) {
-            return parent::generateDenormalizationLine($schema, $name, $context);
+            return parent::getDenormalizationStmt($schema, $name, $context, $input);
         }
 
-        $propertyName = $this->encodePropertyName($name);
+        $valuesVar     = new Expr\Variable($context->getUniqueVariableName('values'));
+        $statements    = [
+            // $values = [];
+            new Expr\Assign($valuesVar, new Expr\Array_()),
+        ];
+
+        $loopStatements = [];
+        $loopValueVar   = new Expr\Variable($context->getUniqueVariableName('value'));
 
         if (is_array($items)) {
-            $lines = [sprintf(<<<EOC
-            \$values = [];
-
-            foreach (\$data->{'%s'} as \$value) {
-EOC
-            , $name)];
-
             foreach ($items as $item) {
-                $lines[] = sprintf(<<<EOC
-                if (%s) {
-                    \$values[] = %s;
-                }
+                list($subStatements, $outputExpr) = $this->typeDecisionManager->resolveType($item)->getDenormalizationStmt($item, $name, $context, $loopValueVar);
 
-EOC
-                , $this->typeDecisionManager->resolveType($item)->getRawCheck($item, $name, $context), sprintf(
-                    $this->typeDecisionManager->resolveType($item)->getDenormalizationValuePattern($item, $name, $context),
-                    '$value'
-                ));
+                $loopStatements[] = new Stmt\If_(
+                    $this->typeDecisionManager->resolveType($item)->getDenormalizationIfStmt($item, $name, $context, $loopValueVar),
+                    [
+                        'stmts' => [
+                            $subStatements,
+                            new Expr\Assign(new Expr\ArrayDimFetch($valuesVar), $outputExpr),
+                            new Stmt\Continue_()
+                        ]
+                    ]
+                );
             }
+        } else {
+            list($subStatements, $outputExpr) = $this->typeDecisionManager->resolveType($items)->getDenormalizationStmt($items, $name, $context, $loopValueVar);
 
-            $lines[] = sprintf(<<<EOC
-            }
-
-            \$object->set%s(\$values);
-
-EOC
-            , ucfirst($propertyName));
-
-            return implode("\n", $lines);
+            $loopStatements = array_merge($loopStatements, $subStatements);
+            $loopStatements[] = new Expr\Assign(new Expr\ArrayDimFetch($valuesVar), $outputExpr);
         }
 
-        return sprintf(<<<EOC
-            \$values = [];
+        $statements[] = new Stmt\Foreach_($input, $loopValueVar, [
+            'stmts'  => $loopStatements
+        ]);
 
-            foreach (\$data->{'%s'} as \$value) {
-                \$values[] = %s;
-            }
-
-            \$object->set%s(\$values);
-
-EOC
-        , $name, sprintf(
-            $this->typeDecisionManager->resolveType($items)->getDenormalizationValuePattern($items, $name, $context),
-            '$value'
-        ), ucfirst($propertyName));
+        return [$statements, $valuesVar];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return 'is_array(%s)';
+        return new Expr\FuncCall(new Name('is_array'), [new Arg($input)]);
     }
 
     /**

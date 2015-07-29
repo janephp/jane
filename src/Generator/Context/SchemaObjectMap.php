@@ -3,7 +3,7 @@
 namespace Joli\Jane\Generator\Context;
 
 use Joli\Jane\Model\JsonSchema;
-use Memio\Model\Object;
+use PhpParser\Builder\Class_;
 
 class SchemaObjectMap
 {
@@ -13,10 +13,10 @@ class SchemaObjectMap
     private $references;
 
     /**
-     * @param JsonSchema          $schema
-     * @param \Memio\Model\Object $object
+     * @param JsonSchema  $schema
+     * @param string      $object
      */
-    public function addSchemaObject(JsonSchema $schema, Object $object)
+    public function addSchemaObject(JsonSchema $schema, $object)
     {
         $this->references[spl_object_hash($schema)] = $object;
     }
@@ -34,7 +34,7 @@ class SchemaObjectMap
     /**
      * @param JsonSchema $schema
      *
-     * @return \Memio\Model\Object
+     * @return string
      */
     public function getObject(JsonSchema $schema)
     {
@@ -42,7 +42,7 @@ class SchemaObjectMap
     }
 
     /**
-     * @return \Object[]
+     * @return Class_[]
      */
     public function getReferences()
     {

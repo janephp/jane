@@ -5,6 +5,7 @@ namespace Joli\Jane\Generator\Type;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
+use PhpParser\Node\Expr;
 
 class MultipleType extends AbstractType
 {
@@ -43,17 +44,22 @@ class MultipleType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        $check = [];
+        $ifStmt     = null;
         $fakeSchema = new JsonSchema();
 
         foreach ($schema->getType() as $type) {
             $fakeSchema->setType($type);
-            $check[] = $this->typeDecisionManager->resolveType($fakeSchema)->getRawCheck($fakeSchema, $name, $context);
+
+            if ($ifStmt === null) {
+                $ifStmt = $this->typeDecisionManager->resolveType($fakeSchema)->getDenormalizationIfStmt($fakeSchema, $name, $context, $input);
+            } else {
+                $ifStmt = new Expr\BinaryOp\LogicalOr($ifStmt, $this->typeDecisionManager->resolveType($fakeSchema)->getDenormalizationIfStmt($fakeSchema, $name, $context, $input));
+            }
         }
 
-        return implode(' || ', $check);
+        return $ifStmt;
     }
 
     /**

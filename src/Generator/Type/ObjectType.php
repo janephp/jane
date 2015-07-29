@@ -3,15 +3,16 @@
 namespace Joli\Jane\Generator\Type;
 
 use Joli\Jane\Generator\Context\Context;
+use Joli\Jane\Generator\File;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
-use Memio\Model\Argument;
-use Memio\Model\Contract;
-use Memio\Model\File;
-use Memio\Model\FullyQualifiedName;
-use Memio\Model\Method;
-use Memio\Model\Object;
-use Memio\Model\Property;
+
+use PhpParser\BuilderFactory;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
+use PhpParser\Node\Scalar;
 
 class ObjectType extends AbstractType
 {
@@ -36,36 +37,33 @@ class ObjectType extends AbstractType
             }
         }
 
-        $object = Object::make($context->getNamespace() . "\\Model\\". ucfirst($name));
-        $context->getSchemaObjectMap()->addSchemaObject($schema, $object);
+        $factory  = new BuilderFactory();
+        $ast      = $factory->namespace($context->getNamespace() . '\Model');
+        $astClass = $factory->class(ucfirst($name));
+
+        $context->getSchemaObjectMap()->addSchemaObject($schema, ucfirst($name));
+
+        if ($schema->getAdditionalProperties() !== false || is_array($schema->getPatternProperties())) {
+            $astClass->extend('\ArrayObject');
+        }
 
         if ($schema->getProperties() !== null) {
             foreach ($schema->getProperties() as $key => $property) {
-                $subType = $this->typeDecisionManager->resolveType($property);
-                $propGenerated = $subType->generateProperty($property, $key, $context);
+                $subType       = $this->typeDecisionManager->resolveType($property);
+                $propertyExpr  = $subType->getProperty($property, $key, $context);
 
-                if ($propGenerated instanceof Property) {
-                    $object->addProperty($propGenerated);
+                if ($propertyExpr !== null) {
+                    $astClass->addStmt($propertyExpr);
                 }
 
-                foreach ($subType->generateMethods($property, $key, $context) as $method) {
-                    $object->addMethod($method);
+                foreach ($subType->getMethods($property, $key, $context) as $method) {
+                    $astClass->addStmt($method);
                 }
             }
         }
 
-        if ($schema->getAdditionalProperties() || is_array($schema->getPatternProperties())) {
-            $object->extend(new Object('\\ArrayObject'));
-        }
-
-        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Model' . DIRECTORY_SEPARATOR . ucfirst($name) . '.php');
-        $schemaFile->setStructure($object);
-
-        if ($object->hasParent()) {
-            $schemaFile->addFullyQualifiedName(FullyQualifiedName::make($object->getParent()->getFullyQualifiedName()));
-        }
-
-        $context->addFile($schemaFile);
+        $ast->addStmt($astClass);
+        $context->addFile(new File($context->getDirectory() . '/Model/'.ucfirst($name).'.php', $ast->getNode()));
     }
 
     /**
@@ -73,129 +71,137 @@ class ObjectType extends AbstractType
      */
     public function generateNormalizer($schema, $name, Context $context)
     {
-        $object = Object::make($context->getNamespace() . "\\Normalizer\\". ucfirst($name).'Normalizer');
-        $context->getSchemaObjectNormalizerMap()->addSchemaObject($schema, $object);
-        $object->implement(Contract::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
-        $object->addProperty(Property::make('normalizerChain'));
-        $object->addMethod(
-            Method::make('setNormalizerChain')
-                ->addArgument(Argument::make($context->getNamespace() . "\\Normalizer\\NormalizerChain", 'normalizerChain'))
-                ->setBody('        $this->normalizerChain = $normalizerChain;')
-        );
+        $factory  = new BuilderFactory();
 
-        $denormalizeMethod = Method::make('denormalize')
-            ->addArgument(
-                Argument::make('mixed', 'data')
+        $context->getSchemaObjectNormalizerMap()->addSchemaObject($schema, ucfirst($name).'Normalizer');
+        $astClass = $factory->class(ucfirst($name).'Normalizer')
+            ->implement('DenormalizerInterface')
+            ->addStmt($factory->property('normalizerChain'))
+            ->addStmt(
+                $factory->method('setNormalizerChain')
+                    ->makePublic()
+                    ->addParam($factory->param('normalizerChain')->setTypeHint('NormalizerChain'))
+                    ->addStmt(
+                        new Expr\Assign(new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizerChain'), new Expr\Variable('normalizerChain'))
+                    )
             )
-            ->addArgument(
-                Argument::make('string', 'class')
-            )
-            ->addArgument(
-                Argument::make('string', 'format')
-                    ->setDefaultValue('null')
-            )
-            ->addArgument(
-                Argument::make('array', 'context')
-                    ->setDefaultValue('array()')
+            ->addStmt(
+                $factory->method('supportsDenormalization')
+                    ->makePublic()
+                    ->addParam($factory->param('data'))
+                    ->addParam($factory->param('type'))
+                    ->addParam($factory->param('format')->setDefault(null))
+                    ->addStmts([
+                            new Stmt\If_(
+                                new Expr\BinaryOp\NotIdentical(new Expr\Variable('type'), new Scalar\String_(sprintf('%s\\Model\\%s', $context->getNamespace(), ucfirst($name)))),
+                                [
+                                    'stmts' => [
+                                        new Stmt\Return_(new Expr\ConstFetch(new Name("false")))
+                                    ]
+                                ]
+                            ),
+                            new Stmt\If_(
+                                new Expr\BinaryOp\NotIdentical(new Expr\Variable('format'), new Scalar\String_('json')),
+                                [
+                                    'stmts' => [
+                                        new Stmt\Return_(new Expr\ConstFetch(new Name("false")))
+                                    ]
+                                ]
+                            ),
+                            new Stmt\Return_(new Expr\ConstFetch(new Name("true")))
+                        ]
+                    )
             )
         ;
 
-        $supportDenormalizationMethod = Method::make('supportsDenormalization')
-            ->addArgument(
-                Argument::make('mixed', 'data')
-            )
-            ->addArgument(
-                Argument::make('string', 'type')
-            )
-            ->addArgument(
-                Argument::make('string', 'format')
-                    ->setDefaultValue('null')
-            )
-            ->setBody(sprintf(<<<EOC
-        if (\$type !== '%s\\Model\\%s') {
-            return false;
-        }
-
-        if (\$format !== 'json') {
-            return false;
-        }
-
-        return true;
-EOC
-            , $context->getNamespace(), $name))
+        $denormalizeMethod = $factory->method('denormalize')
+            ->makePublic()
+            ->addParam($factory->param('data'))
+            ->addParam($factory->param('class'))
+            ->addParam($factory->param('format')->setDefault(null))
+            ->addParam($factory->param('context')->setDefault(array())->setTypeHint('array'))
         ;
 
-        $object->addMethod($denormalizeMethod);
-        $object->addMethod($supportDenormalizationMethod);
-        $lines    = [
-            sprintf(<<<EOC
-        if (empty(\$data)) {
-            return null;
-        }
-
-        if (isset(\$data->{'\$ref'})) {
-            return new Reference(\$data->{'\$ref'}, \$context['rootSchema'] ?: null);
-        }
-
-        \$object = new \\%s\\Model\\%s();
-
-        if (!isset(\$context['rootSchema'])) {
-            \$context['rootSchema'] = \$object;
-        }
-
-EOC
-            , $context->getNamespace(), ucfirst($name))
+        $objectVariable = new Expr\Variable('object');
+        $statements     = [
+            new Stmt\If_(
+                new Expr\Empty_(new Expr\Variable('data')),
+                [
+                    'stmts' => [
+                        new Stmt\Return_(new Expr\ConstFetch(new Name("null")))
+                    ]
+                ]
+            ),
+            new Stmt\If_(
+                new Expr\Isset_([new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}")]),
+                [
+                    'stmts' => [
+                        new Stmt\Return_(new Expr\New_(new Name('Reference'), [
+                            new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}"),
+                            new Expr\Ternary(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), null, new Expr\ConstFetch(new Name("null")))
+                        ]))
+                    ]
+                ]
+            ),
+            new Expr\Assign($objectVariable, new Expr\New_(new Name(sprintf('\\%s\\Model\\%s', $context->getNamespace(), ucfirst($name))))),
+            new Stmt\If_(
+                new Expr\BooleanNot(new Expr\Isset_([new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema'))])),
+                [
+                    'stmts' => [
+                        new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), $objectVariable)
+                    ]
+                ]
+            ),
         ];
 
         foreach ($schema->getProperties() as $key => $property) {
-            $subType  = $this->typeDecisionManager->resolveType($property);
-
-            $lines[] = sprintf(<<<EOC
-        if (isset(\$data->{'%s'})) {
-            %s
+            $propertyVar               = new Expr\PropertyFetch(new Expr\Variable('data'), sprintf("{'%s'}", $key));
+            list($ifStmts, $outputVar) = $this->typeDecisionManager->resolveType($property)->getDenormalizationStmt($property, $key, $context, $propertyVar);
+            $statements[]              = new Stmt\If_(
+                new Expr\Isset_([$propertyVar]),
+                [
+                    'stmts' => array_merge($ifStmts, [
+                        new Expr\MethodCall($objectVariable, 'set'.ucfirst($this->encodePropertyName($key)), [
+                            $outputVar
+                        ])
+                    ])
+                ]
+            );
         }
 
-EOC
-            , $key, $subType->generateDenormalizationLine($property, $key, $context));
-        }
+        $statements[] = new Stmt\Return_($objectVariable);
 
-        if ($schema->getPatternProperties()) {
-        }
+        $denormalizeMethod->addStmts($statements);
+        $astClass->addStmt($denormalizeMethod);
 
-        $lines[] = sprintf(<<<EOC
-        return \$object;
-EOC
-        );
+        $node = $factory->namespace($context->getNamespace() . '\\Normalizer')
+            ->addStmt($factory->use('Joli\Jane\Reference\Reference'))
+            ->addStmt($factory->use('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'))
+            ->addStmt($astClass)
+            ->getNode()
+        ;
 
-        $denormalizeMethod->setBody(implode("\n", $lines));
-
-        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Normalizer' . DIRECTORY_SEPARATOR . ucfirst($name) . 'Normalizer.php');
-        $schemaFile->setStructure($object);
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Joli\Jane\Reference\Reference'));
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make($context->getNamespace() . "\\Normalizer\\NormalizerChain"));
-
-        $context->addFile($schemaFile);
+        $context->addFile(new File($context->getDirectory() . DIRECTORY_SEPARATOR . 'Normalizer' . DIRECTORY_SEPARATOR . ucfirst($name) . 'Normalizer.php', $node));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
         if (!$context->getSchemaObjectNormalizerMap()->hasSchema($schema)) {
             $this->typeDecisionManager->resolveType($schema)->generateNormalizer($schema, $name, $context);
         }
 
-        return parent::generateDenormalizationLine($schema, $name, $context, $mode);
+        return parent::getDenormalizationStmt($schema, $name, $context, $input);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return 'is_object(%s)';
+        return new Expr\FuncCall(new Name('is_object'), [new Arg($input)]);
     }
 
     /**

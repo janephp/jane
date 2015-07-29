@@ -5,8 +5,9 @@ namespace Joli\Jane\Generator\Type;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Reference\Reference;
 use Joli\Jane\Model\JsonSchema;
-use Memio\Model\Method;
-use Memio\Model\Property;
+use PhpParser\Builder\Method;
+use PhpParser\Builder\Property;
+use PhpParser\Node\Expr;
 
 interface TypeInterface
 {
@@ -44,7 +45,7 @@ interface TypeInterface
      *
      * @return Property
      */
-    public function generateProperty($schema, $name, Context $context);
+    public function getProperty($schema, $name, Context $context);
 
     /**
      * Generate methods associated to this schema
@@ -55,7 +56,7 @@ interface TypeInterface
      *
      * @return Method[]
      */
-    public function generateMethods($schema, $name, Context $context);
+    public function getMethods($schema, $name, Context $context);
 
     /**
      * Generate line of code used in denormalization
@@ -63,32 +64,34 @@ interface TypeInterface
      * @param JsonSchema|Reference $schema
      * @param Context          $context
      * @param string $name
-     * @param integer $mode
+     * @param Expr $input
      *
-     * @return string
+     * @return [Expr[], Expr] Return an array of statement, and the output expression
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT);
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input);
 
     /**
      *
      * @param JsonSchema|Reference $schema
-     * @param Context          $context
      * @param string $name
+     * @param Context $context
+     * @param Expr $input
      *
      * @return string
      */
-    public function getDenormalizationValuePattern($schema, $name, Context $context);
+    public function getDenormalizationValueStmt($schema, $name, Context $context, Expr $input);
 
     /**
-     * Generate line of code used in denormalization
+     * Generate if statment when we must choose for this type in denormalization
      *
      * @param JsonSchema|Reference $schema
-     * @param Context          $context
      * @param string $name
+     * @param Context $context
+     * @param Expr $input
      *
-     * @return string
+     * @return Expr
      */
-    public function getRawCheck($schema, $name, Context $context);
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input);
 
     /**
      * Whether this schema is supported

@@ -1,173 +1,141 @@
 <?php
+
 namespace Joli\Jane\Model;
 
-class JsonSchema
+class JsonSchema extends \ArrayObject
 {
     /**
      * @var string
      */
     protected $id;
-
     /**
      * @var string
      */
     protected $dollarSchema;
-
     /**
      * @var string
      */
     protected $title;
-
     /**
      * @var string
      */
     protected $description;
-
     /**
      * @var mixed
      */
     protected $default;
-
     /**
      * @var float
      */
     protected $multipleOf;
-
     /**
      * @var float
      */
     protected $maximum;
-
     /**
      * @var bool
      */
     protected $exclusiveMaximum;
-
     /**
      * @var float
      */
     protected $minimum;
-
     /**
      * @var bool
      */
     protected $exclusiveMinimum;
-
     /**
      * @var int
      */
     protected $maxLength;
-
     /**
      * @var int|mixed
      */
     protected $minLength;
-
     /**
      * @var string
      */
     protected $pattern;
-
     /**
-     * @var bool|\Joli\Jane\Model\JsonSchema
+     * @var bool|JsonSchema
      */
     protected $additionalItems;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema|\Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema|JsonSchema[]
      */
     protected $items;
-
     /**
      * @var int
      */
     protected $maxItems;
-
     /**
      * @var int|mixed
      */
     protected $minItems;
-
     /**
      * @var bool
      */
     protected $uniqueItems;
-
     /**
      * @var int
      */
     protected $maxProperties;
-
     /**
      * @var int|mixed
      */
     protected $minProperties;
-
     /**
      * @var string[]
      */
     protected $required;
-
     /**
-     * @var bool|\Joli\Jane\Model\JsonSchema
+     * @var bool|JsonSchema
      */
     protected $additionalProperties;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema[]
      */
     protected $definitions;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema[]
      */
     protected $properties;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema[]
      */
     protected $patternProperties;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]|string[][]
+     * @var JsonSchema[]|string[][]
      */
     protected $dependencies;
-
     /**
      * @var array
      */
     protected $enum;
-
     /**
      * @var mixed|mixed[]
      */
     protected $type;
-
     /**
      * @var string
      */
     protected $format;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema[]
      */
     protected $allOf;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema[]
      */
     protected $anyOf;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema[]
+     * @var JsonSchema[]
      */
     protected $oneOf;
-
     /**
-     * @var \Joli\Jane\Model\JsonSchema
+     * @var JsonSchema
      */
     protected $not;
-
     /**
      * @return string
      */
@@ -175,15 +143,17 @@ class JsonSchema
     {
         return $this->id;
     }
-
     /**
      * @param string $id
+     *
+     * @return self
      */
-    public function setId($id)
+    public function setId($id = null)
     {
         $this->id = $id;
-    }
 
+        return $this;
+    }
     /**
      * @return string
      */
@@ -191,15 +161,17 @@ class JsonSchema
     {
         return $this->dollarSchema;
     }
-
     /**
      * @param string $dollarSchema
+     *
+     * @return self
      */
-    public function setDollarSchema($dollarSchema)
+    public function setDollarSchema($dollarSchema = null)
     {
         $this->dollarSchema = $dollarSchema;
-    }
 
+        return $this;
+    }
     /**
      * @return string
      */
@@ -207,15 +179,17 @@ class JsonSchema
     {
         return $this->title;
     }
-
     /**
      * @param string $title
+     *
+     * @return self
      */
-    public function setTitle($title)
+    public function setTitle($title = null)
     {
         $this->title = $title;
-    }
 
+        return $this;
+    }
     /**
      * @return string
      */
@@ -223,15 +197,17 @@ class JsonSchema
     {
         return $this->description;
     }
-
     /**
      * @param string $description
+     *
+     * @return self
      */
-    public function setDescription($description)
+    public function setDescription($description = null)
     {
         $this->description = $description;
-    }
 
+        return $this;
+    }
     /**
      * @return mixed
      */
@@ -239,15 +215,17 @@ class JsonSchema
     {
         return $this->default;
     }
-
     /**
      * @param mixed $default
+     *
+     * @return self
      */
-    public function setDefault($default)
+    public function setDefault($default = null)
     {
         $this->default = $default;
-    }
 
+        return $this;
+    }
     /**
      * @return float
      */
@@ -255,15 +233,17 @@ class JsonSchema
     {
         return $this->multipleOf;
     }
-
     /**
      * @param float $multipleOf
+     *
+     * @return self
      */
-    public function setMultipleOf($multipleOf)
+    public function setMultipleOf($multipleOf = null)
     {
         $this->multipleOf = $multipleOf;
-    }
 
+        return $this;
+    }
     /**
      * @return float
      */
@@ -271,15 +251,17 @@ class JsonSchema
     {
         return $this->maximum;
     }
-
     /**
      * @param float $maximum
+     *
+     * @return self
      */
-    public function setMaximum($maximum)
+    public function setMaximum($maximum = null)
     {
         $this->maximum = $maximum;
-    }
 
+        return $this;
+    }
     /**
      * @return bool
      */
@@ -287,15 +269,17 @@ class JsonSchema
     {
         return $this->exclusiveMaximum;
     }
-
     /**
      * @param bool $exclusiveMaximum
+     *
+     * @return self
      */
-    public function setExclusiveMaximum($exclusiveMaximum)
+    public function setExclusiveMaximum($exclusiveMaximum = null)
     {
         $this->exclusiveMaximum = $exclusiveMaximum;
-    }
 
+        return $this;
+    }
     /**
      * @return float
      */
@@ -303,15 +287,17 @@ class JsonSchema
     {
         return $this->minimum;
     }
-
     /**
      * @param float $minimum
+     *
+     * @return self
      */
-    public function setMinimum($minimum)
+    public function setMinimum($minimum = null)
     {
         $this->minimum = $minimum;
-    }
 
+        return $this;
+    }
     /**
      * @return bool
      */
@@ -319,15 +305,17 @@ class JsonSchema
     {
         return $this->exclusiveMinimum;
     }
-
     /**
      * @param bool $exclusiveMinimum
+     *
+     * @return self
      */
-    public function setExclusiveMinimum($exclusiveMinimum)
+    public function setExclusiveMinimum($exclusiveMinimum = null)
     {
         $this->exclusiveMinimum = $exclusiveMinimum;
-    }
 
+        return $this;
+    }
     /**
      * @return int
      */
@@ -335,15 +323,17 @@ class JsonSchema
     {
         return $this->maxLength;
     }
-
     /**
      * @param int $maxLength
+     *
+     * @return self
      */
-    public function setMaxLength($maxLength)
+    public function setMaxLength($maxLength = null)
     {
         $this->maxLength = $maxLength;
-    }
 
+        return $this;
+    }
     /**
      * @return int|mixed
      */
@@ -351,15 +341,17 @@ class JsonSchema
     {
         return $this->minLength;
     }
-
     /**
      * @param int|mixed $minLength
+     *
+     * @return self
      */
-    public function setMinLength($minLength)
+    public function setMinLength($minLength = null)
     {
         $this->minLength = $minLength;
-    }
 
+        return $this;
+    }
     /**
      * @return string
      */
@@ -367,47 +359,53 @@ class JsonSchema
     {
         return $this->pattern;
     }
-
     /**
      * @param string $pattern
+     *
+     * @return self
      */
-    public function setPattern($pattern)
+    public function setPattern($pattern = null)
     {
         $this->pattern = $pattern;
-    }
 
+        return $this;
+    }
     /**
-     * @return bool|\Joli\Jane\Model\JsonSchema
+     * @return bool|JsonSchema
      */
     public function getAdditionalItems()
     {
         return $this->additionalItems;
     }
-
     /**
-     * @param JsonSchema $additionalItems
+     * @param bool|JsonSchema $additionalItems
+     *
+     * @return self
      */
-    public function setAdditionalItems($additionalItems)
+    public function setAdditionalItems($additionalItems = null)
     {
         $this->additionalItems = $additionalItems;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema|\Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema|JsonSchema[]
      */
     public function getItems()
     {
         return $this->items;
     }
-
     /**
-     * @param JsonSchema[] $items
+     * @param JsonSchema|JsonSchema[] $items
+     *
+     * @return self
      */
-    public function setItems($items)
+    public function setItems($items = null)
     {
         $this->items = $items;
-    }
 
+        return $this;
+    }
     /**
      * @return int
      */
@@ -415,15 +413,17 @@ class JsonSchema
     {
         return $this->maxItems;
     }
-
     /**
      * @param int $maxItems
+     *
+     * @return self
      */
-    public function setMaxItems($maxItems)
+    public function setMaxItems($maxItems = null)
     {
         $this->maxItems = $maxItems;
-    }
 
+        return $this;
+    }
     /**
      * @return int|mixed
      */
@@ -431,15 +431,17 @@ class JsonSchema
     {
         return $this->minItems;
     }
-
     /**
      * @param int|mixed $minItems
+     *
+     * @return self
      */
-    public function setMinItems($minItems)
+    public function setMinItems($minItems = null)
     {
         $this->minItems = $minItems;
-    }
 
+        return $this;
+    }
     /**
      * @return bool
      */
@@ -447,15 +449,17 @@ class JsonSchema
     {
         return $this->uniqueItems;
     }
-
     /**
      * @param bool $uniqueItems
+     *
+     * @return self
      */
-    public function setUniqueItems($uniqueItems)
+    public function setUniqueItems($uniqueItems = null)
     {
         $this->uniqueItems = $uniqueItems;
-    }
 
+        return $this;
+    }
     /**
      * @return int
      */
@@ -463,15 +467,17 @@ class JsonSchema
     {
         return $this->maxProperties;
     }
-
     /**
      * @param int $maxProperties
+     *
+     * @return self
      */
-    public function setMaxProperties($maxProperties)
+    public function setMaxProperties($maxProperties = null)
     {
         $this->maxProperties = $maxProperties;
-    }
 
+        return $this;
+    }
     /**
      * @return int|mixed
      */
@@ -479,15 +485,17 @@ class JsonSchema
     {
         return $this->minProperties;
     }
-
     /**
      * @param int|mixed $minProperties
+     *
+     * @return self
      */
-    public function setMinProperties($minProperties)
+    public function setMinProperties($minProperties = null)
     {
         $this->minProperties = $minProperties;
-    }
 
+        return $this;
+    }
     /**
      * @return string[]
      */
@@ -495,95 +503,107 @@ class JsonSchema
     {
         return $this->required;
     }
-
     /**
      * @param string[] $required
+     *
+     * @return self
      */
-    public function setRequired($required)
+    public function setRequired($required = null)
     {
         $this->required = $required;
-    }
 
+        return $this;
+    }
     /**
-     * @return bool|\Joli\Jane\Model\JsonSchema
+     * @return bool|JsonSchema
      */
     public function getAdditionalProperties()
     {
         return $this->additionalProperties;
     }
-
     /**
-     * @param JsonSchema $additionalProperties
+     * @param bool|JsonSchema $additionalProperties
+     *
+     * @return self
      */
-    public function setAdditionalProperties($additionalProperties)
+    public function setAdditionalProperties($additionalProperties = null)
     {
         $this->additionalProperties = $additionalProperties;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema[]
      */
     public function getDefinitions()
     {
         return $this->definitions;
     }
-
     /**
      * @param JsonSchema[] $definitions
+     *
+     * @return self
      */
-    public function setDefinitions($definitions)
+    public function setDefinitions($definitions = null)
     {
         $this->definitions = $definitions;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema[]
      */
     public function getProperties()
     {
         return $this->properties;
     }
-
     /**
      * @param JsonSchema[] $properties
+     *
+     * @return self
      */
-    public function setProperties($properties)
+    public function setProperties($properties = null)
     {
         $this->properties = $properties;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema[]
      */
     public function getPatternProperties()
     {
         return $this->patternProperties;
     }
-
     /**
      * @param JsonSchema[] $patternProperties
+     *
+     * @return self
      */
-    public function setPatternProperties($patternProperties)
+    public function setPatternProperties($patternProperties = null)
     {
         $this->patternProperties = $patternProperties;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]|string[][]
+     * @return JsonSchema[]|string[][]
      */
     public function getDependencies()
     {
         return $this->dependencies;
     }
-
     /**
      * @param JsonSchema[]|string[][] $dependencies
+     *
+     * @return self
      */
-    public function setDependencies($dependencies)
+    public function setDependencies($dependencies = null)
     {
         $this->dependencies = $dependencies;
-    }
 
+        return $this;
+    }
     /**
      * @return array
      */
@@ -591,15 +611,17 @@ class JsonSchema
     {
         return $this->enum;
     }
-
     /**
      * @param array $enum
+     *
+     * @return self
      */
-    public function setEnum(array $enum)
+    public function setEnum($enum = null)
     {
         $this->enum = $enum;
-    }
 
+        return $this;
+    }
     /**
      * @return mixed|mixed[]
      */
@@ -607,15 +629,17 @@ class JsonSchema
     {
         return $this->type;
     }
-
     /**
      * @param mixed|mixed[] $type
+     *
+     * @return self
      */
-    public function setType($type)
+    public function setType($type = null)
     {
         $this->type = $type;
-    }
 
+        return $this;
+    }
     /**
      * @return string
      */
@@ -623,76 +647,87 @@ class JsonSchema
     {
         return $this->format;
     }
-
     /**
      * @param string $format
+     *
+     * @return self
      */
-    public function setFormat($format)
+    public function setFormat($format = null)
     {
         $this->format = $format;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema[]
      */
     public function getAllOf()
     {
         return $this->allOf;
     }
-
     /**
      * @param JsonSchema[] $allOf
+     *
+     * @return self
      */
-    public function setAllOf($allOf)
+    public function setAllOf($allOf = null)
     {
         $this->allOf = $allOf;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema[]
      */
     public function getAnyOf()
     {
         return $this->anyOf;
     }
-
     /**
      * @param JsonSchema[] $anyOf
+     *
+     * @return self
      */
-    public function setAnyOf($anyOf)
+    public function setAnyOf($anyOf = null)
     {
         $this->anyOf = $anyOf;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema[]
+     * @return JsonSchema[]
      */
     public function getOneOf()
     {
         return $this->oneOf;
     }
-
     /**
      * @param JsonSchema[] $oneOf
+     *
+     * @return self
      */
-    public function setOneOf($oneOf)
+    public function setOneOf($oneOf = null)
     {
         $this->oneOf = $oneOf;
-    }
 
+        return $this;
+    }
     /**
-     * @return \Joli\Jane\Model\JsonSchema
+     * @return JsonSchema
      */
     public function getNot()
     {
         return $this->not;
     }
-
     /**
      * @param JsonSchema $not
+     *
+     * @return self
      */
-    public function setNot(JsonSchema $not)
+    public function setNot($not = null)
     {
         $this->not = $not;
+
+        return $this;
     }
 }

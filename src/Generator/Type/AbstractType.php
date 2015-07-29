@@ -3,14 +3,10 @@
 namespace Joli\Jane\Generator\Type;
 
 use Joli\Jane\Generator\Context\Context;
-use Memio\Model\Argument;
-use Memio\Model\Method;
-use Memio\Model\Phpdoc\MethodPhpdoc;
-use Memio\Model\Phpdoc\ParameterTag;
-use Memio\Model\Phpdoc\PropertyPhpdoc;
-use Memio\Model\Phpdoc\ReturnTag;
-use Memio\Model\Phpdoc\VariableTag;
-use Memio\Model\Property;
+use PhpParser\BuilderFactory;
+use PhpParser\Comment\Doc;
+use PhpParser\Node\Stmt;
+use PhpParser\Node\Expr;
 
 abstract class AbstractType implements TypeInterface
 {
@@ -35,42 +31,53 @@ abstract class AbstractType implements TypeInterface
     /**
      * {@inheritDoc}
      */
-    public function generateProperty($schema, $name, Context $context)
+    public function getProperty($schema, $name, Context $context)
     {
-        $phpDoc = new PropertyPhpdoc();
-        $phpDoc->setVariableTag(VariableTag::make($this->getPhpTypeAsString($schema, $name, $context)));
+        $factory = new BuilderFactory();
 
-        $property = new Property($this->encodePropertyName($name));
-        $property->makeProtected();
-        $property->setPhpdoc($phpDoc);
-
-        return $property;
+        return $factory->property($this->encodePropertyName($name))->makeProtected()->setDocComment(
+            new Doc(sprintf(<<<EOD
+/**
+ * @var %s
+ */
+EOD
+            , $this->getPhpTypeAsString($schema, $name, $context)))
+        );
     }
 
     /**
      * {@inheritDoc}
      */
-    public function generateMethods($schema, $name, Context $context)
+    public function getMethods($schema, $name, Context $context)
     {
+        $factory      = new BuilderFactory();
         $propertyName = $this->encodePropertyName($name);
-
-        $getterPhpdoc = MethodPhpdoc::make()
-            ->setReturnTag(ReturnTag::make($this->getPhpTypeAsString($schema, $name, $context)));
-        $getter = Method::make('get'.ucfirst($propertyName))
-            ->setBody(
-                sprintf('        return $this->%s;', $propertyName, $propertyName)
+        $getter       = $factory->method('get'.ucfirst($propertyName))
+            ->setDocComment(new Doc(sprintf(<<<EOD
+/**
+ * @return %s
+ */
+EOD
+                , $this->getPhpTypeAsString($schema, $name, $context))))
+            ->addStmt(new Stmt\Return_(
+                new Expr\PropertyFetch(new Expr\Variable('this'), $propertyName))
             )
-            ->setPhpdoc($getterPhpdoc)
         ;
 
-        $setterPhpdoc = MethodPhpdoc::make()
-            ->addParameterTag(ParameterTag::make($this->getPhpTypeAsString($schema, $name, $context), $propertyName));
-        $setter = Method::make('set'.ucfirst($propertyName))
-            ->addArgument(Argument::make($this->getArgumentType($schema, $name, $context), $propertyName))
-            ->setBody(
-                sprintf('        $this->%s = $%s;', $propertyName, $propertyName)
+        $setter       = $factory->method('set'.ucfirst($propertyName))
+            ->setDocComment(new Doc(sprintf(<<<EOD
+/**
+ * @param %s %s
+ *
+ * @return self
+ */
+EOD
+                , $this->getPhpTypeAsString($schema, $name, $context), '$'.$propertyName)))
+            ->addParam($factory->param($propertyName)->setDefault(null))
+            ->addStmt(
+                new Expr\Assign(new Expr\PropertyFetch(new Expr\Variable('this'), $propertyName), new Expr\Variable($propertyName))
             )
-            ->setPhpdoc($setterPhpdoc)
+            ->addStmt(new Stmt\Return_(new Expr\Variable('this')))
         ;
 
         return [$getter, $setter];
@@ -79,42 +86,17 @@ abstract class AbstractType implements TypeInterface
     /**
      * {@inheritDoc}
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
-        $propertyName = $this->encodePropertyName($name);
-
-        if ($mode == TypeInterface::SET_OBJECT) {
-            return sprintf(
-                "\$object->set%s(%s);", ucfirst($propertyName), sprintf(
-                    $this->getDenormalizationValuePattern($schema, $name, $context),
-                    sprintf("\$data->{'%s'}", $name)
-                )
-            );
-        }
-
-        if ($name === null) {
-            return sprintf(
-                "\$values[] = %s;", sprintf(
-                    $this->getDenormalizationValuePattern($schema, $name, $context),
-                    sprintf("\$value", $name)
-                )
-            );
-        }
-
-        return sprintf(
-            "\$values[\$key] = %s;", sprintf(
-                $this->getDenormalizationValuePattern($schema, $name, $context),
-                sprintf("\$value", $name)
-            )
-        );
+        return [[], $this->getDenormalizationValueStmt($schema, $name, $context, $input)];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDenormalizationValuePattern($schema, $name, Context $context)
+    public function getDenormalizationValueStmt($schema, $name, Context $context, Expr $input)
     {
-        return '%s';
+        return $input;
     }
 
     /**
@@ -156,5 +138,10 @@ abstract class AbstractType implements TypeInterface
         }
 
         return $type;
+    }
+
+    protected function getAssignStatement(Expr $input, Expr $output)
+    {
+
     }
 }

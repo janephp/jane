@@ -4,13 +4,13 @@ namespace Joli\Jane\Generator;
 
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Model\JsonSchema;
-use Memio\Model\Argument;
-use Memio\Model\Contract;
-use Memio\Model\File;
-use Memio\Model\FullyQualifiedName;
-use Memio\Model\Method;
-use Memio\Model\Object;
-use Memio\Model\Property;
+
+use PhpParser\BuilderFactory;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
+use PhpParser\Node\Scalar;
 
 class NormalizerGenerator implements GeneratorInterface
 {
@@ -31,106 +31,130 @@ class NormalizerGenerator implements GeneratorInterface
      * @param string $className Class to generate
      * @param Context $context Context for generation
      *
-     * @return \Memio\Model\File[]
+     * @return File[]
      */
     public function generate(JsonSchema $schema, $className, Context $context)
     {
         $this->typeDecisionManager->resolveType($schema)->generateNormalizer($schema, $className, $context);
 
-        $object = Object::make($context->getNamespace() . "\\Normalizer\\NormalizerChain");
-        $object->implement(Contract::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
-        $object->addProperty(Property::make('normalizers')->setDefaultValue('[]'));
-        $object->addMethod(
-            Method::make('addNormalizer')
-                ->addArgument(Argument::make('mixed', 'normalizer'))
-                ->setBody(sprintf(<<<EOC
-        \$normalizer->setNormalizerChain(\$this);
-        \$this->normalizers[] = \$normalizer;
-EOC
-            ))
-        );
+        $factory              = new BuilderFactory();
+        $normalizerChainClass = $factory->class('NormalizerChain')
+            ->implement('DenormalizerInterface')
+            ->addStmt(
+                $factory->property('normalizers')->makePrivate()->setDefault(new Expr\Array_())
+            )
+            ->addStmt(
+                $factory->method('addNormalizer')
+                    ->makePublic()
+                    ->addParam($factory->param('normalizer'))
+                    ->addStmt(
+                        new Expr\MethodCall(new Expr\Variable('normalizer'), 'setNormalizerChain', [
+                            new Arg(new Expr\Variable('this'))
+                        ])
+                    )
+                    ->addStmt(
+                        new Expr\Assign(new Expr\ArrayDimFetch(new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizers')), new Expr\Variable('normalizer'))
+                    )
+            )
+            ->addStmt(
+                $factory->method('denormalize')
+                    ->makePublic()
+                    ->addParam($factory->param('data'))
+                    ->addParam($factory->param('class'))
+                    ->addParam($factory->param('format')->setDefault(null))
+                    ->addParam($factory->param('context')->setTypeHint('array')->setDefault([]))
+                    ->addStmt(
+                        new Stmt\Foreach_(
+                            new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizers'),
+                            new Expr\Variable('normalizer'),
+                            [
+                                'stmts' => [
+                                    new Stmt\If_(
+                                        new Expr\MethodCall(new Expr\Variable('normalizer'), 'supportsDenormalization', [
+                                            new Arg(new Expr\Variable('data')),
+                                            new Arg(new Expr\Variable('class')),
+                                            new Arg(new Expr\Variable('format')),
+                                        ]),
+                                        [
+                                            'stmts' => [
+                                                new Stmt\Return_(new Expr\MethodCall(new Expr\Variable('normalizer'), 'denormalize', [
+                                                    new Arg(new Expr\Variable('data')),
+                                                    new Arg(new Expr\Variable('class')),
+                                                    new Arg(new Expr\Variable('format')),
+                                                    new Arg(new Expr\Variable('context')),
+                                                ]))
+                                            ]
+                                        ]
+                                    )
+                                ]
+                            ]
+                        )
+                    )
+                    ->addStmt(new Stmt\Return_(new Expr\ConstFetch(new Name("null"))))
+            )
+            ->addStmt(
+                $factory->method('supportsDenormalization')
+                    ->makePublic()
+                    ->addParam($factory->param('data'))
+                    ->addParam($factory->param('type'))
+                    ->addParam($factory->param('format')->setDefault(null))
+                    ->addStmt(
+                        new Stmt\Foreach_(
+                            new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizers'),
+                            new Expr\Variable('normalizer'),
+                            [
+                                'stmts' => [
+                                    new Stmt\If_(
+                                        new Expr\MethodCall(new Expr\Variable('normalizer'), 'supportsDenormalization', [
+                                            new Arg(new Expr\Variable('data')),
+                                            new Arg(new Expr\Variable('type')),
+                                            new Arg(new Expr\Variable('format')),
+                                        ]),
+                                        [
+                                            'stmts' => [
+                                                new Stmt\Return_(new Expr\ConstFetch(new Name("true")))
+                                            ]
+                                        ]
+                                    )
+                                ]
+                            ]
+                        )
+                    )
+                    ->addStmt(new Stmt\Return_(new Expr\ConstFetch(new Name("false"))))
+            )
+        ;
 
-        $object->addMethod(Method::make('denormalize')
-            ->addArgument(
-                Argument::make('mixed', 'data')
+        $buildMethod = $factory->method('build')
+            ->makeStatic()
+            ->makePublic()
+            ->addStmt(
+                new Expr\Assign(new Expr\Variable('normalizer'), new Expr\New_(new Expr\ConstFetch(new Name("self"))))
             )
-            ->addArgument(
-                Argument::make('string', 'class')
-            )
-            ->addArgument(
-                Argument::make('string', 'format')
-                    ->setDefaultValue('null')
-            )
-            ->addArgument(
-                Argument::make('array', 'context')
-                    ->setDefaultValue('array()')
-            )
-            ->setBody(sprintf(<<<EOC
-        foreach (\$this->normalizers as \$normalizer) {
-            if (\$normalizer->supportsDenormalization(\$data, \$class, \$format)) {
-                return \$normalizer->denormalize(\$data, \$class, \$format, \$context);
-            }
-        }
-
-        return null;
-EOC
-            ))
-        );
-
-        $object->addMethod(Method::make('supportsDenormalization')
-            ->addArgument(
-                Argument::make('mixed', 'data')
-            )
-            ->addArgument(
-                Argument::make('string', 'type')
-            )
-            ->addArgument(
-                Argument::make('string', 'format')
-                    ->setDefaultValue('null')
-            )
-            ->setBody(sprintf(<<<EOC
-        foreach (\$this->normalizers as \$normalizer) {
-            if (\$normalizer->supportsDenormalization(\$data, \$type, \$format)) {
-                return true;
-            }
-        }
-
-        return false;
-EOC
-            ))
-        );
-
-        $buildLines = [sprintf(<<<EOC
-        \$normalizer = new self();
-
-EOC
-        )];
+        ;
 
         foreach ($context->getFiles() as $file) {
-            if (preg_match('/Normalizer/', $file->getStructure()->getFullyQualifiedName())) {
-                $buildLines[] = sprintf(<<<EOC
-        \$normalizer->addNormalizer(new %s());
-EOC
-                    , $file->getStructure()->getName());
+            if (preg_match('/Normalizer/', $file->getFilename())) {
+                $buildMethod->addStmt(
+                    new Expr\MethodCall(new Expr\Variable('normalizer'), 'addNormalizer', [
+                        new Arg(new Expr\New_(new Name($file->getNode()->stmts[2]->name)))
+                    ])
+                );
             }
         }
 
-        $buildLines[] = sprintf(<<<EOC
-
-        return \$normalizer;
-EOC
+        $buildMethod->addStmt(
+            new Stmt\Return_(new Expr\Variable('normalizer'))
         );
 
-        $object->addMethod(Method::make('build')
-                ->makeStatic()
-                ->setBody(implode("\n", $buildLines))
-        );
+        $normalizerChainClass->addStmt($buildMethod);
 
-        $schemaFile = File::make($context->getDirectory() . DIRECTORY_SEPARATOR . 'Normalizer' . DIRECTORY_SEPARATOR . 'NormalizerChain.php');
-        $schemaFile->setStructure($object);
-        $schemaFile->addFullyQualifiedName(FullyQualifiedName::make('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'));
+        $node = $factory->namespace($context->getNamespace() . "\\Normalizer")
+            ->addStmt($factory->use('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'))
+            ->addStmt($normalizerChainClass)
+            ->getNode()
+        ;
 
-        $context->addFile($schemaFile);
+        $context->addFile(new File($context->getDirectory() . DIRECTORY_SEPARATOR . 'Normalizer' . DIRECTORY_SEPARATOR . 'NormalizerChain.php', $node));
 
         return $context->getFiles();
     }

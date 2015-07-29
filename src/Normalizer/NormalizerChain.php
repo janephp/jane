@@ -1,18 +1,17 @@
 <?php
+
 namespace Joli\Jane\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class NormalizerChain implements DenormalizerInterface
 {
-    private $normalizers = [];
-
+    private $normalizers = array();
     public function addNormalizer($normalizer)
     {
         $normalizer->setNormalizerChain($this);
         $this->normalizers[] = $normalizer;
     }
-
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         foreach ($this->normalizers as $normalizer) {
@@ -21,9 +20,8 @@ class NormalizerChain implements DenormalizerInterface
             }
         }
 
-        return null;
+        return;
     }
-
     public function supportsDenormalization($data, $type, $format = null)
     {
         foreach ($this->normalizers as $normalizer) {
@@ -34,11 +32,9 @@ class NormalizerChain implements DenormalizerInterface
 
         return false;
     }
-
     public static function build()
     {
         $normalizer = new self();
-
         $normalizer->addNormalizer(new JsonSchemaNormalizer());
 
         return $normalizer;

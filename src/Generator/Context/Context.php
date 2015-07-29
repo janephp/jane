@@ -2,8 +2,8 @@
 
 namespace Joli\Jane\Generator\Context;
 
+use Joli\Jane\Generator\File;
 use Joli\Jane\Model\JsonSchema;
-use Memio\Model\File;
 
 /**
  * Context when generating a library base on a Schema
@@ -41,6 +41,13 @@ class Context
     private $files = [];
 
     /**
+     * @var string[]
+     */
+    private $variablesName = [];
+
+    private $reference = 0;
+
+    /**
      * @param JsonSchema $rootSchema
      * @param string $namespace
      * @param string $directory
@@ -59,6 +66,9 @@ class Context
         $this->files[] = $file;
     }
 
+    /**
+     * @return File[]
+     */
     public function getFiles()
     {
         return $this->files;
@@ -102,5 +112,32 @@ class Context
     public function getSchemaObjectNormalizerMap()
     {
         return $this->schemaObjectNormalizerMap;
+    }
+
+    /**
+     * Get a unique variable name
+     *
+     * @param string $prefix
+     *
+     * @return string
+     */
+    public function getUniqueVariableName($prefix = 'var')
+    {
+        if (!in_array($prefix, $this->variablesName)) {
+            $this->variablesName[] = $prefix;
+
+            return $prefix;
+        }
+
+        $name = sprintf('%s_%s', $prefix, $this->reference);
+        $this->reference++;
+
+        if (!in_array($name, $this->variablesName)) {
+            $this->variablesName[] = $name;
+
+            return $name;
+        }
+
+        return $this->getUniqueVariableName($prefix);
     }
 }

@@ -6,6 +6,11 @@ use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
 
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
+
 class UndefinedType extends AbstractType
 {
     /**
@@ -43,63 +48,74 @@ class UndefinedType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
         if ($schema->getAnyOf() === null && $schema->getAllOf() === null && $schema->getOneOf() === null) {
-            return parent::generateDenormalizationLine($schema, $name, $context, $mode);
+            return parent::getDenormalizationStmt($schema, $name, $context, $input);
         }
 
-        $rawValue = $mode == self::SET_OBJECT ? sprintf("\$data->{'%s'}", $name) : '$value';
-        $lines = [];
+        $valueVar   = new Expr\Variable($context->getUniqueVariableName('value'));
+        $statements = [
+            new Expr\Assign($valueVar, new Expr\ConstFetch(new Name("null")))
+        ];
 
         if ($schema->getAnyOf() !== null) {
             foreach ($schema->getAnyOf() as $subSchema) {
-                $lines[] = sprintf(<<<EOC
-            if (%s) {
-                %s
-            }
+                list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
 
-EOC
-                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode)), $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
+                $statements[] = new Stmt\If_(
+                    $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input),
+                    [
+                        'stmts' => array_merge(
+                            $ifStmts,
+                            [new Expr\Assign($valueVar, $outputExpr)]
+                        )
+                    ]
                 );
             }
         }
 
         if ($schema->getAllOf() !== null) {
             foreach ($schema->getAllOf() as $subSchema) {
-                $lines[] = sprintf(<<<EOC
-            if (%s) {
-                %s
-            }
+                list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
 
-EOC
-                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode)), $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
+                $statements[] = new Stmt\If_(
+                    $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input),
+                    [
+                        'stmts' => array_merge(
+                            $ifStmts,
+                            [new Expr\Assign($valueVar, $outputExpr)]
+                        )
+                    ]
                 );
             }
         }
 
         if ($schema->getOneOf() !== null) {
             foreach ($schema->getOneOf() as $subSchema) {
-                $lines[] = sprintf(<<<EOC
-            if (%s) {
-                %s
-            }
+                list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
 
-EOC
-                    , str_replace('%s', $rawValue, $this->typeDecisionManager->resolveType($subSchema)->getRawCheck($subSchema, $name, $context, $mode)), $this->typeDecisionManager->resolveType($subSchema)->generateDenormalizationLine($subSchema, $name, $context, $mode)
+                $statements[] = new Stmt\If_(
+                    $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input),
+                    [
+                        'stmts' => array_merge(
+                            $ifStmts,
+                            [new Expr\Assign($valueVar, $outputExpr)]
+                        )
+                    ]
                 );
             }
         }
 
-        return implode("\n", $lines);
+        return [$statements, $valueVar];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return 'isset(%s)';
+        return new Expr\FuncCall(new Name('isset'), [new Arg($input)]);
     }
 
     /**

@@ -5,6 +5,11 @@ namespace Joli\Jane\Generator\Type;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt;
+use PhpParser\Node\Scalar;
 
 class ArrayObjectType extends AbstractType
 {
@@ -35,50 +40,61 @@ class ArrayObjectType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
         $additionalProperties = $schema->getAdditionalProperties();
         $patternProperties = $schema->getPatternProperties();
 
         if (($additionalProperties === null || $additionalProperties === false) && ($patternProperties === null || $patternProperties === false)) {
-            return parent::generateDenormalizationLine($schema, $name, $context);
+            return parent::getDenormalizationStmt($schema, $name, $context, $input);
         }
 
-        $propertyName = $this->encodePropertyName($name);
+        $valuesVar     = new Expr\Variable($context->getUniqueVariableName('values'));
+        $statements    = [
+            // $values = new ArrayObject([], ArrayObject::ARRAY_AS_PROPS);
+            new Expr\Assign($valuesVar, new Expr\New_(new Name('\ArrayObject'), [
+                new Expr\Array_(),
+                new Expr\ClassConstFetch(new Name('\ArrayObject'), 'ARRAY_AS_PROPS')
+            ])),
+        ];
 
-        $lines = [sprintf(<<<EOC
-            \$values = new \\ArrayObject([], \\ArrayObject::ARRAY_AS_PROPS);
-
-            foreach (\$data->{'%s'} as \$key => \$value) {
-EOC
-        , $name)];
+        $loopStatements = [];
+        $loopKeyVar     = new Expr\Variable($context->getUniqueVariableName('key'));
+        $loopValueVar   = new Expr\Variable($context->getUniqueVariableName('value'));
 
         if (!empty($patternProperties)) {
-            foreach ($patternProperties as $pattern => $schema) {
-                $lines[] = sprintf(<<<EOC
-                if (preg_match('/%s/', \$key)) {
-                    %s
-                    continue;
-                }
+            foreach ($patternProperties as $pattern => $patternSchema) {
+                list($subStatements, $outputExpr) = $this->typeDecisionManager->resolveType($patternSchema)->getDenormalizationStmt($patternSchema, $name, $context, $loopValueVar);
 
-EOC
-                , str_replace('/', '\\/', $pattern), $this->typeDecisionManager->resolveType($schema)->generateDenormalizationLine($schema, $name, $context, TypeInterface::SET_ARRAY));
+                $loopStatements[] = new Stmt\If_(
+                    new Expr\FuncCall(new Name('preg_match'), [
+                        new Arg(new Scalar\String_('/'.str_replace('/', '\\/', $pattern).'/')),
+                        new Arg($loopKeyVar)
+                    ]),
+                    [
+                        'stmts' => [
+                            $subStatements,
+                            new Expr\Assign(new Expr\ArrayDimFetch($valuesVar, $loopKeyVar), $outputExpr),
+                            new Stmt\Continue_()
+                        ]
+                    ]
+                );
             }
         }
 
         if ($additionalProperties !== null && $additionalProperties !== false) {
-            $lines[] = $this->typeDecisionManager->resolveType($additionalProperties)->generateDenormalizationLine($additionalProperties, $name, $context, TypeInterface::SET_ARRAY);
+            list($subStatements, $outputExpr) = $this->typeDecisionManager->resolveType($additionalProperties)->getDenormalizationStmt($additionalProperties, $name, $context, $loopValueVar);
+
+            $loopStatements = array_merge($loopStatements, $subStatements);
+            $loopStatements[] = new Expr\Assign(new Expr\ArrayDimFetch($valuesVar, $loopKeyVar), $outputExpr);
         }
 
-        $lines[] = sprintf(<<<EOC
-            }
+        $statements[] = new Stmt\Foreach_($input, $loopValueVar, [
+            'keyVar' => $loopKeyVar,
+            'stmts'  => $loopStatements
+        ]);
 
-            \$object->set%s(\$values);
-EOC
-            , ucfirst($propertyName)
-        );
-
-        return implode("\n", $lines);
+        return [$statements, $valuesVar];
     }
 
     /**
@@ -108,9 +124,9 @@ EOC
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return 'is_object(%s)';
+        return new Expr\FuncCall(new Name('is_object'), [new Arg($input)]);
     }
 
     /**

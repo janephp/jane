@@ -7,6 +7,11 @@ use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
 
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Stmt;
+use PhpParser\Node\Scalar;
+
 class ReferenceType extends AbstractType
 {
     private $resolver;
@@ -44,45 +49,51 @@ class ReferenceType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function generateDenormalizationLine($schema, $name, Context $context, $mode = self::SET_OBJECT)
+    public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
-        $newSchema = $this->resolver->resolve($schema, $context->getRootSchema());
+        $newSchema = $this->resolver->resolve($schema);
 
         if ($context->getSchemaObjectMap()->hasSchema($newSchema)) {
             if (!$context->getSchemaObjectNormalizerMap()->hasSchema($newSchema)) {
-                $this->typeDecisionManager->resolveType($newSchema)->generateNormalizer($newSchema, $context->getSchemaObjectMap()->getObject($newSchema)->getName(), $context);
+                $this->typeDecisionManager->resolveType($newSchema)->generateNormalizer($newSchema, $context->getSchemaObjectMap()->getObject($newSchema), $context);
             }
 
-            return parent::generateDenormalizationLine($schema, $name, $context, $mode);
+            return parent::getDenormalizationStmt($schema, $name, $context, $input);
         }
 
-        return $this->typeDecisionManager->resolveType($newSchema)->generateDenormalizationLine($newSchema, $name, $context, $mode);
+        return $this->typeDecisionManager->resolveType($newSchema)->getDenormalizationStmt($newSchema, $name, $context, $input);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDenormalizationValuePattern($schema, $name, Context $context)
+    public function getDenormalizationValueStmt($schema, $name, Context $context, Expr $input)
     {
         $schema = $this->resolver->resolve($schema);
 
         if ($context->getSchemaObjectMap()->hasSchema($schema)) {
-            $fqdn = $context->getSchemaObjectMap()->getObject($schema)->getFullyQualifiedName();
+            $fqdn = $context->getNamespace() . '\\Model\\'. $context->getSchemaObjectMap()->getObject($schema);
 
-            return sprintf('$this->normalizerChain->denormalize(%%s, \'%s\', \'json\', $context)', $fqdn);
+            // $this->normalizerChain->denormalize(...)
+            return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizerChain'), 'denormalize', [
+                new Arg($input),
+                new Arg(new Scalar\String_($fqdn)),
+                new Arg(new Scalar\String_('json')),
+                new Arg(new Expr\Variable('context'))
+            ]);
         }
 
-        return $this->typeDecisionManager->resolveType($schema)->getDenormalizationValuePattern($schema, $name, $context);
+        return $this->typeDecisionManager->resolveType($schema)->getDenormalizationValueStmt($schema, $name, $context, $input);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
         $schema = $this->resolver->resolve($schema, $context->getRootSchema());
 
-        return $this->typeDecisionManager->resolveType($schema)->getRawCheck($schema, $name, $context);
+        return $this->typeDecisionManager->resolveType($schema)->getDenormalizationIfStmt($schema, $name, $context, $input);
     }
 
     /**
@@ -93,7 +104,7 @@ class ReferenceType extends AbstractType
         $newSchema = $this->resolver->resolve($schema, $context->getRootSchema());
 
         if ($context->getSchemaObjectMap()->hasSchema($newSchema)) {
-            return ["\\" . $context->getSchemaObjectMap()->getObject($newSchema)->getFullyQualifiedName()];
+            return [$context->getSchemaObjectMap()->getObject($newSchema)];
         }
 
         return $this->typeDecisionManager->resolveType($newSchema)->getPhpTypes($newSchema, $name, $context);

@@ -3,6 +3,9 @@
 namespace Joli\Jane\Generator\Type;
 
 use Joli\Jane\Generator\Context\Context;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
 
 class IntegerType extends SimpleType
 {
@@ -25,8 +28,8 @@ class IntegerType extends SimpleType
     /**
      * {@inheritDoc}
      */
-    public function getRawCheck($schema, $name, Context $context)
+    public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return 'is_int(%s)';
+        return new Expr\FuncCall(new Name('is_array'), [new Arg($input)]);
     }
 }

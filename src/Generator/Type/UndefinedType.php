@@ -56,7 +56,7 @@ class UndefinedType extends AbstractType
 
         $valueVar   = new Expr\Variable($context->getUniqueVariableName('value'));
         $statements = [
-            new Expr\Assign($valueVar, new Expr\ConstFetch(new Name("null")))
+            new Expr\Assign($valueVar, $input)
         ];
 
         if ($schema->getAnyOf() !== null) {

@@ -210,8 +210,13 @@ class ObjectType extends AbstractType
     public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
         $determinant = [];
+        $required    = $schema->getRequired() ?: [];
 
         foreach ($schema->getProperties() as $key => $property) {
+            if (!in_array($key, $required)) {
+                continue;
+            }
+
             if ($property instanceof Reference) {
                 $property = $this->resolver->resolve($property);
             }

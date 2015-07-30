@@ -57,6 +57,7 @@ class TypeDecisionManager
     public static function build(Serializer $serializer)
     {
         $typeDecision = new self();
+        $resolver     = new Resolver($serializer);
 
         $typeDecision->addType(new MultipleType($typeDecision));
         $typeDecision->addType(new BooleanType());
@@ -66,8 +67,8 @@ class TypeDecisionManager
         $typeDecision->addType(new StringType());
         $typeDecision->addType(new ArrayType($typeDecision));
         $typeDecision->addType(new ArrayObjectType($typeDecision));
-        $typeDecision->addType(new ObjectType($typeDecision));
-        $typeDecision->addType(new ReferenceType(new Resolver($serializer), $typeDecision));
+        $typeDecision->addType(new ObjectType($typeDecision, $resolver));
+        $typeDecision->addType(new ReferenceType($resolver, $typeDecision));
         $typeDecision->addType(new UndefinedType($typeDecision));
 
         return $typeDecision;

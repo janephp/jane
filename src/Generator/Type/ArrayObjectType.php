@@ -68,15 +68,14 @@ class ArrayObjectType extends AbstractType
 
                 $loopStatements[] = new Stmt\If_(
                     new Expr\FuncCall(new Name('preg_match'), [
-                        new Arg(new Scalar\String_('/'.str_replace('/', '\\/', $pattern).'/')),
+                        new Arg(new Expr\ConstFetch(new Name("'/".str_replace('/', '\/', $pattern)."/'"))),
                         new Arg($loopKeyVar)
                     ]),
                     [
-                        'stmts' => [
-                            $subStatements,
+                        'stmts' => array_merge($subStatements, [
                             new Expr\Assign(new Expr\ArrayDimFetch($valuesVar, $loopKeyVar), $outputExpr),
                             new Stmt\Continue_()
-                        ]
+                        ])
                     ]
                 );
             }
@@ -114,7 +113,7 @@ class ArrayObjectType extends AbstractType
             return false;
         }
 
-        if ($schema->getAdditionalProperties() === false && ($schema->getPatternProperties() === false || $schema->getPatternProperties() === null)) {
+        if (($schema->getAdditionalProperties() === false || $schema->getAdditionalProperties() === null) && ($schema->getPatternProperties() === false || $schema->getPatternProperties() === null)) {
             return false;
         }
 

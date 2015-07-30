@@ -60,43 +60,31 @@ class UndefinedType extends AbstractType
         ];
 
         if ($schema->getAnyOf() !== null) {
-            foreach ($schema->getAnyOf() as $subSchema) {
-                list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
-
-                $statements[] = new Stmt\If_(
-                    $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input),
-                    [
-                        'stmts' => array_merge(
-                            $ifStmts,
-                            [new Expr\Assign($valueVar, $outputExpr)]
-                        )
-                    ]
-                );
-            }
+            $statements = array_merge($statements, $this->getSchemaArrayStatements($schema->getAnyOf(), $name, $context, $input, $valueVar));
         }
 
         if ($schema->getAllOf() !== null) {
-            foreach ($schema->getAllOf() as $subSchema) {
-                list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
-
-                $statements[] = new Stmt\If_(
-                    $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input),
-                    [
-                        'stmts' => array_merge(
-                            $ifStmts,
-                            [new Expr\Assign($valueVar, $outputExpr)]
-                        )
-                    ]
-                );
-            }
+            $statements = array_merge($statements, $this->getSchemaArrayStatements($schema->getAllOf(), $name, $context, $input, $valueVar));
         }
 
         if ($schema->getOneOf() !== null) {
-            foreach ($schema->getOneOf() as $subSchema) {
-                list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
+            $statements = array_merge($statements, $this->getSchemaArrayStatements($schema->getOneOf(), $name, $context, $input, $valueVar));
+        }
 
-                $statements[] = new Stmt\If_(
-                    $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input),
+        return [$statements, $valueVar];
+    }
+
+    protected function getSchemaArrayStatements($schemas, $name, $context, $input, $valueVar)
+    {
+        $ifStmt     = null;
+
+        foreach ($schemas as $subSchema) {
+            list($ifStmts, $outputExpr) = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationStmt($subSchema, $name, $context, $input);
+            $condStmt                   = $this->typeDecisionManager->resolveType($subSchema)->getDenormalizationIfStmt($subSchema, $name, $context, $input);
+
+            if ($ifStmt === null) {
+                $ifStmt  = new Stmt\If_(
+                    $condStmt,
                     [
                         'stmts' => array_merge(
                             $ifStmts,
@@ -104,10 +92,18 @@ class UndefinedType extends AbstractType
                         )
                     ]
                 );
+            } else {
+                $ifStmt->elseifs[] = new Stmt\ElseIf_(
+                    $condStmt,
+                    array_merge(
+                        $ifStmts,
+                        [new Expr\Assign($valueVar, $outputExpr)]
+                    )
+                );
             }
         }
 
-        return [$statements, $valueVar];
+        return [$ifStmt];
     }
 
     /**

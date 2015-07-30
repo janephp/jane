@@ -64,11 +64,10 @@ class ArrayType extends AbstractType
                 $loopStatements[] = new Stmt\If_(
                     $this->typeDecisionManager->resolveType($item)->getDenormalizationIfStmt($item, $name, $context, $loopValueVar),
                     [
-                        'stmts' => [
-                            $subStatements,
+                        'stmts' => array_merge($subStatements, [
                             new Expr\Assign(new Expr\ArrayDimFetch($valuesVar), $outputExpr),
                             new Stmt\Continue_()
-                        ]
+                        ])
                     ]
                 );
             }

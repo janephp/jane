@@ -7,6 +7,8 @@ use Joli\Jane\Generator\File;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
 
+use Joli\Jane\Reference\Reference;
+use Joli\Jane\Reference\Resolver;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
@@ -21,9 +23,15 @@ class ObjectType extends AbstractType
      */
     private $typeDecisionManager;
 
-    public function __construct(TypeDecisionManager $typeDecisionManager)
+    /**
+     * @var \Joli\Jane\Reference\Resolver
+     */
+    private $resolver;
+
+    public function __construct(TypeDecisionManager $typeDecisionManager, Resolver $resolver)
     {
         $this->typeDecisionManager = $typeDecisionManager;
+        $this->resolver            = $resolver;
     }
 
     /**
@@ -201,7 +209,57 @@ class ObjectType extends AbstractType
      */
     public function getDenormalizationIfStmt($schema, $name, Context $context, Expr $input)
     {
-        return new Expr\FuncCall(new Name('is_object'), [new Arg($input)]);
+        $determinant = [];
+
+        foreach ($schema->getProperties() as $key => $property) {
+            if ($property instanceof Reference) {
+                $property = $this->resolver->resolve($property);
+            }
+
+            if ($property->getEnum() !== null) {
+                $isSimple = true;
+
+                foreach ($property->getEnum() as $value) {
+                    if (is_array($value) || is_object($value)) {
+                        $isSimple = false;
+                    }
+                }
+
+                if ($isSimple) {
+                    $determinant[$key] = $property->getEnum();
+                }
+            }
+        }
+
+        $ifStmt     = new Expr\FuncCall(new Name('is_object'), [new Arg($input)]);
+        $logicalAnd = null;
+
+        foreach ($determinant as $key => $values) {
+            $logicalOr = null;
+
+            foreach ($values as $value) {
+                if ($logicalOr === null) {
+                    $logicalOr = new Expr\BinaryOp\Equal(
+                        new Expr\PropertyFetch($input, sprintf("{'%s'}", $key)),
+                        new Scalar\String_($value)
+                    );
+                } else {
+                    $logicalOr = new Expr\BinaryOp\LogicalOr(
+                        $logicalOr,
+                        new Expr\BinaryOp\Equal(
+                            new Expr\PropertyFetch($input, sprintf("{'%s'}", $key)),
+                            new Scalar\String_($value)
+                        )
+                    );
+                }
+            }
+
+            if ($logicalOr !== null) {
+                $ifStmt = new Expr\BinaryOp\LogicalAnd($ifStmt, $logicalOr);
+            }
+        }
+
+        return $ifStmt;
     }
 
     /**
@@ -209,7 +267,7 @@ class ObjectType extends AbstractType
      */
     public function supportSchema($schema)
     {
-        return ($schema instanceof JsonSchema && $schema->getType() === 'object');
+        return ($schema instanceof JsonSchema && $schema->getType() === 'object' && $schema->getProperties() !== null);
     }
 
     /**

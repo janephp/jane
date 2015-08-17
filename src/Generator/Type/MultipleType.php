@@ -5,6 +5,7 @@ namespace Joli\Jane\Generator\Type;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Reference\Reference;
 use PhpParser\Node\Expr;
 
 class MultipleType extends AbstractType
@@ -38,7 +39,7 @@ class MultipleType extends AbstractType
      */
     public function supportSchema($schema)
     {
-        return ($schema instanceof JsonSchema && is_array($schema->getType()));
+        return (!($schema instanceof Reference) && is_array($schema->getType()));
     }
 
     /**

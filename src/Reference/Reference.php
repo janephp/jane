@@ -2,8 +2,6 @@
 
 namespace Joli\Jane\Reference;
 
-use Joli\Jane\Model\JsonSchema;
-
 /**
  * Deal with Json Reference (only support internal pointer for the moment)
  *
@@ -47,15 +45,15 @@ class Reference
     private $reference;
 
     /**
-     * @var JsonSchema
+     * @var mixed
      */
     private $currentSchema;
 
     /**
      * @param $ref
-     * @param JsonSchema $currentSchema
+     * @param mixed $currentSchema
      */
-    public function __construct($ref, JsonSchema $currentSchema)
+    public function __construct($ref, $currentSchema)
     {
         $this->reference = $ref;
         $this->scheme    = parse_url($ref, PHP_URL_SCHEME);
@@ -159,7 +157,7 @@ class Reference
     }
 
     /**
-     * @return JsonSchema
+     * @return mixed
      */
     public function getCurrentSchema()
     {

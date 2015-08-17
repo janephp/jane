@@ -26,7 +26,7 @@ class ModelGenerator implements GeneratorInterface
      *
      * @return File[]
      */
-    public function generate(JsonSchema $schema, $className, Context $context)
+    public function generate($schema, $className, Context $context)
     {
         $this->typeDecisionManager->resolveType($schema)->generateObject($schema, $className, $context);
 

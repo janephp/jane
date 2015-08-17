@@ -16,7 +16,7 @@ class SchemaObjectMap
      * @param JsonSchema  $schema
      * @param string      $object
      */
-    public function addSchemaObject(JsonSchema $schema, $object)
+    public function addSchemaObject($schema, $object)
     {
         $this->references[spl_object_hash($schema)] = $object;
     }
@@ -26,7 +26,7 @@ class SchemaObjectMap
      *
      * @return bool
      */
-    public function hasSchema(JsonSchema $schema)
+    public function hasSchema($schema)
     {
         return isset($this->references[spl_object_hash($schema)]);
     }
@@ -36,7 +36,7 @@ class SchemaObjectMap
      *
      * @return string
      */
-    public function getObject(JsonSchema $schema)
+    public function getObject($schema)
     {
         return $this->references[spl_object_hash($schema)];
     }

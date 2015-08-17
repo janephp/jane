@@ -52,7 +52,7 @@ class Context
      * @param string $namespace
      * @param string $directory
      */
-    public function __construct(JsonSchema $rootSchema, $namespace, $directory)
+    public function __construct($rootSchema, $namespace, $directory)
     {
         $this->rootSchema      = $rootSchema;
         $this->namespace       = $namespace;

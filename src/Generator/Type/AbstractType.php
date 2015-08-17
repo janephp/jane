@@ -25,7 +25,7 @@ abstract class AbstractType implements TypeInterface
             }, $name);
         }
 
-        return $name;
+        return lcfirst($name);
     }
 
     /**
@@ -53,6 +53,7 @@ EOD
         $factory      = new BuilderFactory();
         $propertyName = $this->encodePropertyName($name);
         $getter       = $factory->method('get'.ucfirst($propertyName))
+            ->makePublic()
             ->setDocComment(new Doc(sprintf(<<<EOD
 /**
  * @return %s
@@ -65,6 +66,7 @@ EOD
         ;
 
         $setter       = $factory->method('set'.ucfirst($propertyName))
+            ->makePublic()
             ->setDocComment(new Doc(sprintf(<<<EOD
 /**
  * @param %s %s

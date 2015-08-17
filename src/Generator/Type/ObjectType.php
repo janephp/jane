@@ -39,7 +39,7 @@ class ObjectType extends AbstractType
      */
     public function generateObject($schema, $name, Context $context)
     {
-        if ($schema->getDefinitions() !== null) {
+        if (method_exists($schema, 'getDefinitions') && $schema->getDefinitions() !== null) {
             foreach ($schema->getDefinitions() as $key => $definition) {
                 $this->typeDecisionManager->resolveType($definition)->generateObject($definition, $key, $context);
             }
@@ -272,7 +272,7 @@ class ObjectType extends AbstractType
      */
     public function supportSchema($schema)
     {
-        return ($schema instanceof JsonSchema && $schema->getType() === 'object' && $schema->getProperties() !== null);
+        return (!($schema instanceof Reference) && $schema->getType() === 'object' && $schema->getProperties() !== null);
     }
 
     /**

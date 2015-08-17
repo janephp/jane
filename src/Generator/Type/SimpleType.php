@@ -4,6 +4,7 @@ namespace Joli\Jane\Generator\Type;
 
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Reference\Reference;
 
 abstract class SimpleType extends AbstractType
 {
@@ -19,7 +20,7 @@ abstract class SimpleType extends AbstractType
      */
     public function supportSchema($schema)
     {
-        return ($schema instanceof JsonSchema && $schema->getType() === $this->getSimpleType());
+        return (!($schema instanceof Reference) && $schema->getType() === $this->getSimpleType());
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Joli\Jane\Generator\Type;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Reference\Reference;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
@@ -101,7 +102,7 @@ class ArrayObjectType extends AbstractType
      */
     public function supportSchema($schema)
     {
-        if (!($schema instanceof JsonSchema)) {
+        if ($schema instanceof Reference) {
             return false;
         }
 

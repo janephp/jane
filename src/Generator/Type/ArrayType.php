@@ -6,6 +6,7 @@ use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Model\JsonSchema;
 
+use Joli\Jane\Reference\Reference;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
@@ -98,7 +99,7 @@ class ArrayType extends AbstractType
      */
     public function supportSchema($schema)
     {
-        return ($schema instanceof JsonSchema && $schema->getType() === 'array');
+        return (!($schema instanceof Reference) && $schema->getType() === 'array');
     }
 
     /**

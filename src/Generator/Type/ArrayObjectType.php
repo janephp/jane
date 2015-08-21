@@ -44,7 +44,7 @@ class ArrayObjectType extends AbstractType
     public function getDenormalizationStmt($schema, $name, Context $context, Expr $input)
     {
         $additionalProperties = $schema->getAdditionalProperties();
-        $patternProperties = $schema->getPatternProperties();
+        $patternProperties    = method_exists($schema, 'getPatternProperties') ? $schema->getPatternProperties() : null;
 
         if (($additionalProperties === null || $additionalProperties === false) && ($patternProperties === null || $patternProperties === false)) {
             return parent::getDenormalizationStmt($schema, $name, $context, $input);
@@ -114,7 +114,10 @@ class ArrayObjectType extends AbstractType
             return false;
         }
 
-        if (($schema->getAdditionalProperties() === false || $schema->getAdditionalProperties() === null) && ($schema->getPatternProperties() === false || $schema->getPatternProperties() === null)) {
+        $additionalProperties = $schema->getAdditionalProperties();
+        $patternProperties    = method_exists($schema, 'getPatternProperties') ? $schema->getPatternProperties() : null;
+
+        if (($additionalProperties === false || $additionalProperties === null) && ($patternProperties === false || $patternProperties === null)) {
             return false;
         }
 
@@ -135,7 +138,7 @@ class ArrayObjectType extends AbstractType
     public function getPhpTypes($schema, $name, Context $context)
     {
         $additionalProperties = $schema->getAdditionalProperties();
-        $patternProperties    = $schema->getPatternProperties();
+        $patternProperties    = method_exists($schema, 'getPatternProperties') ? $schema->getPatternProperties() : null;
 
         if (($additionalProperties === null || $additionalProperties === true) && ($patternProperties === null || $patternProperties === false)) {
             return ['array'];

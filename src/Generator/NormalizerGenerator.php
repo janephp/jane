@@ -134,9 +134,17 @@ class NormalizerGenerator implements GeneratorInterface
 
         foreach ($context->getFiles() as $file) {
             if (preg_match('/Normalizer/', $file->getFilename())) {
+                $class = null;
+
+                foreach ($file->getNode()->stmts as $stmt) {
+                    if ($stmt instanceof Stmt\Class_) {
+                        $class = $stmt->name;
+                    }
+                }
+
                 $buildMethod->addStmt(
                     new Expr\MethodCall(new Expr\Variable('normalizer'), 'addNormalizer', [
-                        new Arg(new Expr\New_(new Name($file->getNode()->stmts[2]->name)))
+                        new Arg(new Expr\New_(new Name($class)))
                     ])
                 );
             }

@@ -56,7 +56,7 @@ class Resolver
      *
      * @return JsonSchema Return the json schema referenced
      */
-    protected function resolveSchema(Reference $reference, JsonSchema $currentSchema)
+    protected function resolveSchema(Reference $reference, $currentSchema)
     {
         if ($reference->isInCurrentDocument() && $reference->hasFragment()) {
             return $currentSchema;
@@ -99,7 +99,7 @@ class Resolver
      *
      * @return mixed Return the json value (deserialized) referenced
      */
-    protected function resolveJSONPointer(Reference $reference, JsonSchema $schema)
+    protected function resolveJSONPointer(Reference $reference, $schema)
     {
         $pointer = $reference->getFragment();
 

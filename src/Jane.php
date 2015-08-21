@@ -83,9 +83,7 @@ class Jane
 
     public static function build()
     {
-        $encoders       = [new JsonEncoder(new JsonEncode(), new JsonDecode(false))];
-        $normalizers    = [NormalizerChain::build()];
-        $serializer     = new Serializer($normalizers, $encoders);
+        $serializer     = self::buildSerializer();
         $typeDecision   = TypeDecisionManager::build($serializer);
         $modelGenerator = new ModelGenerator($typeDecision);
         $normGenerator  = new NormalizerGenerator($typeDecision);
@@ -93,5 +91,13 @@ class Jane
         $fixer->registerBuiltInFixers();
 
         return new self($serializer, $modelGenerator, $normGenerator, $fixer);
+    }
+
+    public static function buildSerializer()
+    {
+        $encoders       = [new JsonEncoder(new JsonEncode(), new JsonDecode(false))];
+        $normalizers    = [NormalizerChain::build()];
+
+        return new Serializer($normalizers, $encoders);
     }
 }

@@ -3,6 +3,7 @@
 namespace Joli\Jane\Generator\Context;
 
 use Joli\Jane\Generator\File;
+use Joli\Jane\Guesser\Guess\ClassGuess;
 use Joli\Jane\Model\JsonSchema;
 
 /**
@@ -11,54 +12,69 @@ use Joli\Jane\Model\JsonSchema;
 class Context
 {
     /**
+     * Root namespace of the class generated
+     *
      * @var string
      */
     private $namespace;
 
     /**
+     * Directory where the code must be generated
+     *
      * @var string
      */
     private $directory;
 
     /**
-     * @var \Joli\Jane\Model\JsonSchema
+     * The root object use for generating the model,
+     * This is used to resolve reference
+     *
+     * @var object
      */
-    private $rootSchema;
+    private $rootReference;
 
     /**
-     * @var SchemaObjectMap
+     * A reference of all class created for each object,
+     * so passing the same object will use the existing class
+     *
+     * @var ClassGuess[] $objectClassMap
      */
-    private $schemaObjectMap;
+    private $objectClassMap;
 
     /**
-     * @var SchemaObjectMap
-     */
-    private $schemaObjectNormalizerMap;
-
-    /**
+     * Files generated through the run
+     *
      * @var File
      */
     private $files = [];
 
     /**
+     * List of variables name used, allow to generate unique variable name
+     *
      * @var string[]
      */
     private $variablesName = [];
 
+    /**
+     * Internal reference for generating unique variable name
+     * (in a deterministic way, so the same run will give the same name)
+     *
+     * @var int
+     */
     private $reference = 0;
 
     /**
-     * @param JsonSchema $rootSchema
-     * @param string $namespace
-     * @param string $directory
+     * @param mixed        $rootReference
+     * @param string       $namespace
+     * @param string       $directory
+     * @param ClassGuess[] $objectClassMap
      */
-    public function __construct($rootSchema, $namespace, $directory)
+    public function __construct($rootReference, $namespace, $directory, $objectClassMap)
     {
-        $this->rootSchema      = $rootSchema;
+        $this->rootReference   = $rootReference;
         $this->namespace       = $namespace;
         $this->directory       = $directory;
-        $this->schemaObjectMap = new SchemaObjectMap();
-        $this->schemaObjectNormalizerMap = new SchemaObjectMap();
+        $this->objectClassMap  = $objectClassMap;
     }
 
     public function addFile(File $file)
@@ -91,27 +107,19 @@ class Context
     }
 
     /**
-     * @return JsonSchema
+     * @return object
      */
-    public function getRootSchema()
+    public function getRootReference()
     {
-        return $this->rootSchema;
+        return $this->rootReference;
     }
 
     /**
-     * @return SchemaObjectMap
+     * @return ClassGuess[]
      */
-    public function getSchemaObjectMap()
+    public function getObjectClassMap()
     {
-        return $this->schemaObjectMap;
-    }
-
-    /**
-     * @return SchemaObjectMap
-     */
-    public function getSchemaObjectNormalizerMap()
-    {
-        return $this->schemaObjectNormalizerMap;
+        return $this->objectClassMap;
     }
 
     /**

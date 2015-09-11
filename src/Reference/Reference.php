@@ -50,6 +50,11 @@ class Reference
     private $currentSchema;
 
     /**
+     * @var mixed
+     */
+    private $resolved;
+
+    /**
      * @param $ref
      * @param mixed $currentSchema
      */
@@ -162,5 +167,21 @@ class Reference
     public function getCurrentSchema()
     {
         return $this->currentSchema;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResolved()
+    {
+        return $this->resolved;
+    }
+
+    /**
+     * @param mixed $resolved
+     */
+    public function setResolved($resolved)
+    {
+        $this->resolved = $resolved;
     }
 }

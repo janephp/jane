@@ -15,6 +15,7 @@ use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Normalizer\JsonSchemaNormalizer;
 use Joli\Jane\Normalizer\NormalizerChain;
 
+use Joli\Jane\Normalizer\NormalizerFactory;
 use PhpParser\PrettyPrinter\Standard;
 
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -134,7 +135,7 @@ class Jane
     public static function buildSerializer()
     {
         $encoders       = [new JsonEncoder(new JsonEncode(), new JsonDecode(false)), new RawEncoder()];
-        $normalizers    = [new JsonSchemaNormalizer()];
+        $normalizers    = NormalizerFactory::create();
 
         return new Serializer($normalizers, $encoders);
     }

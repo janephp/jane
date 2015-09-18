@@ -42,6 +42,7 @@ class NormalizerGenerator implements GeneratorInterface
     public function generate($schema, $className, Context $context)
     {
         $files   = [];
+        $classes = [];
 
         foreach ($context->getObjectClassMap() as $class) {
             $methods   = [];
@@ -53,6 +54,7 @@ class NormalizerGenerator implements GeneratorInterface
                 $class->getName().'Normalizer',
                 $methods
             );
+            $classes[] = $normalizerClass->name;
 
             $namespace = new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
                 new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Reference\Reference'))]),
@@ -63,6 +65,36 @@ class NormalizerGenerator implements GeneratorInterface
             $files[]   = new File($context->getDirectory().'/Normalizer/'.$class->getName().'Normalizer.php', $namespace, self::FILE_TYPE_NORMALIZER);
         }
 
+        $files[] = new File(
+            $context->getDirectory().'/Normalizer/NormalizerFactory.php',
+            new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
+                $this->createNormalizerFactoryClass($classes)
+            ]),
+            self::FILE_TYPE_NORMALIZER
+        );
+
         return $files;
+    }
+
+    protected function createNormalizerFactoryClass($classes)
+    {
+        $statements = [
+            new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_())
+        ];
+
+        foreach ($classes as $class) {
+            $statements[] = new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_($class));
+        }
+
+        $statements[] = new Stmt\Return_(new Expr\Variable('normalizers'));
+
+        return new Stmt\Class_('NormalizerFactory', [
+            'stmts' => [
+                new Stmt\ClassMethod('create', [
+                    'type' => Stmt\Class_::MODIFIER_STATIC | Stmt\Class_::MODIFIER_PUBLIC,
+                    'stmts' => $statements
+                ])
+            ]
+        ]);
     }
 }

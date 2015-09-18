@@ -4,18 +4,18 @@ namespace Joli\Jane\Reference;
 
 use Joli\Jane\Model\JsonSchema;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class Resolver
 {
     private $schemaCache = [];
 
     /**
-     * @var Serializer
+     * @var SerializerInterface
      */
     private $serializer;
 
-    public function __construct(Serializer $serializer)
+    public function __construct(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
     }
@@ -30,6 +30,24 @@ class Resolver
      * @return mixed Return the json value (deserialized) referenced
      */
     public function resolve(Reference $reference)
+    {
+        if ($reference->getResolved() === null) {
+            $reference->setResolved($this->doResolve($reference));
+        }
+
+        return $reference->getResolved();
+    }
+
+    /**
+     * Resolve a JSON Reference for a Schema
+     *
+     * @param Reference $reference
+     *
+     * @throws UnsupportedException
+     *
+     * @return mixed Return the json value (deserialized) referenced
+     */
+    protected function doResolve(Reference $reference)
     {
         $referencedSchema = $this->resolveSchema($reference, $reference->getCurrentSchema());
 

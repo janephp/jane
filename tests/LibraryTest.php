@@ -25,7 +25,7 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(file_exists(__DIR__ . "/generated/Model/JsonSchema.php"));
         $this->assertTrue(file_exists(__DIR__ . "/generated/Normalizer/JsonSchemaNormalizer.php"));
-        $this->assertTrue(file_exists(__DIR__ . "/generated/Normalizer/NormalizerChain.php"));
+        $this->assertTrue(file_exists(__DIR__ . "/generated/Normalizer/NormalizerFactory.php"));
 
         $this->assertEquals(
             file_get_contents(__DIR__ . "/../src/Model/JsonSchema.php"),
@@ -38,8 +38,8 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            file_get_contents(__DIR__ . "/../src/Normalizer/NormalizerChain.php"),
-            file_get_contents(__DIR__ . "/generated/Normalizer/NormalizerChain.php")
+            file_get_contents(__DIR__ . "/../src/Normalizer/NormalizerFactory.php"),
+            file_get_contents(__DIR__ . "/generated/Normalizer/NormalizerFactory.php")
         );
     }
 } 

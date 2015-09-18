@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Model;
 
-class JsonSchema extends \ArrayObject
+class JsonSchema
 {
     /**
      * @var string
@@ -49,7 +49,7 @@ class JsonSchema extends \ArrayObject
      */
     protected $maxLength;
     /**
-     * @var int|mixed
+     * @var int
      */
     protected $minLength;
     /**
@@ -69,7 +69,7 @@ class JsonSchema extends \ArrayObject
      */
     protected $maxItems;
     /**
-     * @var int|mixed
+     * @var int
      */
     protected $minItems;
     /**
@@ -81,7 +81,7 @@ class JsonSchema extends \ArrayObject
      */
     protected $maxProperties;
     /**
-     * @var int|mixed
+     * @var int
      */
     protected $minProperties;
     /**
@@ -109,7 +109,7 @@ class JsonSchema extends \ArrayObject
      */
     protected $dependencies;
     /**
-     * @var array
+     * @var mixed[]
      */
     protected $enum;
     /**
@@ -148,7 +148,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setId($id = null)
+    public function setId($id)
     {
         $this->id = $id;
 
@@ -166,7 +166,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setDollarSchema($dollarSchema = null)
+    public function setDollarSchema($dollarSchema)
     {
         $this->dollarSchema = $dollarSchema;
 
@@ -184,7 +184,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setTitle($title = null)
+    public function setTitle($title)
     {
         $this->title = $title;
 
@@ -202,7 +202,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setDescription($description = null)
+    public function setDescription($description)
     {
         $this->description = $description;
 
@@ -220,7 +220,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setDefault($default = null)
+    public function setDefault($default)
     {
         $this->default = $default;
 
@@ -238,7 +238,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setMultipleOf($multipleOf = null)
+    public function setMultipleOf($multipleOf)
     {
         $this->multipleOf = $multipleOf;
 
@@ -256,7 +256,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setMaximum($maximum = null)
+    public function setMaximum($maximum)
     {
         $this->maximum = $maximum;
 
@@ -274,7 +274,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setExclusiveMaximum($exclusiveMaximum = null)
+    public function setExclusiveMaximum($exclusiveMaximum)
     {
         $this->exclusiveMaximum = $exclusiveMaximum;
 
@@ -292,7 +292,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setMinimum($minimum = null)
+    public function setMinimum($minimum)
     {
         $this->minimum = $minimum;
 
@@ -310,7 +310,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setExclusiveMinimum($exclusiveMinimum = null)
+    public function setExclusiveMinimum($exclusiveMinimum)
     {
         $this->exclusiveMinimum = $exclusiveMinimum;
 
@@ -328,25 +328,25 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setMaxLength($maxLength = null)
+    public function setMaxLength($maxLength)
     {
         $this->maxLength = $maxLength;
 
         return $this;
     }
     /**
-     * @return int|mixed
+     * @return int
      */
     public function getMinLength()
     {
         return $this->minLength;
     }
     /**
-     * @param int|mixed $minLength
+     * @param int $minLength
      *
      * @return self
      */
-    public function setMinLength($minLength = null)
+    public function setMinLength($minLength)
     {
         $this->minLength = $minLength;
 
@@ -364,7 +364,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setPattern($pattern = null)
+    public function setPattern($pattern)
     {
         $this->pattern = $pattern;
 
@@ -382,7 +382,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setAdditionalItems($additionalItems = null)
+    public function setAdditionalItems($additionalItems)
     {
         $this->additionalItems = $additionalItems;
 
@@ -400,7 +400,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setItems($items = null)
+    public function setItems($items)
     {
         $this->items = $items;
 
@@ -418,25 +418,25 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setMaxItems($maxItems = null)
+    public function setMaxItems($maxItems)
     {
         $this->maxItems = $maxItems;
 
         return $this;
     }
     /**
-     * @return int|mixed
+     * @return int
      */
     public function getMinItems()
     {
         return $this->minItems;
     }
     /**
-     * @param int|mixed $minItems
+     * @param int $minItems
      *
      * @return self
      */
-    public function setMinItems($minItems = null)
+    public function setMinItems($minItems)
     {
         $this->minItems = $minItems;
 
@@ -454,7 +454,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setUniqueItems($uniqueItems = null)
+    public function setUniqueItems($uniqueItems)
     {
         $this->uniqueItems = $uniqueItems;
 
@@ -472,25 +472,25 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setMaxProperties($maxProperties = null)
+    public function setMaxProperties($maxProperties)
     {
         $this->maxProperties = $maxProperties;
 
         return $this;
     }
     /**
-     * @return int|mixed
+     * @return int
      */
     public function getMinProperties()
     {
         return $this->minProperties;
     }
     /**
-     * @param int|mixed $minProperties
+     * @param int $minProperties
      *
      * @return self
      */
-    public function setMinProperties($minProperties = null)
+    public function setMinProperties($minProperties)
     {
         $this->minProperties = $minProperties;
 
@@ -508,7 +508,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setRequired($required = null)
+    public function setRequired($required)
     {
         $this->required = $required;
 
@@ -526,7 +526,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setAdditionalProperties($additionalProperties = null)
+    public function setAdditionalProperties($additionalProperties)
     {
         $this->additionalProperties = $additionalProperties;
 
@@ -544,7 +544,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setDefinitions($definitions = null)
+    public function setDefinitions($definitions)
     {
         $this->definitions = $definitions;
 
@@ -562,7 +562,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setProperties($properties = null)
+    public function setProperties($properties)
     {
         $this->properties = $properties;
 
@@ -580,7 +580,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setPatternProperties($patternProperties = null)
+    public function setPatternProperties($patternProperties)
     {
         $this->patternProperties = $patternProperties;
 
@@ -598,25 +598,25 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setDependencies($dependencies = null)
+    public function setDependencies($dependencies)
     {
         $this->dependencies = $dependencies;
 
         return $this;
     }
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getEnum()
     {
         return $this->enum;
     }
     /**
-     * @param array $enum
+     * @param mixed[] $enum
      *
      * @return self
      */
-    public function setEnum($enum = null)
+    public function setEnum($enum)
     {
         $this->enum = $enum;
 
@@ -634,7 +634,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setType($type = null)
+    public function setType($type)
     {
         $this->type = $type;
 
@@ -652,7 +652,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setFormat($format = null)
+    public function setFormat($format)
     {
         $this->format = $format;
 
@@ -670,7 +670,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setAllOf($allOf = null)
+    public function setAllOf($allOf)
     {
         $this->allOf = $allOf;
 
@@ -688,7 +688,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setAnyOf($anyOf = null)
+    public function setAnyOf($anyOf)
     {
         $this->anyOf = $anyOf;
 
@@ -706,7 +706,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setOneOf($oneOf = null)
+    public function setOneOf($oneOf)
     {
         $this->oneOf = $oneOf;
 
@@ -724,7 +724,7 @@ class JsonSchema extends \ArrayObject
      *
      * @return self
      */
-    public function setNot($not = null)
+    public function setNot($not)
     {
         $this->not = $not;
 

@@ -47,6 +47,18 @@ class ObjectType extends Type
     /**
      * (@inheritDoc}
      */
+    protected function createNormalizationValueStatement(Context $context, Expr $input)
+    {
+        return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'serializer'), 'serialize', [
+            new Arg($input),
+            new Arg(new Scalar\String_('raw')),
+            new Arg(new Expr\Variable('context'))
+        ]);
+    }
+
+    /**
+     * (@inheritDoc}
+     */
     public function createConditionStatement(Expr $input)
     {
         $conditionStatement = parent::createConditionStatement($input);

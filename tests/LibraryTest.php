@@ -3,6 +3,7 @@
 namespace Joli\Jane\Tests;
 
 use Joli\Jane\Jane;
+use Joli\Jane\Model\JsonSchema;
 
 class LibraryTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,5 +42,16 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
             file_get_contents(__DIR__ . "/../src/Normalizer/NormalizerFactory.php"),
             file_get_contents(__DIR__ . "/generated/Normalizer/NormalizerFactory.php")
         );
+    }
+
+    public function testBothWay()
+    {
+        $serializer = Jane::buildSerializer();
+
+        $json = file_get_contents(__DIR__ . '/data/json-schema.json');
+        $schema = $serializer->deserialize($json, JsonSchema::class, 'json');
+        $newJson = $serializer->serialize($schema, 'json');
+
+        $this->assertEquals(json_decode($json), json_decode($newJson));
     }
 } 

@@ -48,7 +48,9 @@ class NormalizerGenerator implements GeneratorInterface
             $methods   = [];
             $modelFqdn = $context->getNamespace()."\\Model\\".$class->getName();
             $methods[] = $this->createSupportsDenormalizationMethod($modelFqdn);
+            $methods[] = $this->createSupportsNormalizationMethod($modelFqdn);
             $methods[] = $this->createDenormalizeMethod($modelFqdn, $context, $class->getProperties());
+            $methods[] = $this->createNormalizeMethod($modelFqdn, $context, $class->getProperties());
 
             $normalizerClass = $this->createNormalizerClass(
                 $class->getName().'Normalizer',
@@ -59,6 +61,7 @@ class NormalizerGenerator implements GeneratorInterface
             $namespace = new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
                 new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Reference\Reference'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'))]),
+                new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\NormalizerInterface'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer'))]),
                 $normalizerClass
             ]);
@@ -68,6 +71,7 @@ class NormalizerGenerator implements GeneratorInterface
         $files[] = new File(
             $context->getDirectory().'/Normalizer/NormalizerFactory.php',
             new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
+                new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Normalizer\ReferenceNormalizer'))]),
                 $this->createNormalizerFactoryClass($classes)
             ]),
             self::FILE_TYPE_NORMALIZER
@@ -79,7 +83,8 @@ class NormalizerGenerator implements GeneratorInterface
     protected function createNormalizerFactoryClass($classes)
     {
         $statements = [
-            new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_())
+            new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_()),
+            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('ReferenceNormalizer')))
         ];
 
         foreach ($classes as $class) {

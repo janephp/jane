@@ -31,6 +31,17 @@ class Type
         self::TYPE_OBJECT  => 'is_object',
     ];
 
+    protected $normalizationConditionMapping = [
+        self::TYPE_BOOLEAN => 'is_bool',
+        self::TYPE_INTEGER => 'is_int',
+        self::TYPE_FLOAT   => 'is_float',
+        self::TYPE_STRING  => 'is_string',
+        self::TYPE_NULL    => 'is_null',
+        self::TYPE_MIXED   => '!is_null',
+        self::TYPE_ARRAY   => 'is_array',
+        self::TYPE_OBJECT  => 'is_object',
+    ];
+
     protected $name;
 
     protected $object;
@@ -70,6 +81,19 @@ class Type
     }
 
     /**
+     * Return the normalization used for this type
+     *
+     * @param Context  $context
+     * @param Expr     $input
+     *
+     * @return Expr[], Expr First array contain all the expr need to transform the input value, second statement is the expr of assignement
+     */
+    public function createNormalizationStatement(Context $context, Expr $input)
+    {
+        return [[], $this->createNormalizationValueStatement($context, $input)];
+    }
+
+    /**
      * Create the denormalization Value Statement (Expr of assignement)
      *
      * @param Context  $context
@@ -78,6 +102,19 @@ class Type
      * @return Expr
      */
     protected function createDenormalizationValueStatement(Context $context, Expr $input)
+    {
+        return $input;
+    }
+
+    /**
+     * Create the normalization Value Statement (Expr of assignement)
+     *
+     * @param Context  $context
+     * @param Expr     $input
+     *
+     * @return Expr
+     */
+    protected function createNormalizationValueStatement(Context $context, Expr $input)
     {
         return $input;
     }
@@ -93,6 +130,23 @@ class Type
     {
         return new Expr\FuncCall(
             new Name($this->conditionMapping[$this->name]),
+            [
+                new Arg($input)
+            ]
+        );
+    }
+
+    /**
+     * Create the condition Statement
+     *
+     * @param Expr $input
+     *
+     * @return Expr
+     */
+    public function createNormalizationConditionStatement(Expr $input)
+    {
+        return new Expr\FuncCall(
+            new Name($this->normalizationConditionMapping[$this->name]),
             [
                 new Arg($input)
             ]

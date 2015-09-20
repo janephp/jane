@@ -134,7 +134,7 @@ class Jane
 
     public static function buildSerializer()
     {
-        $encoders       = [new JsonEncoder(new JsonEncode(), new JsonDecode(false)), new RawEncoder()];
+        $encoders       = [new JsonEncoder(new JsonEncode(JSON_UNESCAPED_SLASHES), new JsonDecode(false)), new RawEncoder()];
         $normalizers    = NormalizerFactory::create();
 
         return new Serializer($normalizers, $encoders);

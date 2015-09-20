@@ -61,7 +61,40 @@ class ArrayType extends Type
         return [$statements, $valuesVar];
     }
 
+    /**
+     * (@inheritDoc}
+     */
+    public function createNormalizationStatement(Context $context, Expr $input)
+    {
+        $valuesVar     = new Expr\Variable($context->getUniqueVariableName('values'));
+        $statements    = [
+            // $values = [];
+            new Expr\Assign($valuesVar, $this->createNormalizationArrayValueStatement()),
+        ];
+
+        $loopValueVar   = new Expr\Variable($context->getUniqueVariableName('value'));
+        $loopKeyVar     = $this->createLoopKeyStatement($context);
+
+        list($subStatements, $outputExpr) = $this->itemType->createNormalizationStatement($context, $loopValueVar);
+
+        $loopStatements   = array_merge($subStatements, [
+            new Expr\Assign($this->createNormalizationLoopOutputAssignement($valuesVar, $loopKeyVar), $outputExpr)
+        ]);
+
+        $statements[]     = new Stmt\Foreach_($input, $loopValueVar, [
+            'keyVar' => $loopKeyVar,
+            'stmts'  => $loopStatements
+        ]);
+
+        return [$statements, $valuesVar];
+    }
+
     protected function createArrayValueStatement()
+    {
+        return new Expr\Array_();
+    }
+
+    protected function createNormalizationArrayValueStatement()
     {
         return new Expr\Array_();
     }
@@ -72,6 +105,11 @@ class ArrayType extends Type
     }
 
     protected function createLoopOutputAssignement(Expr $valuesVar, $loopKeyVar)
+    {
+        return new Expr\ArrayDimFetch($valuesVar);
+    }
+
+    protected function createNormalizationLoopOutputAssignement(Expr $valuesVar, $loopKeyVar)
     {
         return new Expr\ArrayDimFetch($valuesVar);
     }

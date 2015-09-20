@@ -63,7 +63,6 @@ class MultipleType extends Type
         return implode('|', $stringTypes);
     }
 
-
     /**
      * (@inheritDoc}
      */
@@ -78,7 +77,7 @@ class MultipleType extends Type
             list ($typeStatements, $typeOutput) = $type->createDenormalizationStatement($context, $input);
 
             $statements[] = new Stmt\If_(
-                $this->createItemConditionStatement($type, $input),
+                $type->createConditionStatement($input),
                 [
                     'stmts' => array_merge(
                         $typeStatements, [
@@ -91,10 +90,32 @@ class MultipleType extends Type
 
         return [$statements, $output];
     }
-
-    protected function createItemConditionStatement(Type $type, Expr $input)
+    /**
+     * (@inheritDoc}
+     */
+    public function createNormalizationStatement(Context $context, Expr $input)
     {
-        return $type->createConditionStatement($input);
+        $output     = new Expr\Variable($context->getUniqueVariableName('value'));
+        $statements = [
+            new Expr\Assign($output, $input)
+        ];
+
+        foreach ($this->getTypes() as $type) {
+            list ($typeStatements, $typeOutput) = $type->createNormalizationStatement($context, $input);
+
+            $statements[] = new Stmt\If_(
+                $type->createNormalizationConditionStatement($input),
+                [
+                    'stmts' => array_merge(
+                        $typeStatements, [
+                            new Expr\Assign($output, $typeOutput)
+                        ]
+                    )
+                ]
+            );
+        }
+
+        return [$statements, $output];
     }
 }
  

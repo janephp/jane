@@ -14,7 +14,7 @@ use Joli\Jane\Model\JsonSchema;
 
 class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
 {
-    private $typesSupported = [
+    protected $typesSupported = [
         'boolean',
         'integer',
         'number',
@@ -22,7 +22,7 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
         'null'
     ];
 
-    private $phpTypesMapping = [
+    protected $phpTypesMapping = [
         'boolean' => 'bool',
         'integer' => 'int',
         'number'  => 'float',

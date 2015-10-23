@@ -72,6 +72,7 @@ class NormalizerGenerator implements GeneratorInterface
             $context->getDirectory().'/Normalizer/NormalizerFactory.php',
             new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
                 new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Normalizer\ReferenceNormalizer'))]),
+                new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Normalizer\NormalizerArray'))]),
                 $this->createNormalizerFactoryClass($classes)
             ]),
             self::FILE_TYPE_NORMALIZER
@@ -84,7 +85,8 @@ class NormalizerGenerator implements GeneratorInterface
     {
         $statements = [
             new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_()),
-            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('ReferenceNormalizer')))
+            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('ReferenceNormalizer'))),
+            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('NormalizerArray')))
         ];
 
         foreach ($classes as $class) {

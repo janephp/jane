@@ -101,5 +101,12 @@ class ObjectType extends Type
 
         return $conditionStatement;
     }
+
+    /**
+     * (@inheritDoc}
+     */
+    public function getTypeHint()
+    {
+        return $this->className;
+    }
 }
- 

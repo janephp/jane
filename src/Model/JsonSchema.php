@@ -148,7 +148,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setId($id)
+    public function setId($id = null)
     {
         $this->id = $id;
 
@@ -166,7 +166,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setDollarSchema($dollarSchema)
+    public function setDollarSchema($dollarSchema = null)
     {
         $this->dollarSchema = $dollarSchema;
 
@@ -184,7 +184,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setTitle($title)
+    public function setTitle($title = null)
     {
         $this->title = $title;
 
@@ -202,7 +202,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setDescription($description)
+    public function setDescription($description = null)
     {
         $this->description = $description;
 
@@ -220,7 +220,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setDefault($default)
+    public function setDefault($default = null)
     {
         $this->default = $default;
 
@@ -238,7 +238,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMultipleOf($multipleOf)
+    public function setMultipleOf($multipleOf = null)
     {
         $this->multipleOf = $multipleOf;
 
@@ -256,7 +256,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMaximum($maximum)
+    public function setMaximum($maximum = null)
     {
         $this->maximum = $maximum;
 
@@ -274,7 +274,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setExclusiveMaximum($exclusiveMaximum)
+    public function setExclusiveMaximum($exclusiveMaximum = null)
     {
         $this->exclusiveMaximum = $exclusiveMaximum;
 
@@ -292,7 +292,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMinimum($minimum)
+    public function setMinimum($minimum = null)
     {
         $this->minimum = $minimum;
 
@@ -310,7 +310,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setExclusiveMinimum($exclusiveMinimum)
+    public function setExclusiveMinimum($exclusiveMinimum = null)
     {
         $this->exclusiveMinimum = $exclusiveMinimum;
 
@@ -328,7 +328,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMaxLength($maxLength)
+    public function setMaxLength($maxLength = null)
     {
         $this->maxLength = $maxLength;
 
@@ -346,7 +346,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMinLength($minLength)
+    public function setMinLength($minLength = null)
     {
         $this->minLength = $minLength;
 
@@ -364,7 +364,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setPattern($pattern)
+    public function setPattern($pattern = null)
     {
         $this->pattern = $pattern;
 
@@ -382,7 +382,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setAdditionalItems($additionalItems)
+    public function setAdditionalItems($additionalItems = null)
     {
         $this->additionalItems = $additionalItems;
 
@@ -400,7 +400,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setItems($items)
+    public function setItems($items = null)
     {
         $this->items = $items;
 
@@ -418,7 +418,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMaxItems($maxItems)
+    public function setMaxItems($maxItems = null)
     {
         $this->maxItems = $maxItems;
 
@@ -436,7 +436,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMinItems($minItems)
+    public function setMinItems($minItems = null)
     {
         $this->minItems = $minItems;
 
@@ -454,7 +454,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setUniqueItems($uniqueItems)
+    public function setUniqueItems($uniqueItems = null)
     {
         $this->uniqueItems = $uniqueItems;
 
@@ -472,7 +472,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMaxProperties($maxProperties)
+    public function setMaxProperties($maxProperties = null)
     {
         $this->maxProperties = $maxProperties;
 
@@ -490,7 +490,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setMinProperties($minProperties)
+    public function setMinProperties($minProperties = null)
     {
         $this->minProperties = $minProperties;
 
@@ -508,7 +508,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setRequired($required)
+    public function setRequired(array $required = null)
     {
         $this->required = $required;
 
@@ -526,7 +526,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setAdditionalProperties($additionalProperties)
+    public function setAdditionalProperties($additionalProperties = null)
     {
         $this->additionalProperties = $additionalProperties;
 
@@ -544,7 +544,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setDefinitions($definitions)
+    public function setDefinitions(\ArrayObject $definitions = null)
     {
         $this->definitions = $definitions;
 
@@ -562,7 +562,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setProperties($properties)
+    public function setProperties(\ArrayObject $properties = null)
     {
         $this->properties = $properties;
 
@@ -580,7 +580,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setPatternProperties($patternProperties)
+    public function setPatternProperties(\ArrayObject $patternProperties = null)
     {
         $this->patternProperties = $patternProperties;
 
@@ -598,7 +598,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setDependencies($dependencies)
+    public function setDependencies(\ArrayObject $dependencies = null)
     {
         $this->dependencies = $dependencies;
 
@@ -616,7 +616,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setEnum($enum)
+    public function setEnum(array $enum = null)
     {
         $this->enum = $enum;
 
@@ -634,7 +634,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setType($type)
+    public function setType($type = null)
     {
         $this->type = $type;
 
@@ -652,7 +652,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setFormat($format)
+    public function setFormat($format = null)
     {
         $this->format = $format;
 
@@ -670,7 +670,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setAllOf($allOf)
+    public function setAllOf(array $allOf = null)
     {
         $this->allOf = $allOf;
 
@@ -688,7 +688,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setAnyOf($anyOf)
+    public function setAnyOf(array $anyOf = null)
     {
         $this->anyOf = $anyOf;
 
@@ -706,7 +706,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setOneOf($oneOf)
+    public function setOneOf(array $oneOf = null)
     {
         $this->oneOf = $oneOf;
 
@@ -724,7 +724,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setNot($not)
+    public function setNot(JsonSchema $not = null)
     {
         $this->not = $not;
 

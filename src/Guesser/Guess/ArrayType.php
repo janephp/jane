@@ -89,6 +89,14 @@ class ArrayType extends Type
         return [$statements, $valuesVar];
     }
 
+    /**
+     * (@inheritDoc}
+     */
+    public function getTypeHint()
+    {
+        return 'array';
+    }
+
     protected function createArrayValueStatement()
     {
         return new Expr\Array_();
@@ -114,4 +122,3 @@ class ArrayType extends Type
         return new Expr\ArrayDimFetch($valuesVar);
     }
 }
- 

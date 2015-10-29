@@ -17,6 +17,14 @@ class MapType extends ArrayType
     }
 
     /**
+     * (@inheritDoc}
+     */
+    public function getTypeHint()
+    {
+        return new Name('\ArrayObject');
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function createArrayValueStatement()
@@ -59,4 +67,3 @@ class MapType extends ArrayType
         return new Expr\PropertyFetch($valuesVar, $loopKeyVar);
     }
 }
- 

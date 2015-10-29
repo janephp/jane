@@ -152,5 +152,14 @@ class Type
             ]
         );
     }
+
+    /**
+     * Create the typehint statement
+     *
+     * @return null|string|Name
+     */
+    public function getTypeHint()
+    {
+        return null;
+    }
 }
- 

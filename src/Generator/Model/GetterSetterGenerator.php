@@ -3,10 +3,8 @@
 namespace Joli\Jane\Generator\Model;
 
 use Joli\Jane\Generator\Naming;
-
 use Joli\Jane\Guesser\Guess\Type;
 use PhpParser\Comment\Doc;
-
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -15,12 +13,12 @@ use PhpParser\Node\Expr;
 trait GetterSetterGenerator
 {
     /**
-     * @var \Joli\Jane\Generator\Naming
+     * @var Naming
      */
     protected $naming;
 
     /**
-     * Create get method
+     * Create get method.
      *
      * @param $name
      * @param Type $type
@@ -39,16 +37,16 @@ trait GetterSetterGenerator
                     // return $this->property;
                     new Stmt\Return_(
                         new Expr\PropertyFetch(new Expr\Variable('this'), $this->naming->getPropertyName($name))
-                    )
-                ]
+                    ),
+                ],
             ], [
-                'comments' => [$this->createGetterDoc($type)]
+                'comments' => [$this->createGetterDoc($type)],
             ]
         );
     }
 
     /**
-     * Create set method
+     * Create set method.
      *
      * @param $name
      * @param Type $type
@@ -65,7 +63,7 @@ trait GetterSetterGenerator
                 'type' => Stmt\Class_::MODIFIER_PUBLIC,
                 // ($property)
                 'params' => [
-                    new Param($this->naming->getPropertyName($name))
+                    new Param($this->naming->getPropertyName($name), new Expr\ConstFetch(new Name('null')), $type->getTypeHint()),
                 ],
                 'stmts' => [
                     // $this->property = $property;
@@ -76,16 +74,16 @@ trait GetterSetterGenerator
                         ), new Expr\Variable($this->naming->getPropertyName($name))
                     ),
                     // return $this;
-                    new Stmt\Return_(new Expr\Variable('this'))
-                ]
+                    new Stmt\Return_(new Expr\Variable('this')),
+                ],
             ], [
-                'comments' => [$this->createSetterDoc($name, $type)]
+                'comments' => [$this->createSetterDoc($name, $type)],
             ]
         );
     }
 
     /**
-     * Return doc for get method
+     * Return doc for get method.
      *
      * @param Type $type
      *
@@ -102,7 +100,7 @@ EOD
     }
 
     /**
-     * Return doc for set method
+     * Return doc for set method.
      *
      * @param $name
      * @param Type $type
@@ -120,4 +118,4 @@ EOD
 EOD
         , $type->__toString(), '$'.$this->naming->getPropertyName($name)));
     }
-} 
+}

@@ -7,13 +7,10 @@ use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\ModelGenerator;
 use Joli\Jane\Generator\Naming;
 use Joli\Jane\Generator\NormalizerGenerator;
-use Joli\Jane\Generator\TypeDecisionManager;
 use Joli\Jane\Guesser\ChainGuesser;
-use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\JsonSchema\JsonSchemaGuesserFactory;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Normalizer\JsonSchemaNormalizer;
-use Joli\Jane\Normalizer\NormalizerChain;
 
 use Joli\Jane\Normalizer\NormalizerFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -23,7 +20,8 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\CS\Config\Config;
-use Symfony\CS\ConfigurationResolver;
+use Symfony\CS\Console\ConfigurationResolver;
+use Symfony\CS\Finder\DefaultFinder;
 use Symfony\CS\Fixer;
 use Symfony\CS\FixerInterface;
 
@@ -101,19 +99,33 @@ class Jane
         }
 
         if ($this->fixer !== null) {
-            $config = new Config();
-            $config->setDir($directory);
-            $config->level(FixerInterface::PSR0_LEVEL | FixerInterface::PSR1_LEVEL | FixerInterface::PSR2_LEVEL);
+
+            $config = Config::create()
+                ->setRiskyAllowed(true)
+                ->setRules(array(
+                    '@Symfony' => true,
+                    'empty_return' => false,
+                    'concat_without_spaces' => false,
+                    'double_arrow_multiline_whitespaces' => false,
+                    'unalign_equals' => false,
+                    'unalign_double_arrow' => false,
+                    'align_double_arrow' => true,
+                    'align_equals' => true,
+                    'concat_with_spaces' => true,
+                    'newline_after_open_tag' => true,
+                    'ordered_use' => true,
+                    'phpdoc_order' => true,
+                    'short_array_syntax' => true,
+                ))
+                ->finder(
+                    DefaultFinder::create()
+                        ->in($directory)
+                )
+            ;
 
             $resolver = new ConfigurationResolver();
-            $resolver
-                ->setAllFixers($this->fixer->getFixers())
-                ->setConfig($config)
-                ->resolve();
-
-            $config->fixers(array_merge($resolver->getFixers(), [
-                new Fixer\Symfony\ReturnFixer()
-            ]));
+            $resolver->setDefaultConfig($config);
+            $resolver->resolve();
 
             $this->fixer->fix($config);
         }
@@ -127,7 +139,6 @@ class Jane
         $modelGenerator = new ModelGenerator($naming, $chainGuesser, $chainGuesser);
         $normGenerator  = new NormalizerGenerator($naming);
         $fixer          = new Fixer();
-        $fixer->registerBuiltInFixers();
 
         return new self($serializer, $chainGuesser, $modelGenerator, $normGenerator, $fixer);
     }

@@ -17,6 +17,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
         return true;
     }
+
     public function supportsNormalization($data, $format = null)
     {
         if ($data instanceof \Joli\Jane\Model\JsonSchema) {
@@ -25,7 +26,8 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
         return false;
     }
-    public function denormalize($data, $class, $format = null, array $context = array())
+
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (empty($data)) {
             return null;
@@ -92,7 +94,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value_0 = $this->serializer->deserialize($data->{'items'}, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             if (is_array($data->{'items'})) {
-                $values = array();
+                $values = [];
                 foreach ($data->{'items'} as $value_1) {
                     $values[] = $this->serializer->deserialize($value_1, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
                 }
@@ -116,7 +118,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $object->setMinProperties($data->{'minProperties'});
         }
         if (isset($data->{'required'})) {
-            $values_2 = array();
+            $values_2 = [];
             foreach ($data->{'required'} as $value_3) {
                 $values_2[] = $value_3;
             }
@@ -133,35 +135,35 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $object->setAdditionalProperties($value_4);
         }
         if (isset($data->{'definitions'})) {
-            $values_5 = new \ArrayObject(array(), \ArrayObject::ARRAY_AS_PROPS);
+            $values_5 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'definitions'} as $key => $value_6) {
                 $values_5[$key] = $this->serializer->deserialize($value_6, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setDefinitions($values_5);
         }
         if (isset($data->{'properties'})) {
-            $values_7 = new \ArrayObject(array(), \ArrayObject::ARRAY_AS_PROPS);
+            $values_7 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'properties'} as $key_9 => $value_8) {
                 $values_7[$key_9] = $this->serializer->deserialize($value_8, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setProperties($values_7);
         }
         if (isset($data->{'patternProperties'})) {
-            $values_10 = new \ArrayObject(array(), \ArrayObject::ARRAY_AS_PROPS);
+            $values_10 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'patternProperties'} as $key_12 => $value_11) {
                 $values_10[$key_12] = $this->serializer->deserialize($value_11, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setPatternProperties($values_10);
         }
         if (isset($data->{'dependencies'})) {
-            $values_13 = new \ArrayObject(array(), \ArrayObject::ARRAY_AS_PROPS);
+            $values_13 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'dependencies'} as $key_15 => $value_14) {
                 $value_16 = $value_14;
                 if (is_object($value_14)) {
                     $value_16 = $this->serializer->deserialize($value_14, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
                 }
                 if (is_array($value_14)) {
-                    $values_17 = array();
+                    $values_17 = [];
                     foreach ($value_14 as $value_18) {
                         $values_17[] = $value_18;
                     }
@@ -172,7 +174,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $object->setDependencies($values_13);
         }
         if (isset($data->{'enum'})) {
-            $values_19 = array();
+            $values_19 = [];
             foreach ($data->{'enum'} as $value_20) {
                 $values_19[] = $value_20;
             }
@@ -184,7 +186,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value_21 = $data->{'type'};
             }
             if (is_array($data->{'type'})) {
-                $values_22 = array();
+                $values_22 = [];
                 foreach ($data->{'type'} as $value_23) {
                     $values_22[] = $value_23;
                 }
@@ -196,21 +198,21 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $object->setFormat($data->{'format'});
         }
         if (isset($data->{'allOf'})) {
-            $values_24 = array();
+            $values_24 = [];
             foreach ($data->{'allOf'} as $value_25) {
                 $values_24[] = $this->serializer->deserialize($value_25, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setAllOf($values_24);
         }
         if (isset($data->{'anyOf'})) {
-            $values_26 = array();
+            $values_26 = [];
             foreach ($data->{'anyOf'} as $value_27) {
                 $values_26[] = $this->serializer->deserialize($value_27, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setAnyOf($values_26);
         }
         if (isset($data->{'oneOf'})) {
-            $values_28 = array();
+            $values_28 = [];
             foreach ($data->{'oneOf'} as $value_29) {
                 $values_28[] = $this->serializer->deserialize($value_29, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
@@ -222,7 +224,8 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
         return $object;
     }
-    public function normalize($object, $format = null, array $context = array())
+
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = new \stdClass();
         if (null !== $object->getId()) {
@@ -280,7 +283,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value_31 = $this->serializer->serialize($object->getItems(), 'raw', $context);
             }
             if (is_array($object->getItems())) {
-                $values_32 = array();
+                $values_32 = [];
                 foreach ($object->getItems() as $value_33) {
                     $values_32[] = $this->serializer->serialize($value_33, 'raw', $context);
                 }
@@ -304,7 +307,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $data->{'minProperties'} = $object->getMinProperties();
         }
         if (null !== $object->getRequired()) {
-            $values_34 = array();
+            $values_34 = [];
             foreach ($object->getRequired() as $value_35) {
                 $values_34[] = $value_35;
             }
@@ -349,7 +352,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                     $value_49 = $this->serializer->serialize($value_47, 'raw', $context);
                 }
                 if (is_array($value_47)) {
-                    $values_50 = array();
+                    $values_50 = [];
                     foreach ($value_47 as $value_51) {
                         $values_50[] = $value_51;
                     }
@@ -360,7 +363,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $data->{'dependencies'} = $values_46;
         }
         if (null !== $object->getEnum()) {
-            $values_52 = array();
+            $values_52 = [];
             foreach ($object->getEnum() as $value_53) {
                 $values_52[] = $value_53;
             }
@@ -372,7 +375,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value_54 = $object->getType();
             }
             if (is_array($object->getType())) {
-                $values_55 = array();
+                $values_55 = [];
                 foreach ($object->getType() as $value_56) {
                     $values_55[] = $value_56;
                 }
@@ -384,21 +387,21 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             $data->{'format'} = $object->getFormat();
         }
         if (null !== $object->getAllOf()) {
-            $values_57 = array();
+            $values_57 = [];
             foreach ($object->getAllOf() as $value_58) {
                 $values_57[] = $this->serializer->serialize($value_58, 'raw', $context);
             }
             $data->{'allOf'} = $values_57;
         }
         if (null !== $object->getAnyOf()) {
-            $values_59 = array();
+            $values_59 = [];
             foreach ($object->getAnyOf() as $value_60) {
                 $values_59[] = $this->serializer->serialize($value_60, 'raw', $context);
             }
             $data->{'anyOf'} = $values_59;
         }
         if (null !== $object->getOneOf()) {
-            $values_61 = array();
+            $values_61 = [];
             foreach ($object->getOneOf() as $value_62) {
                 $values_61[] = $this->serializer->serialize($value_62, 'raw', $context);
             }

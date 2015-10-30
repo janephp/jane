@@ -21,7 +21,7 @@
         "symfony/yaml": "^2.7",
         "symfony/serializer": "^2.7",
         "symfony/property-access": "^2.7",
-        "fabpot/php-cs-fixer": "^1.10",
+        "fabpot/php-cs-fixer": "dev-master",
         "nikic/php-parser": "^1.4",
         "doctrine/inflector": "^1.0"
     },

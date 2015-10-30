@@ -136,6 +136,7 @@ class JsonSchema
      * @var JsonSchema
      */
     protected $not;
+
     /**
      * @return string
      */
@@ -143,6 +144,7 @@ class JsonSchema
     {
         return $this->id;
     }
+
     /**
      * @param string $id
      *
@@ -154,6 +156,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return string
      */
@@ -161,6 +164,7 @@ class JsonSchema
     {
         return $this->dollarSchema;
     }
+
     /**
      * @param string $dollarSchema
      *
@@ -172,6 +176,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return string
      */
@@ -179,6 +184,7 @@ class JsonSchema
     {
         return $this->title;
     }
+
     /**
      * @param string $title
      *
@@ -190,6 +196,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return string
      */
@@ -197,6 +204,7 @@ class JsonSchema
     {
         return $this->description;
     }
+
     /**
      * @param string $description
      *
@@ -208,6 +216,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return mixed
      */
@@ -215,6 +224,7 @@ class JsonSchema
     {
         return $this->default;
     }
+
     /**
      * @param mixed $default
      *
@@ -226,6 +236,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return float
      */
@@ -233,6 +244,7 @@ class JsonSchema
     {
         return $this->multipleOf;
     }
+
     /**
      * @param float $multipleOf
      *
@@ -244,6 +256,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return float
      */
@@ -251,6 +264,7 @@ class JsonSchema
     {
         return $this->maximum;
     }
+
     /**
      * @param float $maximum
      *
@@ -262,6 +276,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return bool
      */
@@ -269,6 +284,7 @@ class JsonSchema
     {
         return $this->exclusiveMaximum;
     }
+
     /**
      * @param bool $exclusiveMaximum
      *
@@ -280,6 +296,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return float
      */
@@ -287,6 +304,7 @@ class JsonSchema
     {
         return $this->minimum;
     }
+
     /**
      * @param float $minimum
      *
@@ -298,6 +316,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return bool
      */
@@ -305,6 +324,7 @@ class JsonSchema
     {
         return $this->exclusiveMinimum;
     }
+
     /**
      * @param bool $exclusiveMinimum
      *
@@ -316,6 +336,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return int
      */
@@ -323,6 +344,7 @@ class JsonSchema
     {
         return $this->maxLength;
     }
+
     /**
      * @param int $maxLength
      *
@@ -334,6 +356,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return int
      */
@@ -341,6 +364,7 @@ class JsonSchema
     {
         return $this->minLength;
     }
+
     /**
      * @param int $minLength
      *
@@ -352,6 +376,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return string
      */
@@ -359,6 +384,7 @@ class JsonSchema
     {
         return $this->pattern;
     }
+
     /**
      * @param string $pattern
      *
@@ -370,6 +396,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return bool|JsonSchema
      */
@@ -377,6 +404,7 @@ class JsonSchema
     {
         return $this->additionalItems;
     }
+
     /**
      * @param bool|JsonSchema $additionalItems
      *
@@ -388,6 +416,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema|JsonSchema[]
      */
@@ -395,6 +424,7 @@ class JsonSchema
     {
         return $this->items;
     }
+
     /**
      * @param JsonSchema|JsonSchema[] $items
      *
@@ -406,6 +436,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return int
      */
@@ -413,6 +444,7 @@ class JsonSchema
     {
         return $this->maxItems;
     }
+
     /**
      * @param int $maxItems
      *
@@ -424,6 +456,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return int
      */
@@ -431,6 +464,7 @@ class JsonSchema
     {
         return $this->minItems;
     }
+
     /**
      * @param int $minItems
      *
@@ -442,6 +476,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return bool
      */
@@ -449,6 +484,7 @@ class JsonSchema
     {
         return $this->uniqueItems;
     }
+
     /**
      * @param bool $uniqueItems
      *
@@ -460,6 +496,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return int
      */
@@ -467,6 +504,7 @@ class JsonSchema
     {
         return $this->maxProperties;
     }
+
     /**
      * @param int $maxProperties
      *
@@ -478,6 +516,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return int
      */
@@ -485,6 +524,7 @@ class JsonSchema
     {
         return $this->minProperties;
     }
+
     /**
      * @param int $minProperties
      *
@@ -496,6 +536,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return string[]
      */
@@ -503,6 +544,7 @@ class JsonSchema
     {
         return $this->required;
     }
+
     /**
      * @param string[] $required
      *
@@ -514,6 +556,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return bool|JsonSchema
      */
@@ -521,6 +564,7 @@ class JsonSchema
     {
         return $this->additionalProperties;
     }
+
     /**
      * @param bool|JsonSchema $additionalProperties
      *
@@ -532,6 +576,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]
      */
@@ -539,6 +584,7 @@ class JsonSchema
     {
         return $this->definitions;
     }
+
     /**
      * @param JsonSchema[] $definitions
      *
@@ -550,6 +596,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]
      */
@@ -557,6 +604,7 @@ class JsonSchema
     {
         return $this->properties;
     }
+
     /**
      * @param JsonSchema[] $properties
      *
@@ -568,6 +616,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]
      */
@@ -575,6 +624,7 @@ class JsonSchema
     {
         return $this->patternProperties;
     }
+
     /**
      * @param JsonSchema[] $patternProperties
      *
@@ -586,6 +636,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]|string[][]
      */
@@ -593,6 +644,7 @@ class JsonSchema
     {
         return $this->dependencies;
     }
+
     /**
      * @param JsonSchema[]|string[][] $dependencies
      *
@@ -604,6 +656,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return mixed[]
      */
@@ -611,6 +664,7 @@ class JsonSchema
     {
         return $this->enum;
     }
+
     /**
      * @param mixed[] $enum
      *
@@ -622,6 +676,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return mixed|mixed[]
      */
@@ -629,6 +684,7 @@ class JsonSchema
     {
         return $this->type;
     }
+
     /**
      * @param mixed|mixed[] $type
      *
@@ -640,6 +696,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return string
      */
@@ -647,6 +704,7 @@ class JsonSchema
     {
         return $this->format;
     }
+
     /**
      * @param string $format
      *
@@ -658,6 +716,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]
      */
@@ -665,6 +724,7 @@ class JsonSchema
     {
         return $this->allOf;
     }
+
     /**
      * @param JsonSchema[] $allOf
      *
@@ -676,6 +736,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]
      */
@@ -683,6 +744,7 @@ class JsonSchema
     {
         return $this->anyOf;
     }
+
     /**
      * @param JsonSchema[] $anyOf
      *
@@ -694,6 +756,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema[]
      */
@@ -701,6 +764,7 @@ class JsonSchema
     {
         return $this->oneOf;
     }
+
     /**
      * @param JsonSchema[] $oneOf
      *
@@ -712,6 +776,7 @@ class JsonSchema
 
         return $this;
     }
+
     /**
      * @return JsonSchema
      */
@@ -719,6 +784,7 @@ class JsonSchema
     {
         return $this->not;
     }
+
     /**
      * @param JsonSchema $not
      *

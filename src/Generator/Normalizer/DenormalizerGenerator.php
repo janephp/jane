@@ -123,15 +123,4 @@ trait DenormalizerGenerator
             'stmts' => $statements
         ]);
     }
-
-    protected function createDenormalizationIfStatement(Type $type, Expr $input)
-    {
-        // Undefined type or mixed isset
-
-        // Simple Type Property is_...
-
-        // When input can be an object (typed or map)
-        return new Expr\FuncCall(new Name('is_object'), [new Arg($input)]);
-    }
 }
- 

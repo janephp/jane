@@ -8,28 +8,37 @@ use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 class NormalizerArray extends SerializerAwareNormalizer implements DenormalizerInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        preg_match('/array<(.+?)>/', $class, $matches);
-        $subClass = $matches[1];
-
-        $collection = [];
-
-        foreach ($data as $item) {
-            $collection[] = $this->serializer->deserialize($item, $subClass, 'raw');
+        if ($this->serializer === null) {
+            throw new \BadMethodCallException('Please set a serializer before calling denormalize()!');
         }
 
-        return $collection;
-    }
+        if (!is_array($data)) {
+            throw new \InvalidArgumentException('Data expected to be an array, '.gettype($data).' given.');
+        }
 
+        if (substr($class, -2) !== '[]') {
+            throw new \InvalidArgumentException('Unsupported class: '.$class);
+        }
+
+        $serializer = $this->serializer;
+        $class = substr($class, 0, -2);
+
+        return array_map(
+            function ($data) use ($serializer, $class, $format, $context) {
+                return $serializer->denormalize($data, $class, $format, $context);
+            },
+            $data
+        );
+    }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return preg_match('/array<(.+?)>/', $type);
+        return substr($type, -2) === '[]' && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format);
     }
 }
- 

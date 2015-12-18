@@ -59,7 +59,7 @@ class Jane
      */
     public function createContext($schemaFilePath, $name, $namespace, $directory)
     {
-        $schema  = $this->serializer->deserialize(file_get_contents($schemaFilePath), JsonSchema::class, 'json');
+        $schema  = $this->serializer->deserialize(file_get_contents($schemaFilePath), 'Joli\Jane\Model\JsonSchema', 'json');
         $classes = $this->chainGuesser->guessClass($schema, $name);
 
         foreach ($classes as $class) {

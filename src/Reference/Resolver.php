@@ -101,7 +101,7 @@ class Resolver
         }
 
         if (!isset($this->schemaCache[$schemaUrl])) {
-            $schema = $this->serializer->deserialize($this->getJsonSchemaContent($schemaUrl), JsonSchema::class, 'json');
+            $schema = $this->serializer->deserialize($this->getJsonSchemaContent($schemaUrl), 'Joli\Jane\Model\JsonSchema', 'json');
 
             $this->schemaCache[$schemaUrl] = $schema;
         }

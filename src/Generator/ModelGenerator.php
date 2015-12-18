@@ -21,14 +21,9 @@ class ModelGenerator implements GeneratorInterface
 
     const FILE_TYPE_MODEL = 'model';
 
-    /**
-     * @var \Joli\Jane\Generator\Naming
-     */
-    protected $naming;
-
     public function __construct(Naming $naming)
     {
-        $this->naming            = $naming;
+        $this->naming = $naming;
     }
 
     /**
@@ -42,7 +37,7 @@ class ModelGenerator implements GeneratorInterface
      */
     public function generate($schema, $className, Context $context)
     {
-        $files   = [];
+        $files = [];
 
         foreach ($context->getObjectClassMap() as $class) {
             $properties = [];

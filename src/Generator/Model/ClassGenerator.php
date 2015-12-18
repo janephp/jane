@@ -2,15 +2,19 @@
 
 namespace Joli\Jane\Generator\Model;
 
+use Joli\Jane\Generator\Naming;
+use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
 
 trait ClassGenerator
 {
     /**
-     * @var \Joli\Jane\Generator\Naming
+     * The naming service
+     *
+     * @return Naming
      */
-    protected $naming;
+    abstract protected function getNaming();
 
     /**
      * Return a model class
@@ -24,11 +28,10 @@ trait ClassGenerator
     protected function createModel($name, $properties, $methods)
     {
         return new Stmt\Class_(
-            new Name($this->naming->getClassName($name)),
+            new Name($this->getNaming()->getClassName($name)),
             [
                 'stmts' => array_merge($properties, $methods)
             ]
         );
     }
 }
- 

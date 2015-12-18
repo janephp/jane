@@ -13,9 +13,11 @@ use PhpParser\Node\Expr;
 trait GetterSetterGenerator
 {
     /**
-     * @var Naming
+     * The naming service
+     *
+     * @return Naming
      */
-    protected $naming;
+    abstract protected function getNaming();
 
     /**
      * Create get method.
@@ -29,14 +31,14 @@ trait GetterSetterGenerator
     {
         return new Stmt\ClassMethod(
             // getProperty
-            $this->naming->getPrefixedMethodName('get', $name),
+            $this->getNaming()->getPrefixedMethodName('get', $name),
             [
                 // public function
                 'type' => Stmt\Class_::MODIFIER_PUBLIC,
                 'stmts' => [
                     // return $this->property;
                     new Stmt\Return_(
-                        new Expr\PropertyFetch(new Expr\Variable('this'), $this->naming->getPropertyName($name))
+                        new Expr\PropertyFetch(new Expr\Variable('this'), $this->getNaming()->getPropertyName($name))
                     ),
                 ],
             ], [
@@ -57,21 +59,21 @@ trait GetterSetterGenerator
     {
         return new Stmt\ClassMethod(
             // setProperty
-            $this->naming->getPrefixedMethodName('set', $name),
+            $this->getNaming()->getPrefixedMethodName('set', $name),
             [
                 // public function
                 'type' => Stmt\Class_::MODIFIER_PUBLIC,
                 // ($property)
                 'params' => [
-                    new Param($this->naming->getPropertyName($name), new Expr\ConstFetch(new Name('null')), $type->getTypeHint()),
+                    new Param($this->getNaming()->getPropertyName($name), new Expr\ConstFetch(new Name('null')), $type->getTypeHint()),
                 ],
                 'stmts' => [
                     // $this->property = $property;
                     new Expr\Assign(
                         new Expr\PropertyFetch(
                             new Expr\Variable('this'),
-                            $this->naming->getPropertyName($name)
-                        ), new Expr\Variable($this->naming->getPropertyName($name))
+                            $this->getNaming()->getPropertyName($name)
+                        ), new Expr\Variable($this->getNaming()->getPropertyName($name))
                     ),
                     // return $this;
                     new Stmt\Return_(new Expr\Variable('this')),
@@ -116,6 +118,6 @@ EOD
  * @return self
  */
 EOD
-        , $type->__toString(), '$'.$this->naming->getPropertyName($name)));
+        , $type->__toString(), '$'.$this->getNaming()->getPropertyName($name)));
     }
 }

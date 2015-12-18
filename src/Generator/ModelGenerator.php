@@ -21,9 +21,27 @@ class ModelGenerator implements GeneratorInterface
 
     const FILE_TYPE_MODEL = 'model';
 
+    /**
+     * @var Naming Naming Service
+     */
+    protected $naming;
+
+    /**
+     * @param Naming $naming Naming Service
+     */
     public function __construct(Naming $naming)
     {
         $this->naming = $naming;
+    }
+
+    /**
+     * The naming service
+     *
+     * @return Naming
+     */
+    protected function getNaming()
+    {
+        return $this->naming;
     }
 
     /**

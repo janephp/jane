@@ -2,6 +2,7 @@
 
 namespace Joli\Jane\Generator\Model;
 
+use Joli\Jane\Generator\Naming;
 use Joli\Jane\Guesser\Guess\Type;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Name;
@@ -11,9 +12,11 @@ use PhpParser\Node\Expr;
 trait PropertyGenerator
 {
     /**
-     * @var \Joli\Jane\Generator\Naming
+     * The naming service
+     *
+     * @return Naming
      */
-    protected $naming;
+    abstract protected function getNaming();
 
     /**
      * Return a property stmt
@@ -26,7 +29,7 @@ trait PropertyGenerator
      */
     protected function createProperty($name, Type $type, $default = null)
     {
-        $propertyName = $this->naming->getPropertyName($name);
+        $propertyName = $this->getNaming()->getPropertyName($name);
         $property     = new Stmt\PropertyProperty($propertyName);
 
         if ($default !== null) {

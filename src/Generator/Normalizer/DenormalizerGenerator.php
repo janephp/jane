@@ -3,11 +3,7 @@
 namespace Joli\Jane\Generator\Normalizer;
 
 use Joli\Jane\Generator\Context\Context;
-use Joli\Jane\Guesser\Guess\MultipleType;
-use Joli\Jane\Guesser\Guess\Property;
-use Joli\Jane\Guesser\Guess\Type;
-
-use PhpParser\Node\Arg;
+use Joli\Jane\Generator\Naming;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -17,9 +13,11 @@ use PhpParser\Node\Scalar;
 trait DenormalizerGenerator
 {
     /**
-     * @var \Joli\Jane\Generator\Naming
+     * The naming service
+     *
+     * @return Naming
      */
-    protected $naming;
+    abstract protected function getNaming();
 
     /**
      * Create method to check if denormalization is supported
@@ -102,7 +100,7 @@ trait DenormalizerGenerator
                 new Expr\Isset_([$propertyVar]),
                 [
                     'stmts' => array_merge($denormalizationStatements, [
-                        new Expr\MethodCall($objectVariable, $this->naming->getPrefixedMethodName('set', $property->getName()), [
+                        new Expr\MethodCall($objectVariable, $this->getNaming()->getPrefixedMethodName('set', $property->getName()), [
                             $outputVar
                         ])
                     ])

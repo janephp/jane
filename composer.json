@@ -14,6 +14,9 @@
             "Joli\\Jane\\Tests\\": "tests/"
         }
     },
+    "bin": [
+        "bin/jane"
+    ],
     "require": {
         "symfony/yaml": "^2.3|^3.0",
         "symfony/serializer": "^2.3|^3.0",

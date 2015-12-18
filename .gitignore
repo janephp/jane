@@ -4,7 +4,7 @@ debug.php
 vendor
 composer.lock
 bin/*
-!bin/.gitkeep
+!bin/jane
 stub
 
 tests/generated/*

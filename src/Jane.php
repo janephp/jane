@@ -23,10 +23,11 @@ use Symfony\CS\Config\Config;
 use Symfony\CS\Console\ConfigurationResolver;
 use Symfony\CS\Finder\DefaultFinder;
 use Symfony\CS\Fixer;
-use Symfony\CS\FixerInterface;
 
 class Jane
 {
+    const VERSION = '1.0-dev';
+
     private $serializer;
 
     private $modelGenerator;
@@ -89,17 +90,19 @@ class Jane
         $prettyPrinter   = new Standard();
         $modelFiles      = $this->modelGenerator->generate($context->getRootReference(), $name, $context);
         $normalizerFiles = $this->normalizerGenerator->generate($context->getRootReference(), $name, $context);
+        $generated       = [];
 
         foreach ($modelFiles as $file) {
+            $generated[] = $file->getFilename();
             file_put_contents($file->getFilename(), $prettyPrinter->prettyPrintFile([$file->getNode()]));
         }
 
         foreach ($normalizerFiles as $file) {
+            $generated[] = $file->getFilename();
             file_put_contents($file->getFilename(), $prettyPrinter->prettyPrintFile([$file->getNode()]));
         }
 
         if ($this->fixer !== null) {
-
             $config = Config::create()
                 ->setRiskyAllowed(true)
                 ->setRules(array(
@@ -129,6 +132,8 @@ class Jane
 
             $this->fixer->fix($config);
         }
+
+        return $generated;
     }
 
     public static function build()

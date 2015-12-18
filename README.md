@@ -6,7 +6,7 @@
 [![Build Status](https://img.shields.io/travis/jolicode/jane.svg?style=flat-square)](https://travis-ci.org/jolicode/jane)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/jolicode/jane.svg?style=flat-square)](https://scrutinizer-ci.com/g/jolicode/jane)
 [![Quality Score](https://img.shields.io/scrutinizer/g/jolicode/jane.svg?style=flat-square)](https://scrutinizer-ci.com/g/jolicode/jane)
-[![Total Downloads](https://img.shields.io/packagist/dt/jolicode/jane.svg?style=flat-square)](https://packagist.org/packages/jolicode/jane)
+[![Total Downloads](https://img.shields.io/packagist/dt/jane/jane.svg?style=flat-square)](https://packagist.org/packages/jane/jane)
 
 Jane is a library to generate, in PHP, a model and a serializer from a [JSON Schema](http://json-schema.org/).
 

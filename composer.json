@@ -10,7 +10,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "Joli\\Jane\\": "src/",
+            "Joli\\Jane\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Joli\\Jane\\Tests\\": "tests/"
         }
     },

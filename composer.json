@@ -14,17 +14,23 @@
             "Joli\\Jane\\Tests\\": "tests/"
         }
     },
-    "config": {
-        "bin-dir": "bin"
-    },
     "require": {
-        "symfony/yaml": "^2.7",
-        "symfony/serializer": "^2.7",
-        "symfony/property-access": "^2.7",
+        "symfony/yaml": "^2.3|^3.0",
+        "symfony/serializer": "^2.3|^3.0",
+        "symfony/property-access": "^2.3|^3.0",
+        "symfony/console": "^2.3|^3.0",
         "fabpot/php-cs-fixer": "^2.0@dev",
         "nikic/php-parser": "^1.4",
-        "doctrine/inflector": "^1.0",
-        "symfony/console": "^3.0"
+        "doctrine/inflector": "^1.0"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-ci": "vendor/bin/phpunit --coverage-text --coverage-clover=build/coverage.xml"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
     },
     "require-dev": {
         "phpunit/phpunit": "^4.7"

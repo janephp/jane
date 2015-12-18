@@ -21,13 +21,26 @@ class NormalizerGenerator implements GeneratorInterface
     use NormalizerGeneratorTrait;
 
     /**
-     * @var \Joli\Jane\Generator\Naming
+     * @var Naming The naming service
      */
     protected $naming;
 
+    /**
+     * @param Naming $naming Naming Service
+     */
     public function __construct(Naming $naming)
     {
         $this->naming = $naming;
+    }
+
+    /**
+     * The naming service
+     *
+     * @return Naming
+     */
+    protected function getNaming()
+    {
+        return $this->naming;
     }
 
     /**

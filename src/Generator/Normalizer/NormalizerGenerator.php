@@ -3,6 +3,7 @@
 namespace Joli\Jane\Generator\Normalizer;
 
 use Joli\Jane\Generator\Context\Context;
+use Joli\Jane\Generator\Naming;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -12,14 +13,16 @@ use PhpParser\Node\Scalar;
 trait NormalizerGenerator
 {
     /**
-     * @var \Joli\Jane\Generator\Naming
+     * The naming service
+     *
+     * @return Naming
      */
-    protected $naming;
+    abstract protected function getNaming();
 
     protected function createNormalizerClass($name, $methods)
     {
         return new Stmt\Class_(
-            new Name($this->naming->getClassName($name)),
+            new Name($this->getNaming()->getClassName($name)),
             [
                 'stmts' => array_merge($methods),
                 'implements' => [new Name('DenormalizerInterface'), new Name('NormalizerInterface')],
@@ -74,7 +77,7 @@ trait NormalizerGenerator
         ];
 
         foreach ($properties as $property) {
-            $propertyVar                                 = new Expr\MethodCall(new Expr\Variable('object'), $this->naming->getPrefixedMethodName('get', $property->getName()));
+            $propertyVar                                 = new Expr\MethodCall(new Expr\Variable('object'), $this->getNaming()->getPrefixedMethodName('get', $property->getName()));
             list($normalizationStatements, $outputVar) = $property->getType()->createNormalizationStatement($context, $propertyVar);
 
             $statements[] = new Stmt\If_(
@@ -100,4 +103,3 @@ trait NormalizerGenerator
         ]);
     }
 }
- 

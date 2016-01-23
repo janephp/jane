@@ -63,7 +63,7 @@ Here is a quick presentation on how this library transforms a Json Schema file i
 
 ## Credits
 
-* [All contributors](https://github.com/jolicode/JoliCi/graphs/contributors)
+* [All contributors](https://github.com/jolicode/jane/graphs/contributors)
 
 ## License
 

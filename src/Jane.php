@@ -11,17 +11,16 @@ use Joli\Jane\Guesser\ChainGuesser;
 use Joli\Jane\Guesser\JsonSchema\JsonSchemaGuesserFactory;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Normalizer\JsonSchemaNormalizer;
-
 use Joli\Jane\Normalizer\NormalizerFactory;
 use PhpParser\PrettyPrinter\Standard;
-
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\CS\Config\Config;
+use Symfony\CS\Config;
+use Symfony\CS\ConfigInterface;
 use Symfony\CS\Console\ConfigurationResolver;
-use Symfony\CS\Finder\DefaultFinder;
+use Symfony\CS\Finder;
 use Symfony\CS\Fixer;
 
 class Jane
@@ -34,17 +33,17 @@ class Jane
 
     private $normalizerGenerator;
 
-    private $fixer;
+    private $fixerConfig;
 
     private $chainGuesser;
 
-    public function __construct(Serializer $serializer, ChainGuesser $chainGuesser, ModelGenerator $modelGenerator, NormalizerGenerator $normalizerGenerator, Fixer $fixer = null)
+    public function __construct(Serializer $serializer, ChainGuesser $chainGuesser, ModelGenerator $modelGenerator, NormalizerGenerator $normalizerGenerator, ConfigInterface $fixerConfig = null)
     {
         $this->serializer          = $serializer;
         $this->chainGuesser        = $chainGuesser;
         $this->modelGenerator      = $modelGenerator;
         $this->normalizerGenerator = $normalizerGenerator;
-        $this->fixer               = $fixer;
+        $this->fixerConfig         = $fixerConfig;
     }
 
     /**
@@ -75,6 +74,16 @@ class Jane
         return new Context($schema, $namespace, $directory, $classes);
     }
 
+    /**
+     * Generate code
+     *
+     * @param $schemaFilePath
+     * @param $name
+     * @param $namespace
+     * @param $directory
+     *
+     * @return array
+     */
     public function generate($schemaFilePath, $name, $namespace, $directory)
     {
         $context = $this->createContext($schemaFilePath, $name, $namespace, $directory);
@@ -102,12 +111,33 @@ class Jane
             file_put_contents($file->getFilename(), $prettyPrinter->prettyPrintFile([$file->getNode()]));
         }
 
-        if ($this->fixer !== null) {
-            $config = Config::create()
+        $this->fix($directory);
+
+        return $generated;
+    }
+
+    /**
+     * Fix files generated in a directory
+     *
+     * @param $directory
+     *
+     * @return array|void
+     */
+    protected function fix($directory)
+    {
+        if (!class_exists('Symfony\CS\Config')) {
+            return;
+        }
+
+        /** @var Config $fixerConfig */
+        $fixerConfig = $this->fixerConfig;
+
+        if (null === $fixerConfig) {
+            $fixerConfig = Config::create()
                 ->setRiskyAllowed(true)
                 ->setRules(array(
                     '@Symfony' => true,
-                    'empty_return' => false,
+                    'simplified_null_return' => false,
                     'concat_without_spaces' => false,
                     'double_arrow_multiline_whitespaces' => false,
                     'unalign_equals' => false,
@@ -115,25 +145,24 @@ class Jane
                     'align_double_arrow' => true,
                     'align_equals' => true,
                     'concat_with_spaces' => true,
-                    'newline_after_open_tag' => true,
-                    'ordered_use' => true,
+                    'ordered_imports' => true,
                     'phpdoc_order' => true,
                     'short_array_syntax' => true,
                 ))
-                ->finder(
-                    DefaultFinder::create()
-                        ->in($directory)
-                )
             ;
 
             $resolver = new ConfigurationResolver();
-            $resolver->setDefaultConfig($config);
+            $resolver->setDefaultConfig($fixerConfig);
             $resolver->resolve();
-
-            $this->fixer->fix($config);
         }
 
-        return $generated;
+        $finder = new Finder();
+        $finder->in($directory);
+        $fixerConfig->finder($finder);
+
+        $fixer = new Fixer();
+
+        return $fixer->fix($fixerConfig);
     }
 
     public static function build()
@@ -143,9 +172,8 @@ class Jane
         $naming         = new Naming();
         $modelGenerator = new ModelGenerator($naming, $chainGuesser, $chainGuesser);
         $normGenerator  = new NormalizerGenerator($naming);
-        $fixer          = new Fixer();
 
-        return new self($serializer, $chainGuesser, $modelGenerator, $normGenerator, $fixer);
+        return new self($serializer, $chainGuesser, $modelGenerator, $normGenerator);
     }
 
     public static function buildSerializer()

@@ -4,6 +4,9 @@ namespace Joli\Jane\Generator\Normalizer;
 
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\Naming;
+use Joli\Jane\Guesser\Guess\MultipleType;
+use Joli\Jane\Guesser\Guess\Type;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -93,17 +96,56 @@ trait DenormalizerGenerator
         ];
 
         foreach ($properties as $property) {
-            $propertyVar                                 = new Expr\PropertyFetch(new Expr\Variable('data'), sprintf("{'%s'}", $property->getName()));
-            list($denormalizationStatements, $outputVar) = $property->getType()->createDenormalizationStatement($context, $propertyVar);
+            $propertyVar = new Expr\PropertyFetch(new Expr\Variable('data'), sprintf("{'%s'}", $property->getName()));
+
+            /** @var Type $type */
+            $type = $property->getType();
+            $else = null;
+
+            if ('null' === $type->getName()) {
+                $ifCondition = new Expr\FuncCall(
+                    new Name('property_exists'),
+                    [
+                        new Arg($objectVariable),
+                        New Arg(new Scalar\String_($property->getName())),
+                    ]
+                );
+            } else {
+                $ifCondition = new Expr\Isset_([$propertyVar]);
+
+                if ($type instanceof MultipleType) {
+                    $types = $type->getTypes();
+
+                    foreach ($types as $key => $childType) {
+                        if ('null' === $childType->getName()) {
+                            unset($types[$key]);
+                            $type = new MultipleType($type->getObject(), $types);
+
+                            $else = new Stmt\Else_([
+                                new Expr\MethodCall(
+                                    $objectVariable,
+                                    $this->getNaming()->getPrefixedMethodName('set', $property->getName()),
+                                    [
+                                        new Expr\ConstFetch(new Name('null')),
+                                    ]
+                                )
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            list($denormalizationStatements, $outputVar) = $type->createDenormalizationStatement($context, $propertyVar);
 
             $statements[] = new Stmt\If_(
-                new Expr\Isset_([$propertyVar]),
+                $ifCondition,
                 [
                     'stmts' => array_merge($denormalizationStatements, [
                         new Expr\MethodCall($objectVariable, $this->getNaming()->getPrefixedMethodName('set', $property->getName()), [
                             $outputVar
                         ])
-                    ])
+                    ]),
+                    'else' => $else,
                 ]
             );
         }

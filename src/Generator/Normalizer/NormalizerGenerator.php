@@ -4,6 +4,8 @@ namespace Joli\Jane\Generator\Normalizer;
 
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\Naming;
+use Joli\Jane\Guesser\Guess\MultipleType;
+use Joli\Jane\Guesser\Guess\Type;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -77,17 +79,65 @@ trait NormalizerGenerator
         ];
 
         foreach ($properties as $property) {
-            $propertyVar                                 = new Expr\MethodCall(new Expr\Variable('object'), $this->getNaming()->getPrefixedMethodName('get', $property->getName()));
-            list($normalizationStatements, $outputVar) = $property->getType()->createNormalizationStatement($context, $propertyVar);
-
-            $statements[] = new Stmt\If_(
-                new Expr\BinaryOp\NotIdentical(new Expr\ConstFetch(new Name("null")), $propertyVar),
-                [
-                    'stmts' => array_merge($normalizationStatements, [
-                        new Expr\Assign(new Expr\PropertyFetch($dataVariable, sprintf("{'%s'}", $property->getName())), $outputVar)
-                    ])
-                ]
+            $propertyVar = new Expr\MethodCall(
+                new Expr\Variable('object'),
+                $this->getNaming()->getPrefixedMethodName('get', $property->getName()
+                )
             );
+
+            /** @var Type $type */
+            $type = $property->getType();
+
+            if ('null' === $type->getName()) {
+                $statements[] = new Expr\Assign(
+                    new Expr\PropertyFetch(
+                        $dataVariable,
+                        sprintf("{'%s'}",$property->getName())
+                    ),
+                    new Expr\ConstFetch(new Name('null'))
+                );
+            } else {
+                $else = null;
+
+                if ($type instanceof MultipleType) {
+                    $types = $type->getTypes();
+
+                    foreach ($types as $key => $childType) {
+                        if ('null' === $childType->getName()) {
+                            unset($types[$key]);
+                            $type = new MultipleType($type->getObject(), $types);
+
+                            $else = new Stmt\Else_([
+                                new Expr\Assign(
+                                    new Expr\PropertyFetch(
+                                        $dataVariable,
+                                        sprintf("{'%s'}",$property->getName())
+                                    ),
+                                    new Expr\ConstFetch(new Name('null'))
+                                )
+                            ]);
+                        }
+                    }
+                }
+
+                list($normalizationStatements, $outputVar) = $type->createNormalizationStatement($context, $propertyVar);
+
+                $statements[] = new Stmt\If_(
+                    new Expr\BinaryOp\NotIdentical(new Expr\ConstFetch(new Name("null")), $propertyVar),
+                    [
+                        'stmts' => array_merge($normalizationStatements, [
+                            new Expr\Assign(
+                                new Expr\PropertyFetch(
+                                    $dataVariable,
+                                    sprintf("{'%s'}", $property->getName())
+                                ),
+                                $outputVar
+                            )
+                        ]),
+                        'else' => $else,
+                    ]
+                );
+            }
         }
 
         $statements[] = new Stmt\Return_($dataVariable);

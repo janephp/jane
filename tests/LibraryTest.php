@@ -54,4 +54,9 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(json_decode($json), json_decode($newJson));
     }
-} 
+
+    public function testNull()
+    {
+        $this->jane->generate(__DIR__ . '/data/null-schema.json', 'NullSchema', 'Joli\\Jane', __DIR__ . "/generated");
+    }
+}

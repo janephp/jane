@@ -6,8 +6,6 @@ use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\Model\ClassGenerator;
 use Joli\Jane\Generator\Model\GetterSetterGenerator;
 use Joli\Jane\Generator\Model\PropertyGenerator;
-use Joli\Jane\Guesser\ClassGuesserInterface;
-use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 
 use PhpParser\Node\Name;

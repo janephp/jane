@@ -19,11 +19,17 @@ class Property
      */
     private $object;
 
-    public function __construct($object, $name, $type = null, $options = array())
+    /**
+     * @var bool
+     */
+    private $nullable;
+
+    public function __construct($object, $name, $nullable = false, $type = null)
     {
-        $this->name   = $name;
+        $this->name = $name;
         $this->object = $object;
-        $this->type   = $type;
+        $this->nullable = $nullable;
+        $this->type = $type;
     }
 
     /**
@@ -35,7 +41,7 @@ class Property
     }
 
     /**
-     * Return name of the property
+     * Return name of the property.
      *
      * @return string
      */
@@ -45,7 +51,17 @@ class Property
     }
 
     /**
-     * Return type of the property
+     * Whether the property is nullable or not.
+     *
+     * @return bool
+     */
+    public function isNullable()
+    {
+        return $this->nullable;
+    }
+
+    /**
+     * Return type of the property.
      *
      * @return Type
      */
@@ -55,7 +71,7 @@ class Property
     }
 
     /**
-     * Set the type
+     * Set the type.
      *
      * @param Type $type
      */
@@ -64,4 +80,3 @@ class Property
         $this->type = $type;
     }
 }
- 

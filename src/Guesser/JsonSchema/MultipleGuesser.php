@@ -2,12 +2,10 @@
 
 namespace Joli\Jane\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 
@@ -16,7 +14,7 @@ class MultipleGuesser implements GuesserInterface, TypeGuesserInterface, ChainGu
     use ChainGuesserAwareTrait;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportObject($object)
     {
@@ -24,11 +22,11 @@ class MultipleGuesser implements GuesserInterface, TypeGuesserInterface, ChainGu
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($object, $name, $classes)
     {
-        $typeGuess  = new MultipleType($object);
+        $typeGuess = new MultipleType($object);
         $fakeSchema = clone $object;
 
         foreach ($object->getType() as $type) {
@@ -40,4 +38,3 @@ class MultipleGuesser implements GuesserInterface, TypeGuesserInterface, ChainGu
         return $typeGuess;
     }
 }
- 

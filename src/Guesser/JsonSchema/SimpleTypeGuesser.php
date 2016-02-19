@@ -25,12 +25,21 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
         'null' => 'null',
     ];
 
+    protected $excludeFormat = [
+        'date-time'
+    ];
+
     /**
      * {@inheritdoc}
      */
     public function supportObject($object)
     {
-        return ($object instanceof JsonSchema) && in_array($object->getType(), $this->typesSupported);
+        return ($object instanceof JsonSchema)
+            &&
+            in_array($object->getType(), $this->typesSupported)
+            &&
+            !in_array($object->getFormat(), $this->excludeFormat)
+        ;
     }
 
     /**

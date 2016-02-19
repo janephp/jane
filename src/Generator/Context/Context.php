@@ -44,7 +44,7 @@ class Context
     /**
      * Files generated through the run
      *
-     * @var File
+     * @var File[]
      */
     private $files = [];
 
@@ -64,6 +64,13 @@ class Context
     private $reference = 0;
 
     /**
+     * Variable scope to have unique variable name per method
+     *
+     * @var UniqueVariableScope
+     */
+    private $variableScope;
+
+    /**
      * @param mixed        $rootReference
      * @param string       $namespace
      * @param string       $directory
@@ -75,6 +82,7 @@ class Context
         $this->namespace       = $namespace;
         $this->directory       = $directory;
         $this->objectClassMap  = $objectClassMap;
+        $this->variableScope   = new UniqueVariableScope();
     }
 
     public function addFile(File $file)
@@ -123,6 +131,14 @@ class Context
     }
 
     /**
+     * Refresh the unique variable scope for a context
+     */
+    public function refreshScope()
+    {
+        $this->variableScope = new UniqueVariableScope();
+    }
+
+    /**
      * Get a unique variable name
      *
      * @param string $prefix
@@ -131,21 +147,6 @@ class Context
      */
     public function getUniqueVariableName($prefix = 'var')
     {
-        if (!in_array($prefix, $this->variablesName)) {
-            $this->variablesName[] = $prefix;
-
-            return $prefix;
-        }
-
-        $name = sprintf('%s_%s', $prefix, $this->reference);
-        $this->reference++;
-
-        if (!in_array($name, $this->variablesName)) {
-            $this->variablesName[] = $name;
-
-            return $name;
-        }
-
-        return $this->getUniqueVariableName($prefix);
+        return $this->variableScope->getUniqueName($prefix);
     }
 }

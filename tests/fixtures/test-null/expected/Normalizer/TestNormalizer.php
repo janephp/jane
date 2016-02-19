@@ -60,14 +60,14 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
     {
         $data               = new \stdClass();
         $data->{'onlyNull'} = $object->getOnlyNull();
-        $value_0            = $object->getNullOrString();
+        $value              = $object->getNullOrString();
         if (is_string($object->getNullOrString())) {
-            $value_0 = $object->getNullOrString();
+            $value = $object->getNullOrString();
         }
         if (is_null($object->getNullOrString())) {
-            $value_0 = $object->getNullOrString();
+            $value = $object->getNullOrString();
         }
-        $data->{'nullOrString'} = $value_0;
+        $data->{'nullOrString'} = $value;
 
         return $data;
     }

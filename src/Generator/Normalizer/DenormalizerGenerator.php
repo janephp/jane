@@ -61,6 +61,7 @@ trait DenormalizerGenerator
      */
     protected function createDenormalizeMethod($modelFqdn, Context $context, $properties)
     {
+        $context->refreshScope();
         $objectVariable = new Expr\Variable('object');
         $statements     = [
             new Stmt\If_(

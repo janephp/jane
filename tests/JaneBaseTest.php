@@ -44,6 +44,13 @@ class JaneBaseTest extends \PHPUnit_Framework_TestCase
         foreach ($generatedFinder as $generatedFile) {
             $generatedData[$generatedFile->getRelativePathname()] = $generatedFile->getRealPath();
         }
+
+        foreach ($expectedFinder as $expectedFile) {
+            $this->assertArrayHasKey($expectedFile->getRelativePathname(), $generatedData);
+            if ($expectedFile->isFile()) {
+                $this->assertEquals(file_get_contents($expectedFile->getRealPath()), file_get_contents($generatedData[$expectedFile->getRelativePathname()]));
+            }
+        }
     }
 
     public function schemaProvider()

@@ -71,6 +71,7 @@ trait NormalizerGenerator
      */
     protected function createNormalizeMethod($modelFqdn, Context $context, $properties)
     {
+        $context->refreshScope();
         $dataVariable = new Expr\Variable('data');
         $statements = [
             new Expr\Assign($dataVariable, new Expr\New_(new Name('\\stdClass'))),

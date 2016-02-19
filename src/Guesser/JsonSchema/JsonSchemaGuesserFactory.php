@@ -22,6 +22,7 @@ class JsonSchemaGuesserFactory
         $merger                = new JsonSchemaMerger();
         $resolver              = new Resolver($serializer);
 
+        $chainGuesser->addGuesser(new DateTimeGuesser());
         $chainGuesser->addGuesser(new SimpleTypeGuesser());
         $chainGuesser->addGuesser(new ArrayGuesser());
         $chainGuesser->addGuesser(new MultipleGuesser());
@@ -39,4 +40,3 @@ class JsonSchemaGuesserFactory
         return $chainGuesser;
     }
 }
- 

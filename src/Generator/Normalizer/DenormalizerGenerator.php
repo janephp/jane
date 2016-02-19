@@ -4,6 +4,7 @@ namespace Joli\Jane\Generator\Normalizer;
 
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\Naming;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -97,8 +98,10 @@ trait DenormalizerGenerator
             list($denormalizationStatements, $outputVar) = $property->getType()->createDenormalizationStatement($context, $propertyVar);
 
             $statements[] = new Stmt\If_(
-                new Expr\Isset_([$propertyVar]),
-                [
+                new Expr\FuncCall(new Name('property_exists'), [
+                    new Arg(new Expr\Variable('data')),
+                    new Arg(new Scalar\String_($property->getName())),
+                ]), [
                     'stmts' => array_merge($denormalizationStatements, [
                         new Expr\MethodCall($objectVariable, $this->getNaming()->getPrefixedMethodName('set', $property->getName()), [
                             $outputVar

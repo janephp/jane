@@ -2,13 +2,8 @@
 
 namespace Joli\Jane\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Context\Context;
-
-use Joli\Jane\Guesser\Guess\Property;
 use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\PropertiesGuesserInterface;
-
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 
@@ -19,19 +14,19 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
         'integer',
         'number',
         'string',
-        'null'
+        'null',
     ];
 
     protected $phpTypesMapping = [
         'boolean' => 'bool',
         'integer' => 'int',
-        'number'  => 'float',
-        'string'  => 'string',
-        'null'    => 'null'
+        'number' => 'float',
+        'string' => 'string',
+        'null' => 'null',
     ];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportObject($object)
     {
@@ -39,10 +34,10 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($object, $name, $classes)
     {
         return new Type($object, $this->phpTypesMapping[$object->getType()]);
     }
-} 
+}

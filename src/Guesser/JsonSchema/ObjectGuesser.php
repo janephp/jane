@@ -2,9 +2,6 @@
 
 namespace Joli\Jane\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Model\ClassGenerator;
-use Joli\Jane\Generator\Model\GetterSetterGenerator;
-use Joli\Jane\Generator\Model\PropertyGenerator;
 use Joli\Jane\Generator\Naming;
 use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
@@ -35,20 +32,20 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
 
     public function __construct(Naming $naming, Resolver $resolver)
     {
-        $this->naming   = $naming;
+        $this->naming = $naming;
         $this->resolver = $resolver;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportObject($object)
     {
-        return (($object instanceof JsonSchema) && $object->getType() === 'object' && $object->getProperties() !== null);
+        return ($object instanceof JsonSchema) && $object->getType() === 'object' && $object->getProperties() !== null;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessClass($object, $name)
     {
@@ -62,26 +59,35 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessProperties($object, $name, $classes)
     {
         $properties = [];
 
         foreach ($object->getProperties() as $key => $property) {
-            $properties[] = new Property($property, $key);
+            $propertyObj = $property;
+
+            if ($propertyObj instanceof Reference) {
+                $propertyObj = $this->resolver->resolve($propertyObj);
+            }
+
+            $type = $propertyObj->getType();
+            $nullable = $type == 'null' || (is_array($type) && in_array('null', $type));
+
+            $properties[] = new Property($property, $key, $nullable);
         }
 
         return $properties;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($object, $name, $classes)
     {
         $discriminants = [];
-        $required      = $object->getRequired() ?: [];
+        $required = $object->getRequired() ?: [];
 
         foreach ($object->getProperties() as $key => $property) {
             if (!in_array($key, $required)) {
@@ -110,4 +116,3 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
         return new ObjectType($object, $this->naming->getClassName($name), $discriminants);
     }
 }
- 

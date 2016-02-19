@@ -39,46 +39,46 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
         if (!isset($context['rootSchema'])) {
             $context['rootSchema'] = $object;
         }
-        if (isset($data->{'id'})) {
+        if (property_exists($data, 'id')) {
             $object->setId($data->{'id'});
         }
-        if (isset($data->{'$schema'})) {
+        if (property_exists($data, '$schema')) {
             $object->setDollarSchema($data->{'$schema'});
         }
-        if (isset($data->{'title'})) {
+        if (property_exists($data, 'title')) {
             $object->setTitle($data->{'title'});
         }
-        if (isset($data->{'description'})) {
+        if (property_exists($data, 'description')) {
             $object->setDescription($data->{'description'});
         }
-        if (isset($data->{'default'})) {
+        if (property_exists($data, 'default')) {
             $object->setDefault($data->{'default'});
         }
-        if (isset($data->{'multipleOf'})) {
+        if (property_exists($data, 'multipleOf')) {
             $object->setMultipleOf($data->{'multipleOf'});
         }
-        if (isset($data->{'maximum'})) {
+        if (property_exists($data, 'maximum')) {
             $object->setMaximum($data->{'maximum'});
         }
-        if (isset($data->{'exclusiveMaximum'})) {
+        if (property_exists($data, 'exclusiveMaximum')) {
             $object->setExclusiveMaximum($data->{'exclusiveMaximum'});
         }
-        if (isset($data->{'minimum'})) {
+        if (property_exists($data, 'minimum')) {
             $object->setMinimum($data->{'minimum'});
         }
-        if (isset($data->{'exclusiveMinimum'})) {
+        if (property_exists($data, 'exclusiveMinimum')) {
             $object->setExclusiveMinimum($data->{'exclusiveMinimum'});
         }
-        if (isset($data->{'maxLength'})) {
+        if (property_exists($data, 'maxLength')) {
             $object->setMaxLength($data->{'maxLength'});
         }
-        if (isset($data->{'minLength'})) {
+        if (property_exists($data, 'minLength')) {
             $object->setMinLength($data->{'minLength'});
         }
-        if (isset($data->{'pattern'})) {
+        if (property_exists($data, 'pattern')) {
             $object->setPattern($data->{'pattern'});
         }
-        if (isset($data->{'additionalItems'})) {
+        if (property_exists($data, 'additionalItems')) {
             $value = $data->{'additionalItems'};
             if (is_bool($data->{'additionalItems'})) {
                 $value = $data->{'additionalItems'};
@@ -88,7 +88,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             }
             $object->setAdditionalItems($value);
         }
-        if (isset($data->{'items'})) {
+        if (property_exists($data, 'items')) {
             $value_0 = $data->{'items'};
             if (is_object($data->{'items'})) {
                 $value_0 = $this->serializer->deserialize($data->{'items'}, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
@@ -102,29 +102,29 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             }
             $object->setItems($value_0);
         }
-        if (isset($data->{'maxItems'})) {
+        if (property_exists($data, 'maxItems')) {
             $object->setMaxItems($data->{'maxItems'});
         }
-        if (isset($data->{'minItems'})) {
+        if (property_exists($data, 'minItems')) {
             $object->setMinItems($data->{'minItems'});
         }
-        if (isset($data->{'uniqueItems'})) {
+        if (property_exists($data, 'uniqueItems')) {
             $object->setUniqueItems($data->{'uniqueItems'});
         }
-        if (isset($data->{'maxProperties'})) {
+        if (property_exists($data, 'maxProperties')) {
             $object->setMaxProperties($data->{'maxProperties'});
         }
-        if (isset($data->{'minProperties'})) {
+        if (property_exists($data, 'minProperties')) {
             $object->setMinProperties($data->{'minProperties'});
         }
-        if (isset($data->{'required'})) {
+        if (property_exists($data, 'required')) {
             $values_2 = [];
             foreach ($data->{'required'} as $value_3) {
                 $values_2[] = $value_3;
             }
             $object->setRequired($values_2);
         }
-        if (isset($data->{'additionalProperties'})) {
+        if (property_exists($data, 'additionalProperties')) {
             $value_4 = $data->{'additionalProperties'};
             if (is_bool($data->{'additionalProperties'})) {
                 $value_4 = $data->{'additionalProperties'};
@@ -134,28 +134,28 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             }
             $object->setAdditionalProperties($value_4);
         }
-        if (isset($data->{'definitions'})) {
+        if (property_exists($data, 'definitions')) {
             $values_5 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'definitions'} as $key => $value_6) {
                 $values_5[$key] = $this->serializer->deserialize($value_6, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setDefinitions($values_5);
         }
-        if (isset($data->{'properties'})) {
+        if (property_exists($data, 'properties')) {
             $values_7 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'properties'} as $key_9 => $value_8) {
                 $values_7[$key_9] = $this->serializer->deserialize($value_8, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setProperties($values_7);
         }
-        if (isset($data->{'patternProperties'})) {
+        if (property_exists($data, 'patternProperties')) {
             $values_10 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'patternProperties'} as $key_12 => $value_11) {
                 $values_10[$key_12] = $this->serializer->deserialize($value_11, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setPatternProperties($values_10);
         }
-        if (isset($data->{'dependencies'})) {
+        if (property_exists($data, 'dependencies')) {
             $values_13 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'dependencies'} as $key_15 => $value_14) {
                 $value_16 = $value_14;
@@ -173,14 +173,14 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             }
             $object->setDependencies($values_13);
         }
-        if (isset($data->{'enum'})) {
+        if (property_exists($data, 'enum')) {
             $values_19 = [];
             foreach ($data->{'enum'} as $value_20) {
                 $values_19[] = $value_20;
             }
             $object->setEnum($values_19);
         }
-        if (isset($data->{'type'})) {
+        if (property_exists($data, 'type')) {
             $value_21 = $data->{'type'};
             if (isset($data->{'type'})) {
                 $value_21 = $data->{'type'};
@@ -194,31 +194,31 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             }
             $object->setType($value_21);
         }
-        if (isset($data->{'format'})) {
+        if (property_exists($data, 'format')) {
             $object->setFormat($data->{'format'});
         }
-        if (isset($data->{'allOf'})) {
+        if (property_exists($data, 'allOf')) {
             $values_24 = [];
             foreach ($data->{'allOf'} as $value_25) {
                 $values_24[] = $this->serializer->deserialize($value_25, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setAllOf($values_24);
         }
-        if (isset($data->{'anyOf'})) {
+        if (property_exists($data, 'anyOf')) {
             $values_26 = [];
             foreach ($data->{'anyOf'} as $value_27) {
                 $values_26[] = $this->serializer->deserialize($value_27, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setAnyOf($values_26);
         }
-        if (isset($data->{'oneOf'})) {
+        if (property_exists($data, 'oneOf')) {
             $values_28 = [];
             foreach ($data->{'oneOf'} as $value_29) {
                 $values_28[] = $this->serializer->deserialize($value_29, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context);
             }
             $object->setOneOf($values_28);
         }
-        if (isset($data->{'not'})) {
+        if (property_exists($data, 'not')) {
             $object->setNot($this->serializer->deserialize($data->{'not'}, 'Joli\\Jane\\Model\\JsonSchema', 'raw', $context));
         }
 

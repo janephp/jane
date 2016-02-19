@@ -8,3 +8,4 @@ stub
 
 tests/generated/*
 !tests/generated/.gitkeep
+tests/fixtures/*/generated

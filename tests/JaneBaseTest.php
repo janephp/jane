@@ -1,0 +1,61 @@
+<?php
+
+namespace Joli\Jane\tests;
+
+use Joli\Jane\Jane;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
+class JaneBaseTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider schemaProvider
+     */
+    public function testRessources(SplFileInfo $testDirectory)
+    {
+        // 1. Cleanup generated
+        $filesystem = new Filesystem();
+
+        if ($filesystem->exists($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated')) {
+            $filesystem->remove($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated');
+        }
+
+        $filesystem->mkdir($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated');
+
+        // 2. Generate
+        $jane = Jane::build();
+        $jane->generate(
+            $testDirectory->getRealPath().DIRECTORY_SEPARATOR.'schema.json',
+            'Test',
+            'Joli\Jane\Tests\Expected',
+            $testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated'
+        );
+
+        // 3. Compare
+        $expectedFinder = new Finder();
+        $expectedFinder->in($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'expected');
+        $generatedFinder = new Finder();
+        $generatedFinder->in($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated');
+        $generatedData = [];
+
+        $this->assertEquals(count($expectedFinder), count($generatedFinder));
+
+        foreach ($generatedFinder as $generatedFile) {
+            $generatedData[$generatedFile->getRelativePathname()] = $generatedFile->getRealPath();
+        }
+    }
+
+    public function schemaProvider()
+    {
+        $finder = new Finder();
+        $finder->directories()->in(__DIR__.'/fixtures');
+        $finder->depth('< 1');
+        $data = array();
+        foreach ($finder as $directory) {
+            $data[] = [$directory];
+        }
+
+        return $data;
+    }
+}

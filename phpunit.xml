@@ -16,6 +16,7 @@
     <testsuites>
         <testsuite name="Jane Unit Test Suite">
             <directory>tests</directory>
+            <exclude>tests/fixtures</exclude>
         </testsuite>
     </testsuites>
 

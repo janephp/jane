@@ -4,6 +4,7 @@ namespace Joli\Jane\Guesser;
 
 use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\Guess\Type;
+use Joli\Jane\Guesser\JsonSchema\DateTimeGuesser;
 
 class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, ClassGuesserInterface
 {
@@ -56,7 +57,14 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             if ($guesser->supportObject($object)) {
                 if ($type === null) {
                     $type = $guesser->guessType($object, $name, $classes);
-                    continue;
+
+                    // DateTime guesser should not end up in multiple types
+                    // TODO: there should be a more generic solution for this
+                    if ($guesser instanceof DateTimeGuesser) {
+                        break;
+                    } else {
+                        continue;
+                    }
                 }
 
                 if (!$type instanceof MultipleType) {
@@ -93,4 +101,4 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
 
         return $properties;
     }
-} 
+}

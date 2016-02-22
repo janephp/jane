@@ -7,6 +7,14 @@
         "date": {
             "type": "string",
             "format": "date-time"
+        },
+        "dateOrNull": {
+            "type": ["string", "null"],
+            "format": "date-time"
+        },
+        "dateOrNullOrInt": {
+            "type": ["string", "null", "integer"],
+            "format": "date-time"
         }
     }
 }

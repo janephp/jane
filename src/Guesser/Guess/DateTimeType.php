@@ -54,17 +54,12 @@ class DateTimeType extends ObjectType
      */
     public function createConditionStatement(Expr $input)
     {
-        return new Expr\BinaryOp\LogicalAnd(new Expr\FuncCall(
-            new Name($this->normalizationConditionMapping[$this->name]), [
+        return new Expr\BinaryOp\NotIdentical(
+            new Expr\ConstFetch(new Name('false')),
+            new Expr\StaticCall(new Name('\DateTime'), 'createFromFormat', [
+                new Arg(new Expr\ConstFetch(new Name('"'.$this->format.'"'))),
                 new Arg($input),
-            ]),
-            new Expr\BinaryOp\NotIdentical(
-                new Expr\ConstFetch(new Name('false')),
-                new Expr\StaticCall(new Name('\DateTime'), 'createFromFormat', [
-                    new Arg(new Expr\ConstFetch(new Name('"'.$this->format.'"'))),
-                    new Arg($input),
-                ])
-            )
+            ])
         );
     }
 }

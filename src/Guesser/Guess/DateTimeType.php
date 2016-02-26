@@ -55,7 +55,7 @@ class DateTimeType extends ObjectType
     public function createConditionStatement(Expr $input)
     {
         return new Expr\BinaryOp\LogicalAnd(new Expr\FuncCall(
-            new Name($this->normalizationConditionMapping[$this->name]), [
+            new Name('is_string'), [
                 new Arg($input),
             ]),
             new Expr\BinaryOp\NotIdentical(

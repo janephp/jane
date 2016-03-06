@@ -2,7 +2,6 @@
 
 namespace Joli\Jane\Guesser;
 
-use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\Guess\Type;
 
 class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, ClassGuesserInterface
@@ -54,16 +53,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                if ($type === null) {
-                    $type = $guesser->guessType($object, $name, $classes);
-                    continue;
-                }
-
-                if (!$type instanceof MultipleType) {
-                    $type = new MultipleType($object, [$type]);
-                }
-
-                $type->addType($guesser->guessType($object, $name, $classes));
+                return $guesser->guessType($object, $name, $classes);
             }
         }
 
@@ -93,4 +83,4 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
 
         return $properties;
     }
-} 
+}

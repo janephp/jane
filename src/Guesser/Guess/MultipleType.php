@@ -64,7 +64,33 @@ class MultipleType extends Type
     }
 
     /**
-     * (@inheritDoc}
+     * {@inheritdoc}
+     */
+    public function getTypeHint()
+    {
+        // We have exactly two types: one null and an object
+        if (count($this->types) === 2) {
+            list($type1, $type2) = $this->types;
+
+            if ($this->isOptionalObjectType($type1, $type2)) {
+                return $type2->getTypeHint();
+            }
+
+            if ($this->isOptionalObjectType($type2, $type1)) {
+                return $type1->getTypeHint();
+            }
+        }
+
+        return null;
+    }
+
+    private function isOptionalObjectType(Type $nullType, Type $objectType)
+    {
+        return 'null' === $nullType->getName() && $objectType instanceof ObjectType;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function createDenormalizationStatement(Context $context, Expr $input)
     {
@@ -91,7 +117,7 @@ class MultipleType extends Type
         return [$statements, $output];
     }
     /**
-     * (@inheritDoc}
+     * {@inheritdoc}
      */
     public function createNormalizationStatement(Context $context, Expr $input)
     {
@@ -118,4 +144,3 @@ class MultipleType extends Type
         return [$statements, $output];
     }
 }
- 

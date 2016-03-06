@@ -26,7 +26,9 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
     ];
 
     protected $excludeFormat = [
-        'date-time'
+        'string' => [
+            'date-time',
+        ],
     ];
 
     /**
@@ -38,7 +40,11 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
             &&
             in_array($object->getType(), $this->typesSupported)
             &&
-            !in_array($object->getFormat(), $this->excludeFormat)
+            (
+                !in_array($object->getType(), $this->excludeFormat)
+                ||
+                !in_array($object->getFormat(), $this->excludeFormat[$object->getType()])
+            )
         ;
     }
 

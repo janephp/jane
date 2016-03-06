@@ -39,16 +39,25 @@ class JaneBaseTest extends \PHPUnit_Framework_TestCase
         $generatedFinder->in($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated');
         $generatedData = [];
 
-        $this->assertEquals(count($expectedFinder), count($generatedFinder));
+        $this->assertEquals(count($expectedFinder), count($generatedFinder), sprintf('No same number of files for %s', $testDirectory->getRelativePathname()));
 
         foreach ($generatedFinder as $generatedFile) {
             $generatedData[$generatedFile->getRelativePathname()] = $generatedFile->getRealPath();
         }
 
         foreach ($expectedFinder as $expectedFile) {
-            $this->assertArrayHasKey($expectedFile->getRelativePathname(), $generatedData);
+            $this->assertArrayHasKey(
+                $expectedFile->getRelativePathname(),
+                $generatedData,
+                sprintf('File %s does not exist for %s', $expectedFile->getRelativePathname(), $testDirectory->getRelativePathname())
+            );
+
             if ($expectedFile->isFile()) {
-                $this->assertEquals(file_get_contents($expectedFile->getRealPath()), file_get_contents($generatedData[$expectedFile->getRelativePathname()]));
+                $this->assertEquals(
+                    file_get_contents($expectedFile->getRealPath()),
+                    file_get_contents($generatedData[$expectedFile->getRelativePathname()]),
+                    sprintf('File %s does not have the same content for %s', $expectedFile->getRelativePathname(), $testDirectory->getRelativePathname())
+                );
             }
         }
     }

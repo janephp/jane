@@ -44,7 +44,7 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
         }
         if (property_exists($data, 'dateOrNull')) {
             $value = $data->{'dateOrNull'};
-            if (is_object($data->{'dateOrNull'}) and false !== \DateTime::createFromFormat("Y-m-d\TH:i:sP", $data->{'dateOrNull'})) {
+            if (is_string($data->{'dateOrNull'}) and false !== \DateTime::createFromFormat("Y-m-d\TH:i:sP", $data->{'dateOrNull'})) {
                 $value = \DateTime::createFromFormat("Y-m-d\TH:i:sP", $data->{'dateOrNull'});
             }
             if (is_null($data->{'dateOrNull'})) {
@@ -54,7 +54,7 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
         }
         if (property_exists($data, 'dateOrNullOrInt')) {
             $value_1 = $data->{'dateOrNullOrInt'};
-            if (is_object($data->{'dateOrNullOrInt'}) and false !== \DateTime::createFromFormat("Y-m-d\TH:i:sP", $data->{'dateOrNullOrInt'})) {
+            if (is_string($data->{'dateOrNullOrInt'}) and false !== \DateTime::createFromFormat("Y-m-d\TH:i:sP", $data->{'dateOrNullOrInt'})) {
                 $value_1 = \DateTime::createFromFormat("Y-m-d\TH:i:sP", $data->{'dateOrNullOrInt'});
             }
             if (is_null($data->{'dateOrNullOrInt'})) {

@@ -2,9 +2,7 @@
 
 namespace Joli\Jane\Guesser;
 
-use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\Guess\Type;
-use Joli\Jane\Guesser\JsonSchema\DateTimeGuesser;
 
 class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, ClassGuesserInterface
 {

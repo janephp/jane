@@ -55,23 +55,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                if ($type === null) {
-                    $type = $guesser->guessType($object, $name, $classes);
-
-                    // DateTime guesser should not end up in multiple types
-                    // TODO: there should be a more generic solution for this
-                    if ($guesser instanceof DateTimeGuesser) {
-                        break;
-                    } else {
-                        continue;
-                    }
-                }
-
-                if (!$type instanceof MultipleType) {
-                    $type = new MultipleType($object, [$type]);
-                }
-
-                $type->addType($guesser->guessType($object, $name, $classes));
+                return $guesser->guessType($object, $name, $classes);
             }
         }
 

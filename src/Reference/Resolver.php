@@ -3,6 +3,7 @@
 namespace Joli\Jane\Reference;
 
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Runtime\Reference;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\SerializerInterface;
 

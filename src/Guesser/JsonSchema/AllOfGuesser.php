@@ -8,8 +8,8 @@ use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Runtime\Reference;
 
 class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -63,4 +63,3 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         return (($object instanceof JsonSchema) && is_array($object->getAllOf()) && count($object->getAllOf()) > 0);
     }
 }
- 

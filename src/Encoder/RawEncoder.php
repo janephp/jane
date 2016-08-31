@@ -2,44 +2,11 @@
 
 namespace Joli\Jane\Encoder;
 
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
+@trigger_error('RawEncoder is deprecated since 1.4 and will be removed in 2.0, please use Joli\Jane\Runtime\Encoder\RawEncoder instead.', E_USER_DEPRECATED);
 
-class RawEncoder implements DecoderInterface, EncoderInterface
+/**
+ * @deprecated RawEncoder is deprecated since 1.4 and will be removed in 2.0, please use Joli\Jane\Runtime\Encoder\RawEncoder instead.
+ */
+class RawEncoder extends \Joli\Jane\Runtime\Encoder\RawEncoder
 {
-    const FORMAT = 'raw';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function decode($data, $format, array $context = array())
-    {
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDecoding($format)
-    {
-        return self::FORMAT === $format;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function encode($data, $format, array $context = array())
-    {
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsEncoding($format)
-    {
-        return self::FORMAT === $format;
-    }
-
 }
- 

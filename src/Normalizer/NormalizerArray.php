@@ -2,43 +2,13 @@
 
 namespace Joli\Jane\Normalizer;
 
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Joli\Jane\Runtime\Normalizer\ArrayDenormalizer;
 
-class NormalizerArray extends SerializerAwareNormalizer implements DenormalizerInterface
+@trigger_error('NormalizerArray is deprecated since 1.4 and will be removed in 2.0, please use Joli\Jane\Runtime\Normalizer\ArrayDenormalizer instead.', E_USER_DEPRECATED);
+
+/**
+ * @deprecated NormalizerArray is deprecated since 1.4 and will be removed in 2.0, please use Joli\Jane\Runtime\Normalizer\ArrayDenormalizer instead.
+ */
+class NormalizerArray extends ArrayDenormalizer
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, $format = null, array $context = array())
-    {
-        if ($this->serializer === null) {
-            throw new \BadMethodCallException('Please set a serializer before calling denormalize()!');
-        }
-
-        if (!is_array($data)) {
-            throw new \InvalidArgumentException('Data expected to be an array, '.gettype($data).' given.');
-        }
-
-        if (substr($class, -2) !== '[]') {
-            throw new \InvalidArgumentException('Unsupported class: '.$class);
-        }
-
-        $serializer = $this->serializer;
-        $class = substr($class, 0, -2);
-
-        return array_map(
-            function ($data) use ($serializer, $class, $format, $context) {
-                return $serializer->denormalize($data, $class, $format, $context);
-            },
-            $data
-        );
-    }
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return substr($type, -2) === '[]' && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format);
-    }
 }

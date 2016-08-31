@@ -13,8 +13,8 @@ use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Runtime\Reference;
 
 class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
 {

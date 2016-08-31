@@ -11,8 +11,8 @@ use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\JsonSchemaMerger;
 use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Runtime\Reference;
 
 class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, ClassGuesserInterface, ChainGuesserAwareInterface
 {

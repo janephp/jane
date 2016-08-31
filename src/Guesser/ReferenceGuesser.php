@@ -2,9 +2,8 @@
 
 namespace Joli\Jane\Guesser;
 
-use Joli\Jane\Guesser\Guess\ObjectType;
-use Joli\Jane\Reference\Reference;
 use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Runtime\Reference;
 
 class ReferenceGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -17,11 +16,11 @@ class ReferenceGuesser implements GuesserInterface, TypeGuesserInterface, ChainG
 
     public function __construct(Resolver $resolver)
     {
-        $this->resolver     = $resolver;
+        $this->resolver = $resolver;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportObject($object)
     {
@@ -29,7 +28,7 @@ class ReferenceGuesser implements GuesserInterface, TypeGuesserInterface, ChainG
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($object, $name, $classes)
     {
@@ -41,4 +40,4 @@ class ReferenceGuesser implements GuesserInterface, TypeGuesserInterface, ChainG
 
         return $this->chainGuesser->guessType($resolved, $name, $classes);
     }
-} 
+}

@@ -2,29 +2,11 @@
 
 namespace Joli\Jane\Normalizer;
 
-use Joli\Jane\Reference\Reference;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+@trigger_error('ReferenceNormalizer is deprecated since 1.4 and will be removed in 2.0, please use Joli\Jane\Runtime\Normalizer\ReferenceNormalizer instead.', E_USER_DEPRECATED);
 
-class ReferenceNormalizer implements NormalizerInterface
+/**
+ * @deprecated ReferenceNormalizer is deprecated since 1.4 and will be removed in 2.0, please use Joli\Jane\Runtime\Normalizer\ReferenceNormalizer instead.
+ */
+class ReferenceNormalizer extends \Joli\Jane\Runtime\Normalizer\ReferenceNormalizer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function normalize($object, $format = null, array $context = array())
-    {
-        $ref = new \stdClass();
-        $ref->{'$ref'} = $object->getReference();
-
-        return $ref;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return ($data instanceof Reference);
-    }
-
 }
- 

@@ -2,6 +2,8 @@
 
 namespace Joli\Jane\Reference;
 
+use Joli\Jane\Runtime\Reference;
+
 class Replacer
 {
     /**

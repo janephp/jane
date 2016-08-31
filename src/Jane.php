@@ -2,7 +2,6 @@
 
 namespace Joli\Jane;
 
-use Joli\Jane\Encoder\RawEncoder;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\ModelGenerator;
 use Joli\Jane\Generator\Naming;
@@ -10,6 +9,7 @@ use Joli\Jane\Generator\NormalizerGenerator;
 use Joli\Jane\Guesser\ChainGuesser;
 use Joli\Jane\Guesser\JsonSchema\JsonSchemaGuesserFactory;
 use Joli\Jane\Normalizer\NormalizerFactory;
+use Joli\Jane\Runtime\Encoder\RawEncoder;
 use PhpCsFixer\Differ\NullDiffer;
 use PhpCsFixer\Error\ErrorsManager;
 use PhpCsFixer\Linter\NullLinter;
@@ -153,7 +153,11 @@ class Jane
             ;
 
             $resolver = new ConfigurationResolver();
-            $resolver->setFormats(['txt']);
+
+            if (method_exists($resolver, 'setFormats')) {
+                $resolver->setFormats(['txt']);
+            }
+
             $resolver->setDefaultConfig($fixerConfig);
             $resolver->resolve();
         }

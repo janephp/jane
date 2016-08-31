@@ -9,9 +9,11 @@ use Joli\Jane\Generator\Naming;
 use Joli\Jane\Generator\NormalizerGenerator;
 use Joli\Jane\Guesser\ChainGuesser;
 use Joli\Jane\Guesser\JsonSchema\JsonSchemaGuesserFactory;
-use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Normalizer\JsonSchemaNormalizer;
 use Joli\Jane\Normalizer\NormalizerFactory;
+use PhpCsFixer\Differ\NullDiffer;
+use PhpCsFixer\Error\ErrorsManager;
+use PhpCsFixer\Linter\NullLinter;
+use PhpCsFixer\Runner\Runner;
 use PhpParser\PrettyPrinter\Standard;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
@@ -21,7 +23,6 @@ use PhpCsFixer\Config;
 use PhpCsFixer\ConfigInterface;
 use PhpCsFixer\Console\ConfigurationResolver;
 use PhpCsFixer\Finder;
-use PhpCsFixer\Fixer;
 
 class Jane
 {
@@ -39,15 +40,15 @@ class Jane
 
     public function __construct(Serializer $serializer, ChainGuesser $chainGuesser, ModelGenerator $modelGenerator, NormalizerGenerator $normalizerGenerator, ConfigInterface $fixerConfig = null)
     {
-        $this->serializer          = $serializer;
-        $this->chainGuesser        = $chainGuesser;
-        $this->modelGenerator      = $modelGenerator;
+        $this->serializer = $serializer;
+        $this->chainGuesser = $chainGuesser;
+        $this->modelGenerator = $modelGenerator;
         $this->normalizerGenerator = $normalizerGenerator;
-        $this->fixerConfig         = $fixerConfig;
+        $this->fixerConfig = $fixerConfig;
     }
 
     /**
-     * Return a list of class guessed
+     * Return a list of class guessed.
      *
      * @param $schemaFilePath
      * @param $name
@@ -58,7 +59,7 @@ class Jane
      */
     public function createContext($schemaFilePath, $name, $namespace, $directory)
     {
-        $schema  = $this->serializer->deserialize(file_get_contents($schemaFilePath), 'Joli\Jane\Model\JsonSchema', 'json');
+        $schema = $this->serializer->deserialize(file_get_contents($schemaFilePath), 'Joli\Jane\Model\JsonSchema', 'json');
         $classes = $this->chainGuesser->guessClass($schema, $name);
 
         foreach ($classes as $class) {
@@ -75,7 +76,7 @@ class Jane
     }
 
     /**
-     * Generate code
+     * Generate code.
      *
      * @param $schemaFilePath
      * @param $name
@@ -88,18 +89,18 @@ class Jane
     {
         $context = $this->createContext($schemaFilePath, $name, $namespace, $directory);
 
-        if (!file_exists(($directory . DIRECTORY_SEPARATOR . 'Model'))) {
-            mkdir($directory . DIRECTORY_SEPARATOR . 'Model', 0755, true);
+        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'Model'))) {
+            mkdir($directory.DIRECTORY_SEPARATOR.'Model', 0755, true);
         }
 
-        if (!file_exists(($directory . DIRECTORY_SEPARATOR . 'Normalizer'))) {
-            mkdir($directory . DIRECTORY_SEPARATOR . 'Normalizer', 0755, true);
+        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'Normalizer'))) {
+            mkdir($directory.DIRECTORY_SEPARATOR.'Normalizer', 0755, true);
         }
 
-        $prettyPrinter   = new Standard();
-        $modelFiles      = $this->modelGenerator->generate($context->getRootReference(), $name, $context);
+        $prettyPrinter = new Standard();
+        $modelFiles = $this->modelGenerator->generate($context->getRootReference(), $name, $context);
         $normalizerFiles = $this->normalizerGenerator->generate($context->getRootReference(), $name, $context);
-        $generated       = [];
+        $generated = [];
 
         foreach ($modelFiles as $file) {
             $generated[] = $file->getFilename();
@@ -117,7 +118,7 @@ class Jane
     }
 
     /**
-     * Fix files generated in a directory
+     * Fix files generated in a directory.
      *
      * @param $directory
      *
@@ -125,7 +126,7 @@ class Jane
      */
     protected function fix($directory)
     {
-        if (!class_exists('PhpCsFixer\Config')) {
+        if (!class_exists('PhpCsFixer\Runner\Runner')) {
             return;
         }
 
@@ -152,6 +153,7 @@ class Jane
             ;
 
             $resolver = new ConfigurationResolver();
+            $resolver->setFormats(['txt']);
             $resolver->setDefaultConfig($fixerConfig);
             $resolver->resolve();
         }
@@ -160,26 +162,33 @@ class Jane
         $finder->in($directory);
         $fixerConfig->finder($finder);
 
-        $fixer = new Fixer();
+        $fixer = new Runner(
+            $fixerConfig,
+            new NullDiffer(),
+            null,
+            new ErrorsManager(),
+            new NullLinter(),
+            false
+        );
 
-        return $fixer->fix($fixerConfig);
+        return $fixer->fix();
     }
 
     public static function build()
     {
-        $serializer     = self::buildSerializer();
-        $chainGuesser   = JsonSchemaGuesserFactory::create($serializer);
-        $naming         = new Naming();
+        $serializer = self::buildSerializer();
+        $chainGuesser = JsonSchemaGuesserFactory::create($serializer);
+        $naming = new Naming();
         $modelGenerator = new ModelGenerator($naming, $chainGuesser, $chainGuesser);
-        $normGenerator  = new NormalizerGenerator($naming);
+        $normGenerator = new NormalizerGenerator($naming);
 
         return new self($serializer, $chainGuesser, $modelGenerator, $normGenerator);
     }
 
     public static function buildSerializer()
     {
-        $encoders       = [new JsonEncoder(new JsonEncode(JSON_UNESCAPED_SLASHES), new JsonDecode(false)), new RawEncoder()];
-        $normalizers    = NormalizerFactory::create();
+        $encoders = [new JsonEncoder(new JsonEncode(JSON_UNESCAPED_SLASHES), new JsonDecode(false)), new RawEncoder()];
+        $normalizers = NormalizerFactory::create();
 
         return new Serializer($normalizers, $encoders);
     }

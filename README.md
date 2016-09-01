@@ -1,11 +1,11 @@
 # Jane
 
 
-[![Latest Version](https://img.shields.io/github/release/jolicode/jane.svg?style=flat-square)](https://github.com/jolicode/jane/releases)
+[![Latest Version](https://img.shields.io/github/release/janephp/jane.svg?style=flat-square)](https://github.com/janephp/jane/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Build Status](https://img.shields.io/travis/jolicode/jane.svg?style=flat-square)](https://travis-ci.org/jolicode/jane)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/jolicode/jane.svg?style=flat-square)](https://scrutinizer-ci.com/g/jolicode/jane)
-[![Quality Score](https://img.shields.io/scrutinizer/g/jolicode/jane.svg?style=flat-square)](https://scrutinizer-ci.com/g/jolicode/jane)
+[![Build Status](https://img.shields.io/travis/janephp/jane.svg?style=flat-square)](https://travis-ci.org/janephp/jane)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/janephp/jane.svg?style=flat-square)](https://scrutinizer-ci.com/g/janephp/jane)
+[![Quality Score](https://img.shields.io/scrutinizer/g/janephp/jane.svg?style=flat-square)](https://scrutinizer-ci.com/g/janephp/jane)
 [![Total Downloads](https://img.shields.io/packagist/dt/jane/jane.svg?style=flat-square)](https://packagist.org/packages/jane/jane)
 
 Jane is a library to generate, in PHP, a model and a serializer from a [JSON Schema](http://json-schema.org/).
@@ -50,7 +50,7 @@ An optional and recommanded practice is to separate the generated code in a spec
 like creating a `generated` directory in your project and using jane inside. This allows other developers
 to be aware that this part of the project is generated and must not be updated manually.
 
-[See this library (jane-swagger)](https://github.com/jolicode/jane-swagger) for an example on how to achieve that.
+[See this library (jane-swagger)](https://github.com/janephp/openapi) for an example on how to achieve that.
 
 ## Internal
 
@@ -63,7 +63,8 @@ Here is a quick presentation on how this library transforms a Json Schema file i
 
 ## Credits
 
-* [All contributors](https://github.com/jolicode/jane/graphs/contributors)
+* [All contributors](https://github.com/janephp/jane/graphs/contributors)
+* [JoliCode](https://jolicode.com) for giving me time on my work to maintain this library
 
 ## License
 

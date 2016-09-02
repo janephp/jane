@@ -178,13 +178,13 @@ class Jane
         return $fixer->fix();
     }
 
-    public static function build()
+    public static function build($options = [])
     {
         $serializer = self::buildSerializer();
-        $chainGuesser = JsonSchemaGuesserFactory::create($serializer);
+        $chainGuesser = JsonSchemaGuesserFactory::create($serializer, $options);
         $naming = new Naming();
         $modelGenerator = new ModelGenerator($naming, $chainGuesser, $chainGuesser);
-        $normGenerator = new NormalizerGenerator($naming);
+        $normGenerator = new NormalizerGenerator($naming, isset($options['reference']) ? $options['reference'] : true);
 
         return new self($serializer, $chainGuesser, $modelGenerator, $normGenerator);
     }

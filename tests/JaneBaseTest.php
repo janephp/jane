@@ -2,7 +2,10 @@
 
 namespace Joli\Jane\tests;
 
+use Joli\Jane\Command\GenerateCommand;
 use Joli\Jane\Jane;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -24,13 +27,12 @@ class JaneBaseTest extends \PHPUnit_Framework_TestCase
         $filesystem->mkdir($testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated');
 
         // 2. Generate
-        $jane = Jane::build();
-        $jane->generate(
-            $testDirectory->getRealPath().DIRECTORY_SEPARATOR.'schema.json',
-            'Test',
-            'Joli\Jane\Tests\Expected',
-            $testDirectory->getRealPath().DIRECTORY_SEPARATOR.'generated'
-        );
+        $command = new GenerateCommand();
+        $inputArray = new ArrayInput([
+            '--config-file' => $testDirectory->getRealPath().DIRECTORY_SEPARATOR.'.jane',
+        ], $command->getDefinition());
+
+        $command->execute($inputArray, new NullOutput());
 
         // 3. Compare
         $expectedFinder = new Finder();

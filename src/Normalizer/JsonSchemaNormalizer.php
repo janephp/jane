@@ -29,9 +29,6 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (empty($data)) {
-            return null;
-        }
         if (isset($data->{'$ref'})) {
             return new Reference($data->{'$ref'}, $context['rootSchema'] ?: null);
         }

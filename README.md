@@ -28,6 +28,24 @@ of the json schema file, and all the subclasses discovered through the parsing o
 
 `Normalizer` directory will contain a normalizer service class for each of the model class generated.
 
+### Using a config file
+
+For more control over how your library should be generated you can use a config file, just create a file `.jane` at the root of your repository
+which will return an array of options:
+
+```
+<?php
+
+return [
+    'json-schema-file' => __DIR__ . '/json-schema.json', // Location of our JSON Schema
+    'root-class' => 'Classname', // root classname of the root object of your JSON Schema
+    'namespace' => 'Namespace\Prefix', // namespace of the generated code
+    'directory' => __DIR__ . '/src/Namespace/Prefix', // directory where the code will be output
+    'date-format' => \DateTime::RFC3339, // format of the date that your use (you should not change it unless you have to deal with a non compliant specification)
+    'reference' => true, // Add the JSON Reference specification to the generated library (so your data can use reference like described in https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03)
+]
+```
+
 ## Installation
 
 Use composer for installation

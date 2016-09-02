@@ -26,11 +26,18 @@ class NormalizerGenerator implements GeneratorInterface
     protected $naming;
 
     /**
-     * @param Naming $naming Naming Service
+     * @var bool Whether to generate the JSON Reference system
      */
-    public function __construct(Naming $naming)
+    protected $useReference;
+
+    /**
+     * @param Naming $naming       Naming Service
+     * @param bool   $useReference Whether to generate the JSON Reference system
+     */
+    public function __construct(Naming $naming, $useReference = true)
     {
         $this->naming = $naming;
+        $this->useReference = $useReference;
     }
 
     /**
@@ -96,9 +103,16 @@ class NormalizerGenerator implements GeneratorInterface
     {
         $statements = [
             new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_()),
-            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Joli\Jane\Runtime\Normalizer\ReferenceNormalizer'))),
             new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Joli\Jane\Runtime\Normalizer\ArrayDenormalizer')))
         ];
+
+        if ($this->useReference) {
+            $statements = [
+                new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_()),
+                new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Joli\Jane\Runtime\Normalizer\ReferenceNormalizer'))),
+                new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Joli\Jane\Runtime\Normalizer\ArrayDenormalizer'))),
+            ];
+        }
 
         foreach ($classes as $class) {
             $statements[] = new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_($class));

@@ -14,14 +14,14 @@ use PhpParser\Node\Scalar;
 trait DenormalizerGenerator
 {
     /**
-     * The naming service
+     * The naming service.
      *
      * @return Naming
      */
     abstract protected function getNaming();
 
     /**
-     * Create method to check if denormalization is supported
+     * Create method to check if denormalization is supported.
      *
      * @param string $modelFqdn Fully Qualified name of the model class denormalized
      *
@@ -34,27 +34,27 @@ trait DenormalizerGenerator
             'params' => [
                 new Param('data'),
                 new Param('type'),
-                new Param('format', new Expr\ConstFetch(new Name("null"))),
+                new Param('format', new Expr\ConstFetch(new Name('null'))),
             ],
             'stmts' => [
                 new Stmt\If_(
                     new Expr\BinaryOp\NotIdentical(new Expr\Variable('type'), new Scalar\String_($modelFqdn)),
                     [
                         'stmts' => [
-                            new Stmt\Return_(new Expr\ConstFetch(new Name("false")))
-                        ]
+                            new Stmt\Return_(new Expr\ConstFetch(new Name('false'))),
+                        ],
                     ]
                 ),
-                new Stmt\Return_(new Expr\ConstFetch(new Name("true")))
-            ]
+                new Stmt\Return_(new Expr\ConstFetch(new Name('true'))),
+            ],
         ]);
     }
 
     /**
-     * Create the denormalization method
+     * Create the denormalization method.
      *
      * @param $modelFqdn
-     * @param Context  $context
+     * @param Context $context
      * @param $properties
      *
      * @return Stmt\ClassMethod
@@ -63,39 +63,36 @@ trait DenormalizerGenerator
     {
         $context->refreshScope();
         $objectVariable = new Expr\Variable('object');
-        $statements     = [
-            new Stmt\If_(
-                new Expr\Empty_(new Expr\Variable('data')),
-                [
-                    'stmts' => [
-                        new Stmt\Return_(new Expr\ConstFetch(new Name("null")))
+        $assignStatement = new Expr\Assign($objectVariable, new Expr\New_(new Name('\\'.$modelFqdn)));
+        $statements = [$assignStatement];
+
+        if ($this->useReference) {
+            $statements = [
+                new Stmt\If_(
+                    new Expr\Isset_([new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}")]),
+                    [
+                        'stmts' => [
+                            new Stmt\Return_(new Expr\New_(new Name('Reference'), [
+                                new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}"),
+                                new Expr\Ternary(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), null, new Expr\ConstFetch(new Name('null'))),
+                            ])),
+                        ],
                     ]
-                ]
-            ),
-            new Stmt\If_(
-                new Expr\Isset_([new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}")]),
-                [
-                    'stmts' => [
-                        new Stmt\Return_(new Expr\New_(new Name('Reference'), [
-                            new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}"),
-                            new Expr\Ternary(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), null, new Expr\ConstFetch(new Name("null")))
-                        ]))
+                ),
+                $assignStatement,
+                new Stmt\If_(
+                    new Expr\BooleanNot(new Expr\Isset_([new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema'))])),
+                    [
+                        'stmts' => [
+                            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), $objectVariable),
+                        ],
                     ]
-                ]
-            ),
-            new Expr\Assign($objectVariable, new Expr\New_(new Name("\\".$modelFqdn))),
-            new Stmt\If_(
-                new Expr\BooleanNot(new Expr\Isset_([new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema'))])),
-                [
-                    'stmts' => [
-                        new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), $objectVariable)
-                    ]
-                ]
-            ),
-        ];
+                ),
+            ];
+        }
 
         foreach ($properties as $property) {
-            $propertyVar                                 = new Expr\PropertyFetch(new Expr\Variable('data'), sprintf("{'%s'}", $property->getName()));
+            $propertyVar = new Expr\PropertyFetch(new Expr\Variable('data'), sprintf("{'%s'}", $property->getName()));
             list($denormalizationStatements, $outputVar) = $property->getType()->createDenormalizationStatement($context, $propertyVar);
 
             $statements[] = new Stmt\If_(
@@ -105,9 +102,9 @@ trait DenormalizerGenerator
                 ]), [
                     'stmts' => array_merge($denormalizationStatements, [
                         new Expr\MethodCall($objectVariable, $this->getNaming()->getPrefixedMethodName('set', $property->getName()), [
-                            $outputVar
-                        ])
-                    ])
+                            $outputVar,
+                        ]),
+                    ]),
                 ]
             );
         }
@@ -119,10 +116,10 @@ trait DenormalizerGenerator
             'params' => [
                 new Param('data'),
                 new Param('class'),
-                new Param('format', new Expr\ConstFetch(new Name("null"))),
+                new Param('format', new Expr\ConstFetch(new Name('null'))),
                 new Param('context', new Expr\Array_(), 'array'),
             ],
-            'stmts' => $statements
+            'stmts' => $statements,
         ]);
     }
 }

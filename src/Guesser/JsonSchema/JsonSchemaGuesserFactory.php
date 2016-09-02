@@ -14,15 +14,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class JsonSchemaGuesserFactory
 {
-    public static function create(SerializerInterface $serializer)
+    public static function create(SerializerInterface $serializer, array $options = [])
     {
         $chainGuesser          = ChainGuesserFactory::create($serializer);
-
         $naming                = new Naming();
         $merger                = new JsonSchemaMerger();
         $resolver              = new Resolver($serializer);
+        $dateFormat            = isset($options['date-format']) ? $options['date-format'] : \DateTime::RFC3339;
 
-        $chainGuesser->addGuesser(new DateTimeGuesser());
+        $chainGuesser->addGuesser(new DateTimeGuesser($dateFormat));
         $chainGuesser->addGuesser(new SimpleTypeGuesser());
         $chainGuesser->addGuesser(new ArrayGuesser());
         $chainGuesser->addGuesser(new MultipleGuesser());

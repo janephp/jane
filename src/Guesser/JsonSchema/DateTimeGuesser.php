@@ -9,6 +9,14 @@ use Joli\Jane\Model\JsonSchema;
 
 class DateTimeGuesser implements GuesserInterface, TypeGuesserInterface
 {
+    /** @var string Format of date to use */
+    private $dateFormat;
+
+    public function __construct($dateFormat = \DateTime::RFC3339)
+    {
+        $this->dateFormat = $dateFormat;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -22,6 +30,6 @@ class DateTimeGuesser implements GuesserInterface, TypeGuesserInterface
      */
     public function guessType($object, $name, $classes)
     {
-        return new DateTimeType($object);
+        return new DateTimeType($object, $this->dateFormat);
     }
 }

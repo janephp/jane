@@ -29,4 +29,3 @@ class AdditionalItemsGuesser implements ChainGuesserAwareInterface, GuesserInter
         return ($object instanceof JsonSchema) && ($object->getAdditionalItems() instanceof JsonSchema);
     }
 }
- 

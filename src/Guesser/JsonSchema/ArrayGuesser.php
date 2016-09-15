@@ -48,4 +48,3 @@ class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         return $type;
     }
 }
- 

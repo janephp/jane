@@ -66,4 +66,3 @@ class ClassGuess
         $this->properties = $properties;
     }
 }
- 

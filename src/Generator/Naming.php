@@ -63,4 +63,4 @@ class Naming
 
         return $name;
     }
-} 
+}

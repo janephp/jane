@@ -15,4 +15,3 @@ interface TypeGuesserInterface
      */
     public function guessType($object, $name, $classes);
 }
- 

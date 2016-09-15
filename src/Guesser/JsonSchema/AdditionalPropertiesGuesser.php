@@ -46,4 +46,3 @@ class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterf
         return new MapType($object, $this->chainGuesser->guessType($object->getAdditionalProperties(), $name, $classes));
     }
 }
- 

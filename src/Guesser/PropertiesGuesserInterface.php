@@ -14,4 +14,4 @@ interface PropertiesGuesserInterface
      * @return \Joli\Jane\Guesser\Guess\Property[]
      */
     public function guessProperties($object, $name, $classes);
-} 
+}

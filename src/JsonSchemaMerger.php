@@ -56,4 +56,3 @@ class JsonSchemaMerger
         return array_unique($array);
     }
 }
- 

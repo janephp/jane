@@ -1,0 +1,37 @@
+{
+    "id": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Testing allOf",
+    "type": "object",
+    "definitions": {
+        "childtype": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/parenttype"
+                }
+            ],
+            "properties": {
+                "childProperty": {
+                    "type": "string"
+                }
+            }
+        },
+        "parenttype": {
+            "type": "object",
+            "properties": {
+                "inheritedProperty": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "properties": {
+        "child": {
+            "$ref": "#/definitions/childtype"
+        },
+        "parent": {
+            "$ref": "#/definitions/parenttype"
+        }
+    }
+}

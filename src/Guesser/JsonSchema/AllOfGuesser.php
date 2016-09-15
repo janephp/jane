@@ -6,12 +6,13 @@ use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
+use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Runtime\Reference;
 
-class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
+class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, PropertiesGuesserInterface
 {
     use ChainGuesserAwareTrait;
 
@@ -22,11 +23,11 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
 
     public function __construct(Resolver $resolver)
     {
-        $this->resolver         = $resolver;
+        $this->resolver = $resolver;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($object, $name, $classes)
     {
@@ -56,10 +57,26 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportObject($object)
     {
-        return (($object instanceof JsonSchema) && is_array($object->getAllOf()) && count($object->getAllOf()) > 0);
+        return ($object instanceof JsonSchema) && is_array($object->getAllOf()) && count($object->getAllOf()) > 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessProperties($object, $name, $classes)
+    {
+        $properties = [];
+        foreach ($object->getAllOf() as $allOfSchema) {
+            if ($allOfSchema instanceof Reference) {
+                $allOfSchema = $this->resolver->resolve($allOfSchema);
+            }
+            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $classes));
+        }
+
+        return $properties;
     }
 }

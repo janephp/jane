@@ -35,4 +35,3 @@ class OneOfGuesser implements ChainGuesserAwareInterface, TypeGuesserInterface, 
         return $type;
     }
 }
- 

@@ -52,4 +52,3 @@ class ItemsGuesser implements GuesserInterface, ClassGuesserInterface, ChainGues
         );
     }
 }
- 

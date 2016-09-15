@@ -35,4 +35,3 @@ class DefinitionGuesser implements ChainGuesserAwareInterface, GuesserInterface,
         return ($object instanceof JsonSchema) && $object->getDefinitions() !== null && count($object->getDefinitions()) > 0;
     }
 }
- 

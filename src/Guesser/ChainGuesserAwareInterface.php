@@ -11,4 +11,3 @@ interface ChainGuesserAwareInterface
      */
     public function setChainGuesser(ChainGuesser $chainGuesser);
 }
- 

@@ -62,4 +62,4 @@ class File
     {
         return $this->type;
     }
-} 
+}

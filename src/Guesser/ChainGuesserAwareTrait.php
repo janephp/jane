@@ -19,4 +19,3 @@ trait ChainGuesserAwareTrait
         $this->chainGuesser = $chainGuesser;
     }
 }
- 

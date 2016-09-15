@@ -54,4 +54,4 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(json_decode($json), json_decode($newJson));
     }
-} 
+}

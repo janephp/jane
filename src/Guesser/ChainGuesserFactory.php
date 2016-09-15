@@ -15,4 +15,3 @@ class ChainGuesserFactory
         return $chainGuesser;
     }
 }
- 

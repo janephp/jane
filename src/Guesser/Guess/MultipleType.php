@@ -100,7 +100,7 @@ class MultipleType extends Type
         ];
 
         foreach ($this->getTypes() as $type) {
-            list ($typeStatements, $typeOutput) = $type->createDenormalizationStatement($context, $input);
+            list($typeStatements, $typeOutput) = $type->createDenormalizationStatement($context, $input);
 
             $statements[] = new Stmt\If_(
                 $type->createConditionStatement($input),
@@ -127,7 +127,7 @@ class MultipleType extends Type
         ];
 
         foreach ($this->getTypes() as $type) {
-            list ($typeStatements, $typeOutput) = $type->createNormalizationStatement($context, $input);
+            list($typeStatements, $typeOutput) = $type->createNormalizationStatement($context, $input);
 
             $statements[] = new Stmt\If_(
                 $type->createNormalizationConditionStatement($input),

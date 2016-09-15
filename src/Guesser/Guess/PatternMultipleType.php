@@ -161,4 +161,3 @@ class PatternMultipleType extends Type
         return new Expr\Variable($context->getUniqueVariableName('key'));
     }
 }
- 

@@ -59,4 +59,4 @@ trait PropertyGenerator
 EOD
         , $type->__toString()));
     }
-} 
+}

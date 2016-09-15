@@ -55,4 +55,3 @@ class AnyOfGuesser implements GuesserInterface, ClassGuesserInterface, TypeGuess
         return (($object instanceof JsonSchema) && is_array($object->getAnyOf()) && count($object->getAnyOf()) > 0);
     }
 }
- 

@@ -20,7 +20,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Model\JsonSchema) {
+        if ($data instanceof \Joli\Jane\Model\JsonSchemaInterface) {
             return true;
         }
 

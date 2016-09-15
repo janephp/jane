@@ -48,7 +48,7 @@ trait NormalizerGenerator
             ],
             'stmts' => [
                 new Stmt\If_(
-                    new Expr\Instanceof_(new Expr\Variable('data'), new Name('\\'.$modelFqdn)),
+                    new Expr\Instanceof_(new Expr\Variable('data'), new Name('\\'.$modelFqdn.'Interface')),
                     [
                         'stmts' => [
                             new Stmt\Return_(new Expr\ConstFetch(new Name('true'))),

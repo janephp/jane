@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Tests\Expected\Model;
 
-class Test
+class Test implements TestInterface
 {
     /**
      * @var string

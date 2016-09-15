@@ -13,9 +13,9 @@ class ClassGuess
     private $name;
 
     /**
-     * @var array Options for generation
+     * @var string[] Types that this class is composed of
      */
-    private $options;
+    private $types;
 
     /**
      * @var mixed Object link to the generation
@@ -27,11 +27,18 @@ class ClassGuess
      */
     private $properties;
 
-    public function __construct($object, $name, $options = [])
+    /**
+     * ClassGuess constructor.
+     *
+     * @param mixed    $object
+     * @param string   $name
+     * @param string[] $types
+     */
+    public function __construct($object, $name, $types = [])
     {
-        $this->name = $name;
+        $this->name   = $name;
         $this->object = $object;
-        $this->options = $options;
+        $this->types  = $types;
     }
 
     /**
@@ -64,5 +71,21 @@ class ClassGuess
     public function setProperties($properties)
     {
         $this->properties = $properties;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * @param \string[] $types
+     */
+    public function setTypes($types)
+    {
+        $this->types = $types;
     }
 }

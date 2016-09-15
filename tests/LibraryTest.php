@@ -32,6 +32,10 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
             file_get_contents(__DIR__ . "/../src/Model/JsonSchema.php"),
             file_get_contents(__DIR__ . "/generated/Model/JsonSchema.php")
         );
+        $this->assertEquals(
+            file_get_contents(__DIR__ . "/../src/Model/JsonSchemaInterface.php"),
+            file_get_contents(__DIR__ . "/generated/Model/JsonSchemaInterface.php")
+        );
 
         $this->assertEquals(
             file_get_contents(__DIR__ . "/../src/Normalizer/JsonSchemaNormalizer.php"),

@@ -63,4 +63,14 @@ class Naming
 
         return $name;
     }
+
+    /**
+     * @param $name
+     *
+     * @return string
+     */
+    public function getInterfaceName($name)
+    {
+        return $this->getClassName($name)."Interface";
+    }
 }

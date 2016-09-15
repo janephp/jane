@@ -10,6 +10,7 @@ class NormalizerFactory
         $normalizers[] = new \Joli\Jane\Runtime\Normalizer\ReferenceNormalizer();
         $normalizers[] = new \Joli\Jane\Runtime\Normalizer\ArrayDenormalizer();
         $normalizers[] = new JsonSchemaNormalizer();
+        $normalizers[] = new PositiveIntegerDefault0Normalizer();
 
         return $normalizers;
     }

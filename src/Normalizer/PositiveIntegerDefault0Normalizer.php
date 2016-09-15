@@ -1,16 +1,17 @@
 <?php
 
-namespace Joli\Jane\Tests\Expected\Normalizer;
+namespace Joli\Jane\Normalizer;
 
+use Joli\Jane\Runtime\Reference;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
-class ParenttypeNormalizer extends SerializerAwareNormalizer implements DenormalizerInterface, NormalizerInterface
+class PositiveIntegerDefault0Normalizer extends SerializerAwareNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Parenttype') {
+        if ($type !== 'Joli\\Jane\\Model\\PositiveIntegerDefault0') {
             return false;
         }
 
@@ -19,7 +20,7 @@ class ParenttypeNormalizer extends SerializerAwareNormalizer implements Denormal
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\ParenttypeInterface) {
+        if ($data instanceof \Joli\Jane\Model\PositiveIntegerDefault0) {
             return true;
         }
 
@@ -28,9 +29,12 @@ class ParenttypeNormalizer extends SerializerAwareNormalizer implements Denormal
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $object = new \Joli\Jane\Tests\Expected\Model\Parenttype();
-        if (property_exists($data, 'inheritedProperty')) {
-            $object->setInheritedProperty($data->{'inheritedProperty'});
+        if (isset($data->{'$ref'})) {
+            return new Reference($data->{'$ref'}, $context['rootSchema'] ?: null);
+        }
+        $object = new \Joli\Jane\Model\PositiveIntegerDefault0();
+        if (!isset($context['rootSchema'])) {
+            $context['rootSchema'] = $object;
         }
 
         return $object;
@@ -39,9 +43,6 @@ class ParenttypeNormalizer extends SerializerAwareNormalizer implements Denormal
     public function normalize($object, $format = null, array $context = [])
     {
         $data = new \stdClass();
-        if (null !== $object->getInheritedProperty()) {
-            $data->{'inheritedProperty'} = $object->getInheritedProperty();
-        }
 
         return $data;
     }

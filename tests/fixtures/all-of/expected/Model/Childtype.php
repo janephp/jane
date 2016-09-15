@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Tests\Expected\Model;
 
-class Childtype
+class Childtype implements ParenttypeInterface, ChildtypeInterface
 {
     /**
      * @var string

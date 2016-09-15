@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Tests\Expected\Model;
 
-class Test
+class Test implements TestInterface
 {
     /**
      * @var Childtype
@@ -26,7 +26,7 @@ class Test
      *
      * @return self
      */
-    public function setChild(Childtype $child = null)
+    public function setChild(ChildtypeInterface $child = null)
     {
         $this->child = $child;
 
@@ -46,7 +46,7 @@ class Test
      *
      * @return self
      */
-    public function setParent(Parenttype $parent = null)
+    public function setParent(ParenttypeInterface $parent = null)
     {
         $this->parent = $parent;
 

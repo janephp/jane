@@ -5,6 +5,7 @@ namespace Joli\Jane\Generator;
 use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Generator\Model\ClassGenerator;
 use Joli\Jane\Generator\Model\GetterSetterGenerator;
+use Joli\Jane\Generator\Model\InterfaceGenerator;
 use Joli\Jane\Generator\Model\PropertyGenerator;
 use Joli\Jane\Model\JsonSchema;
 
@@ -16,6 +17,7 @@ class ModelGenerator implements GeneratorInterface
     use ClassGenerator;
     use GetterSetterGenerator;
     use PropertyGenerator;
+    use InterfaceGenerator;
 
     const FILE_TYPE_MODEL = 'model';
 
@@ -33,21 +35,11 @@ class ModelGenerator implements GeneratorInterface
     }
 
     /**
-     * The naming service
-     *
-     * @return Naming
-     */
-    protected function getNaming()
-    {
-        return $this->naming;
-    }
-
-    /**
      * Generate a model given a schema
      *
-     * @param mixed   $schema     Schema to generate from
-     * @param string  $className  Class to generate
-     * @param Context $context    Context for generation
+     * @param mixed   $schema    Schema to generate from
+     * @param string  $className Class to generate
+     * @param Context $context   Context for generation
      *
      * @return File[]
      */
@@ -68,14 +60,34 @@ class ModelGenerator implements GeneratorInterface
             $model = $this->createModel(
                 $class->getName(),
                 $properties,
-                $methods
+                $methods,
+                $class->getTypes()
             );
 
-            $namespace = new Stmt\Namespace_(new Name($context->getNamespace()."\\Model"), [$model]);
+            $namespace = new Stmt\Namespace_(new Name($context->getNamespace() . "\\Model"), [$model]);
 
-            $files[] = new File($context->getDirectory().'/Model/'.$class->getName().'.php', $namespace, self::FILE_TYPE_MODEL);
+            $files[] = new File(
+                $context->getDirectory() . '/Model/' . $class->getName() . '.php', $namespace, self::FILE_TYPE_MODEL
+            );
+
+            $modelInterface = $this->createModelInterface($model->name, $methods);
+            $namespace      = new Stmt\Namespace_(new Name($context->getNamespace() . "\\Model"), [$modelInterface]);
+
+            $files[] = new File(
+                $context->getDirectory() . '/Model/' . $modelInterface->name . '.php', $namespace, self::FILE_TYPE_MODEL
+            );
         }
 
         return $files;
+    }
+
+    /**
+     * The naming service
+     *
+     * @return Naming
+     */
+    protected function getNaming()
+    {
+        return $this->naming;
     }
 }

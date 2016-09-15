@@ -67,4 +67,9 @@ class DateTimeType extends ObjectType
             )
         );
     }
+
+    public function getTypeHint()
+    {
+        return "\\DateTime";
+    }
 }

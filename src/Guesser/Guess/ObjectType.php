@@ -107,6 +107,6 @@ class ObjectType extends Type
      */
     public function getTypeHint()
     {
-        return $this->className;
+        return $this->className."Interface";
     }
 }

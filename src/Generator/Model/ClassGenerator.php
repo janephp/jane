@@ -19,18 +19,28 @@ trait ClassGenerator
     /**
      * Return a model class
      *
-     * @param string $name
-     * @param Node[] $properties
-     * @param Node[] $methods
+     * @param string   $name
+     * @param Node[]   $properties
+     * @param Node[]   $methods
+     * @param string[] $types
      *
      * @return Stmt\Class_
      */
-    protected function createModel($name, $properties, $methods)
+    protected function createModel($name, $properties, $methods, $types)
     {
+        $implements = [];
+
+        foreach ($types as $type) {
+            $implements[] = new Name($this->getNaming()->getInterfaceName($type));
+        }
+
+        $implements[] = new Name($this->getNaming()->getInterfaceName($name));
+
         return new Stmt\Class_(
             new Name($this->getNaming()->getClassName($name)),
             [
-                'stmts' => array_merge($properties, $methods)
+                'stmts'      => array_merge($properties, $methods),
+                'implements' => $implements,
             ]
         );
     }

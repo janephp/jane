@@ -19,7 +19,7 @@ class ChildtypeNormalizer extends SerializerAwareNormalizer implements Denormali
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Childtype) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Model\ChildtypeInterface) {
             return true;
         }
 

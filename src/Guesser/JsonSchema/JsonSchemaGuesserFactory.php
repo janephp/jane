@@ -30,7 +30,7 @@ class JsonSchemaGuesserFactory
         $chainGuesser->addGuesser(new DefinitionGuesser());
         $chainGuesser->addGuesser(new ItemsGuesser());
         $chainGuesser->addGuesser(new AnyOfGuesser());
-        $chainGuesser->addGuesser(new AllOfGuesser($resolver));
+        $chainGuesser->addGuesser(new AllOfGuesser($naming, $resolver));
         $chainGuesser->addGuesser(new OneOfGuesser());
         $chainGuesser->addGuesser(new ObjectOneOfGuesser($merger, $resolver));
         $chainGuesser->addGuesser(new PatternPropertiesGuesser());

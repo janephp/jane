@@ -19,7 +19,7 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Test) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Model\TestInterface) {
             return true;
         }
 

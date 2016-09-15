@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Model;
 
-class JsonSchema
+class JsonSchema implements JsonSchemaInterface
 {
     /**
      * @var string
@@ -790,7 +790,7 @@ class JsonSchema
      *
      * @return self
      */
-    public function setNot(JsonSchema $not = null)
+    public function setNot(JsonSchemaInterface $not = null)
     {
         $this->not = $not;
 

@@ -22,6 +22,7 @@
         "bin/jane"
     ],
     "require": {
+        "php": ">=5.5.9",
         "jane/runtime": "dev-master",
         "symfony/property-access": "^2.3|^3.0",
         "symfony/console": "^2.3|^3.0",

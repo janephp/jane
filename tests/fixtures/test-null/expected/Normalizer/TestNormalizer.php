@@ -30,12 +30,9 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (isset($data->{'$ref'})) {
-            return new Reference($data->{'$ref'}, $context['rootSchema'] ?: null);
+            return new Reference($data->{'$ref'}, $context['schema-origin']);
         }
         $object = new \Joli\Jane\Tests\Expected\Model\Test();
-        if (!isset($context['rootSchema'])) {
-            $context['rootSchema'] = $object;
-        }
         if (property_exists($data, 'onlyNull')) {
             $object->setOnlyNull($data->{'onlyNull'});
         }

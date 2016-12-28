@@ -16,9 +16,9 @@ class AdditionalItemsGuesser implements ChainGuesserAwareInterface, GuesserInter
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
-        return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'AdditionalItems');
+        return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'AdditionalItems', $reference . '/additionalItems');
     }
 
     /**

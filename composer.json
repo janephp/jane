@@ -22,7 +22,7 @@
         "bin/jane"
     ],
     "require": {
-        "jane/runtime": "^1.0",
+        "jane/runtime": "dev-master",
         "symfony/property-access": "^2.3|^3.0",
         "symfony/console": "^2.3|^3.0",
         "nikic/php-parser": "^1.4|^2.0",

@@ -2,7 +2,6 @@
 
 namespace Joli\Jane\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Context\Context;
 use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\ClassGuesserInterface;
@@ -13,6 +12,7 @@ use Joli\Jane\JsonSchemaMerger;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Runtime\Reference;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, ClassGuesserInterface, ChainGuesserAwareInterface
 {
@@ -24,34 +24,34 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
     private $jsonSchemaMerger;
 
     /**
-     * @var \Joli\Jane\Reference\Resolver
+     * @var SerializerInterface
      */
-    private $resolver;
+    private $serializer;
 
-    public function __construct(JsonSchemaMerger $jsonSchemaMerger, Resolver $resolver)
+    public function __construct(JsonSchemaMerger $jsonSchemaMerger, SerializerInterface $serializer)
     {
         $this->jsonSchemaMerger = $jsonSchemaMerger;
-        $this->resolver         = $resolver;
+        $this->serializer = $serializer;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
-        $classes   = [];
+        $classes = [];
 
-        foreach ($object->getOneOf() as $oneOf) {
+        foreach ($object->getOneOf() as $key => $oneOf) {
             $oneOfName = $name.'Sub';
             $oneOfResolved = $oneOf;
 
             if ($oneOf instanceof Reference) {
-                $oneOfName     = array_pop(explode('/', $oneOf->getFragment()));
+                $oneOfName = array_pop(explode('/', $oneOf->getFragment()));
                 $oneOfResolved = $this->resolver->resolve($oneOf);
             }
 
-            $merged  = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($merged, $oneOfName));
+            $merged = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
+            $classes = array_merge($classes, $this->chainGuesser->guessClass($merged, $oneOfName, $reference . '/oneOf/' . $key));
 
             if ($oneOf instanceof Reference) {
                 $oneOf->setResolved($merged);
@@ -62,7 +62,7 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($object, $name, $classes)
     {
@@ -76,10 +76,10 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportObject($object)
     {
-        return (($object instanceof JsonSchema) && $object->getType() === "object" && is_array($object->getOneOf()) && count($object->getOneOf()) > 0);
+        return ($object instanceof JsonSchema) && $object->getType() === 'object' && is_array($object->getOneOf()) && count($object->getOneOf()) > 0;
     }
 }

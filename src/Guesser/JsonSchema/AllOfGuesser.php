@@ -11,19 +11,20 @@ use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Runtime\Reference;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, PropertiesGuesserInterface
 {
     use ChainGuesserAwareTrait;
 
     /**
-     * @var \Joli\Jane\Reference\Resolver
+     * @var SerializerInterface
      */
-    private $resolver;
+    private $serializer;
 
-    public function __construct(Resolver $resolver)
+    public function __construct(SerializerInterface $serializer)
     {
-        $this->resolver = $resolver;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -37,7 +38,11 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
             $allOfSchema = $allOf;
 
             if ($allOfSchema instanceof Reference) {
-                $allOfSchema = $this->resolver->resolve($allOf);
+                $allOfSchema = $allOfSchema->resolve(function($data) use($allOfSchema) {
+                    return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
+                        'schema-origin' => $allOfSchema->getUri()
+                    ]);
+                });
             }
 
             if (null !== $allOfSchema->getType()) {
@@ -72,8 +77,13 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         $properties = [];
         foreach ($object->getAllOf() as $allOfSchema) {
             if ($allOfSchema instanceof Reference) {
-                $allOfSchema = $this->resolver->resolve($allOfSchema);
+                $allOfSchema = $allOfSchema->resolve(function($data) use($allOfSchema) {
+                    return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
+                        'schema-origin' => $allOfSchema->getUri()
+                    ]);
+                });
             }
+
             $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $classes));
         }
 

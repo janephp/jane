@@ -16,17 +16,17 @@ class ItemsGuesser implements GuesserInterface, ClassGuesserInterface, ChainGues
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
         if ($object->getItems() instanceof JsonSchema) {
-            return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'Item');
+            return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'Item', $reference . '/additionalItems');
         }
 
         $classes = [];
         $count   = 1;
 
         foreach ($object->getItems() as $item) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($item, $name . 'Item' . $count));
+            $classes = array_merge($classes, $this->chainGuesser->guessClass($item, $name . 'Item' . $count, $reference . '/additionalItems/' . $count - 1));
             $count++;
         }
 

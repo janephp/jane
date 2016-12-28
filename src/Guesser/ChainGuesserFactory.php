@@ -10,7 +10,7 @@ class ChainGuesserFactory
     public static function create(SerializerInterface $serializer)
     {
         $chainGuesser = new ChainGuesser();
-        $chainGuesser->addGuesser(new ReferenceGuesser(new Resolver($serializer)));
+        $chainGuesser->addGuesser(new ReferenceGuesser($serializer));
 
         return $chainGuesser;
     }

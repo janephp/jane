@@ -2,21 +2,22 @@
 
 namespace Joli\Jane\Guesser;
 
-use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Runtime\Reference;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ReferenceGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
     use ChainGuesserAwareTrait;
 
     /**
-     * @var Resolver
+     * @var SerializerInterface
      */
-    private $resolver;
+    private $serializer;
 
-    public function __construct(Resolver $resolver)
+    public function __construct(SerializerInterface $serializer)
     {
-        $this->resolver = $resolver;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -29,13 +30,19 @@ class ReferenceGuesser implements GuesserInterface, TypeGuesserInterface, ChainG
 
     /**
      * {@inheritdoc}
+     *
+     * @param Reference $object
      */
     public function guessType($object, $name, $classes)
     {
-        $resolved = $this->resolver->resolve($object);
+        $resolved = $object->resolve(function ($data) use($object, $name) {
+            return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
+                'schema-origin' => $object->getUri()
+            ]);
+        });
 
-        if (array_key_exists(spl_object_hash($resolved), $classes)) {
-            $name = $classes[spl_object_hash($resolved)]->getName();
+        if (array_key_exists($object->getUri(true), $classes)) {
+            $name = $classes[$object->getUri(true)]->getName();
         }
 
         return $this->chainGuesser->guessType($resolved, $name, $classes);

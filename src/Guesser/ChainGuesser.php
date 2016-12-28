@@ -23,7 +23,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
         $classes = [];
 
@@ -33,7 +33,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                $classes = array_merge($classes, $guesser->guessClass($object, $name));
+                $classes = array_merge($classes, $guesser->guessClass($object, $name, $reference));
             }
         }
 

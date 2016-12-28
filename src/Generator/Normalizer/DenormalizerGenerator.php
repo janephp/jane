@@ -74,20 +74,12 @@ trait DenormalizerGenerator
                         'stmts' => [
                             new Stmt\Return_(new Expr\New_(new Name('Reference'), [
                                 new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}"),
-                                new Expr\Ternary(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), null, new Expr\ConstFetch(new Name('null'))),
+                                new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('schema-origin')),
                             ])),
                         ],
                     ]
                 ),
                 $assignStatement,
-                new Stmt\If_(
-                    new Expr\BooleanNot(new Expr\Isset_([new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema'))])),
-                    [
-                        'stmts' => [
-                            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('rootSchema')), $objectVariable),
-                        ],
-                    ]
-                ),
             ];
         }
 

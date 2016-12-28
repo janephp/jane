@@ -19,20 +19,19 @@ class JsonSchemaGuesserFactory
         $chainGuesser          = ChainGuesserFactory::create($serializer);
         $naming                = new Naming();
         $merger                = new JsonSchemaMerger();
-        $resolver              = new Resolver($serializer);
         $dateFormat            = isset($options['date-format']) ? $options['date-format'] : \DateTime::RFC3339;
 
         $chainGuesser->addGuesser(new DateTimeGuesser($dateFormat));
         $chainGuesser->addGuesser(new SimpleTypeGuesser());
         $chainGuesser->addGuesser(new ArrayGuesser());
         $chainGuesser->addGuesser(new MultipleGuesser());
-        $chainGuesser->addGuesser(new ObjectGuesser($naming, $resolver));
+        $chainGuesser->addGuesser(new ObjectGuesser($naming, $serializer));
         $chainGuesser->addGuesser(new DefinitionGuesser());
         $chainGuesser->addGuesser(new ItemsGuesser());
         $chainGuesser->addGuesser(new AnyOfGuesser());
-        $chainGuesser->addGuesser(new AllOfGuesser($resolver));
+        $chainGuesser->addGuesser(new AllOfGuesser($serializer));
         $chainGuesser->addGuesser(new OneOfGuesser());
-        $chainGuesser->addGuesser(new ObjectOneOfGuesser($merger, $resolver));
+        $chainGuesser->addGuesser(new ObjectOneOfGuesser($merger, $serializer));
         $chainGuesser->addGuesser(new PatternPropertiesGuesser());
         $chainGuesser->addGuesser(new AdditionalItemsGuesser());
         $chainGuesser->addGuesser(new AdditionalPropertiesGuesser());

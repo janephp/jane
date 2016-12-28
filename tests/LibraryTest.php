@@ -49,7 +49,7 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
         $serializer = Jane::buildSerializer();
 
         $json = file_get_contents(__DIR__ . '/data/json-schema.json');
-        $schema = $serializer->deserialize($json, 'Joli\Jane\Model\JsonSchema', 'json');
+        $schema = $serializer->deserialize($json, 'Joli\Jane\Model\JsonSchema', 'json', ['schema-origin' => __DIR__ . '/data/json-schema.json']);
         $newJson = $serializer->serialize($schema, 'json');
 
         $this->assertEquals(json_decode($json), json_decode($newJson));

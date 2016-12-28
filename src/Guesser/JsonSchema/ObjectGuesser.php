@@ -15,6 +15,7 @@ use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Runtime\Reference;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
 {
@@ -26,14 +27,14 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     protected $naming;
 
     /**
-     * @var \Joli\Jane\Reference\Resolver
+     * @var SerializerInterface
      */
-    protected $resolver;
+    private $serializer;
 
-    public function __construct(Naming $naming, Resolver $resolver)
+    public function __construct(Naming $naming, SerializerInterface $serializer)
     {
         $this->naming = $naming;
-        $this->resolver = $resolver;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -47,12 +48,12 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     /**
      * {@inheritdoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
-        $classes = [spl_object_hash($object) => new ClassGuess($object, $this->naming->getClassName($name))];
+        $classes = [$reference => new ClassGuess($object, $this->naming->getClassName($name))];
 
         foreach ($object->getProperties() as $key => $property) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($property, $key));
+            $classes = array_merge($classes, $this->chainGuesser->guessClass($property, $key, $reference . '/properties/' . $key));
         }
 
         return $classes;
@@ -69,7 +70,11 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             $propertyObj = $property;
 
             if ($propertyObj instanceof Reference) {
-                $propertyObj = $this->resolver->resolve($propertyObj);
+                $propertyObj = $propertyObj->resolve(function($data) use($propertyObj) {
+                    return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
+                        'schema-origin' => $propertyObj->getUri()
+                    ]);
+                });
             }
 
             $type = $propertyObj->getType();
@@ -95,7 +100,11 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             }
 
             if ($property instanceof Reference) {
-                $property = $this->resolver->resolve($property);
+                $property = $property->resolve(function($data) use($property) {
+                    return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
+                        'schema-origin' => $property->getUri()
+                    ]);
+                });
             }
 
             if ($property->getEnum() !== null) {

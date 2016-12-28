@@ -18,12 +18,12 @@ class AnyOfGuesser implements GuesserInterface, ClassGuesserInterface, TypeGuess
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
         $classes = [];
 
         foreach ($object->getAnyOf() as $anyOfObject) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($anyOfObject, $name.'AnyOf'));
+            $classes = array_merge($classes, $this->chainGuesser->guessClass($anyOfObject, $name.'AnyOf', $reference . '/anyOf'));
         }
 
         return $classes;

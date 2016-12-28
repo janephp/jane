@@ -16,12 +16,12 @@ class DefinitionGuesser implements ChainGuesserAwareInterface, GuesserInterface,
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name)
+    public function guessClass($object, $name, $reference)
     {
         $classes = [];
 
         foreach ($object->getDefinitions() as $key => $definition) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($definition, $key));
+            $classes = array_merge($classes, $this->chainGuesser->guessClass($definition, $key, $reference . '/definitions/' . $key));
         }
 
         return $classes;

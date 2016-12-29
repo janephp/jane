@@ -11,7 +11,7 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
 {
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Test') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\JsonSchema.Model\\Test') {
             return false;
         }
 

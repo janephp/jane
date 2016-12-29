@@ -10,7 +10,7 @@ class ChildtypeNormalizer extends SerializerAwareNormalizer implements Denormali
 {
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Childtype') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\JsonSchema.Model\\Childtype') {
             return false;
         }
 

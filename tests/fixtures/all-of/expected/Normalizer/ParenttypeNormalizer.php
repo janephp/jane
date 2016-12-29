@@ -10,7 +10,7 @@ class ParenttypeNormalizer extends SerializerAwareNormalizer implements Denormal
 {
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Parenttype') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\JsonSchema.Model\\Parenttype') {
             return false;
         }
 

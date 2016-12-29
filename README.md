@@ -21,12 +21,12 @@ The generated code may contain bug or incorrect behavior, use it as a base for y
 php vendor/bin/jane generate json-schema.json Classname Namespace\\Prefix src/Namespace/Prefix
 ```
 
-This will generate, in the `src/Namespace/Prefix`, a `Model` and a `Normalizer` directory.
+This will generate, in the `src/Namespace/Prefix`, a `JsonSchema.Model` and a `JsonSchema.Normalizer` directory.
 
-`Model` directory will contain a `Namespace\Prefix\Model\Classname`, which correspond to the root Schema
+`JsonSchema.Model` directory will contain a `Namespace\Prefix\JsonSchema.Model\Classname`, which correspond to the root Schema
 of the json schema file, and all the subclasses discovered through the parsing of the Schema.
 
-`Normalizer` directory will contain a normalizer service class for each of the model class generated.
+`JsonSchema.Normalizer` directory will contain a normalizer service class for each of the model class generated.
 
 ### Using a config file
 

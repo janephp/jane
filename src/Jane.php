@@ -3,6 +3,7 @@
 namespace Joli\Jane;
 
 use Joli\Jane\Generator\Context\Context;
+use Joli\Jane\Generator\GeneratorConfig;
 use Joli\Jane\Generator\ModelGenerator;
 use Joli\Jane\Generator\Naming;
 use Joli\Jane\Generator\NormalizerGenerator;
@@ -80,23 +81,20 @@ class Jane
     /**
      * Generate code.
      *
-     * @param $schemaFilePath
-     * @param $name
-     * @param $namespace
-     * @param $directory
+     * @param GeneratorConfig $generatorConfig
      *
      * @return array
      */
-    public function generate($schemaFilePath, $name, $namespace, $directory)
+    public function generate(GeneratorConfig $generatorConfig)
     {
         $context = $this->createContext($schemaFilePath, $name, $namespace, $directory);
 
-        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'Model'))) {
-            mkdir($directory.DIRECTORY_SEPARATOR.'Model', 0755, true);
+        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'JsonSchema.Model'))) {
+            mkdir($directory.DIRECTORY_SEPARATOR.'JsonSchema.Model', 0755, true);
         }
 
-        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'Normalizer'))) {
-            mkdir($directory.DIRECTORY_SEPARATOR.'Normalizer', 0755, true);
+        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'JsonSchema.Normalizer'))) {
+            mkdir($directory.DIRECTORY_SEPARATOR.'JsonSchema.Normalizer', 0755, true);
         }
 
         $prettyPrinter = new Standard();

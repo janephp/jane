@@ -10,6 +10,7 @@ use Joli\Jane\Guesser\Guess\ObjectType;
 use Joli\Jane\Guesser\Guess\Property;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\ClassGuesserInterface;
+use Joli\Jane\Guesser\GuesserResolverTrait;
 use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
@@ -20,16 +21,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
 {
     use ChainGuesserAwareTrait;
+    use GuesserResolverTrait;
 
     /**
      * @var \Joli\Jane\Generator\Naming
      */
     protected $naming;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
 
     public function __construct(Naming $naming, SerializerInterface $serializer)
     {
@@ -70,11 +67,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             $propertyObj = $property;
 
             if ($propertyObj instanceof Reference) {
-                $propertyObj = $propertyObj->resolve(function($data) use($propertyObj) {
-                    return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
-                        'schema-origin' => $propertyObj->getUri()
-                    ]);
-                });
+                $propertyObj = $this->resolve($propertyObj, JsonSchema::class);
             }
 
             $type = $propertyObj->getType();
@@ -100,11 +93,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             }
 
             if ($property instanceof Reference) {
-                $property = $property->resolve(function($data) use($property) {
-                    return $this->serializer->denormalize($data, JsonSchema::class, 'json', [
-                        'schema-origin' => $property->getUri()
-                    ]);
-                });
+                $property = $this->resolve($property, JsonSchema::class);
             }
 
             if ($property->getEnum() !== null) {

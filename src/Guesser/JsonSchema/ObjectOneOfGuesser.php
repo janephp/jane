@@ -7,26 +7,22 @@ use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\GuesserInterface;
+use Joli\Jane\Guesser\GuesserResolverTrait;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\JsonSchemaMerger;
 use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Reference\Resolver;
 use Joli\Jane\Runtime\Reference;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, ClassGuesserInterface, ChainGuesserAwareInterface
 {
     use ChainGuesserAwareTrait;
+    use GuesserResolverTrait;
 
     /**
      * @var \Joli\Jane\JsonSchemaMerger
      */
     private $jsonSchemaMerger;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
 
     public function __construct(JsonSchemaMerger $jsonSchemaMerger, SerializerInterface $serializer)
     {
@@ -47,15 +43,11 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
 
             if ($oneOf instanceof Reference) {
                 $oneOfName = array_pop(explode('/', $oneOf->getFragment()));
-                $oneOfResolved = $this->resolver->resolve($oneOf);
+                $oneOfResolved = $this->resolve($oneOf, JsonSchema::class);
             }
 
             $merged = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
             $classes = array_merge($classes, $this->chainGuesser->guessClass($merged, $oneOfName, $reference . '/oneOf/' . $key));
-
-            if ($oneOf instanceof Reference) {
-                $oneOf->setResolved($merged);
-            }
         }
 
         return $classes;

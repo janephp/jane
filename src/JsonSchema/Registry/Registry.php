@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Joli\Jane\JsonSchema\Registry;
 
 use Joli\Jane\AstGenerator\Extractor\ClassInfoExtractorInterface;
+use League\Uri\Schemes\Http;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -13,15 +14,23 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class Registry implements ClassInfoExtractorInterface, PropertyInfoExtractorInterface
 {
+    /** @var Schema[] */
+    private $schemas = [];
 
-    public function registerSchema($schema)
+    /**
+     * @param Schema $schema
+     */
+    public function addSchema(Schema $schema)
     {
-
+        $this->schemas[$schema->getName()] = $schema;
     }
 
-    public function registerModel($schema, $model)
+    /**
+     * @return Schema[]
+     */
+    public function getSchemas()
     {
-
+        return $this->schemas;
     }
 
     /**
@@ -29,7 +38,7 @@ class Registry implements ClassInfoExtractorInterface, PropertyInfoExtractorInte
      */
     public function getClasses($domain)
     {
-        // TODO: Implement getClasses() method.
+        return $this->schemas[$domain]->getModels();
     }
 
     /**
@@ -37,7 +46,7 @@ class Registry implements ClassInfoExtractorInterface, PropertyInfoExtractorInte
      */
     public function getNamespace($domain, $class)
     {
-        // TODO: Implement getNamespace() method.
+        return $this->schemas[$domain]->getNamespace();
     }
 
     /**
@@ -89,12 +98,36 @@ class Registry implements ClassInfoExtractorInterface, PropertyInfoExtractorInte
     }
 
     /**
+     * Get schema for a specific reference
+     *
+     * @param string $reference
+     *
+     * @return Schema|null
+     */
+    public function getSchema($reference)
+    {
+        if (array_key_exists($reference, $this->schemas)) {
+            return $this->schemas[$reference];
+        }
+
+        return null;
+    }
+
+    /**
      * @param string $classFqdn
      *
      * @return Model
      */
     private function getModel($classFqdn)
     {
+        foreach ($this->schemas as $schema) {
+            $model = $schema->getModel($classFqdn);
 
+            if (null !== $model) {
+                return $model;
+            }
+        }
+
+        throw new \RuntimeException('Model not found');
     }
 }

@@ -1,37 +1,30 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Naming;
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\Guess\ClassGuess;
-use Joli\Jane\Guesser\Guess\ObjectType;
-use Joli\Jane\Guesser\Guess\Property;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\ClassGuesserInterface;
-use Joli\Jane\Guesser\GuesserResolverTrait;
-use Joli\Jane\Guesser\PropertiesGuesserInterface;
-use Joli\Jane\Guesser\TypeGuesserInterface;
-use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Reference\Resolver;
-use Joli\Jane\Runtime\Reference;
-use Symfony\Component\Serializer\SerializerInterface;
+use Joli\Jane\AstGenerator\Naming;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\ModelGuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\GuesserResolverTrait;
+use Joli\Jane\JsonSchema\Guesser\PropertiesGuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Model;
+use Joli\Jane\JsonSchema\Registry\Property;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
+class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ModelGuesserInterface
 {
     use ChainGuesserAwareTrait;
     use GuesserResolverTrait;
 
-    /**
-     * @var \Joli\Jane\Generator\Naming
-     */
-    protected $naming;
-
-    public function __construct(Naming $naming, SerializerInterface $serializer)
+    public function __construct(DenormalizerInterface $denormalizer)
     {
-        $this->naming = $naming;
-        $this->serializer = $serializer;
+        $this->denormalizer = $denormalizer;
     }
 
     /**
@@ -44,36 +37,30 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
 
     /**
      * {@inheritdoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
-        $classes = [$reference => new ClassGuess($object, $this->naming->getClassName($name))];
+        $schema = $registry->getSchema($reference);
+        $schema->addModel(new Model($object, Naming::getClassName($name), $reference));
 
         foreach ($object->getProperties() as $key => $property) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($property, $key, $reference . '/properties/' . $key));
+            $this->chainGuesser->registerModel($property, $key, $reference . '/properties/' . $key, $registry);
         }
-
-        return $classes;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessProperties($object, $name, $classes)
+    public function guessProperties($object, $name, Registry $registry)
     {
         $properties = [];
 
         foreach ($object->getProperties() as $key => $property) {
-            $propertyObj = $property;
-
-            if ($propertyObj instanceof Reference) {
-                $propertyObj = $this->resolve($propertyObj, JsonSchema::class);
-            }
-
-            $type = $propertyObj->getType();
-            $nullable = $type == 'null' || (is_array($type) && in_array('null', $type));
-
-            $properties[] = new Property($property, $key, $nullable);
+            $properties[] = new Property($property, $key, true, true, '', '');
         }
 
         return $properties;
@@ -82,9 +69,9 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        $discriminants = [];
+        /*$discriminants = [];
         $required = $object->getRequired() ?: [];
 
         foreach ($object->getProperties() as $key => $property) {
@@ -112,5 +99,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
         }
 
         return new ObjectType($object, $this->naming->getClassName($name), $discriminants);
+        */
+        return [new Type(Type::BUILTIN_TYPE_OBJECT, true, Naming::getClassName($name))];
     }
 }

@@ -1,8 +1,7 @@
 <?php
 
-namespace Joli\Jane;
+namespace Joli\Jane\JsonSchema\Command;
 
-use Joli\Jane\Command\GenerateCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 
 class Application extends BaseApplication
@@ -12,7 +11,7 @@ class Application extends BaseApplication
      */
     public function __construct()
     {
-        parent::__construct('Jane', Jane::VERSION);
+        parent::__construct('Jane');
 
         $this->add(new GenerateCommand());
     }

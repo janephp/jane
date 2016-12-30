@@ -22,7 +22,7 @@ abstract class Model implements AstGeneratorInterface
      */
     protected $propertyInfoExtractor;
 
-    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, PropertyTypeExtractorInterface $propertyTypeExtractor)
+    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor)
     {
         $this->propertyInfoExtractor = $propertyInfoExtractor;
     }
@@ -50,7 +50,7 @@ abstract class Model implements AstGeneratorInterface
             $methods[] = $this->createSetter($object, $property);
         }
 
-        return new Stmt\Class_(
+        return [new Stmt\Class_(
             new Name($context['short_class_name']),
             [
                 'stmts' => array_merge($properties, $methods),
@@ -58,7 +58,7 @@ abstract class Model implements AstGeneratorInterface
             [
                 'comments' => array(new Comment("/**\n * This class is generated.\n * Please do not update it manually.\n */")),
             ]
-        );
+        )];
     }
 
     /**
@@ -118,10 +118,10 @@ EOD
     protected function createProperty($class, $property)
     {
         $propertyName = Naming::getPropertyName($property);
-        $property = new Stmt\PropertyProperty($propertyName);
+        $propertyStmt = new Stmt\PropertyProperty($propertyName);
 
         return new Stmt\Property(Stmt\Class_::MODIFIER_PROTECTED, [
-            $property,
+            $propertyStmt,
         ], [
             'comments' => [new Doc(sprintf(<<<'EOD'
 /**

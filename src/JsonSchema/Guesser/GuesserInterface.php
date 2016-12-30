@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
 
 interface GuesserInterface
 {
@@ -9,7 +9,7 @@ interface GuesserInterface
      *
      * @param $object
      *
-     * @return mixed
+     * @return bool
      */
     public function supportObject($object);
 }

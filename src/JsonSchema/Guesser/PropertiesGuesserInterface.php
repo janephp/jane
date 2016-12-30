@@ -1,17 +1,20 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
+
+use Joli\Jane\JsonSchema\Registry\Property;
+use Joli\Jane\JsonSchema\Registry\Registry;
 
 interface PropertiesGuesserInterface
 {
     /**
      * Return all properties guessed
      *
-     * @param mixed                                 $object
-     * @param string                                $name
-     * @param \Joli\Jane\Guesser\Guess\ClassGuess[] $classes
+     * @param mixed    $object
+     * @param string   $name
+     * @param Registry $registry
      *
-     * @return \Joli\Jane\Guesser\Guess\Property[]
+     * @return Property[]
      */
-    public function guessProperties($object, $name, $classes);
+    public function guessProperties($object, $name, Registry $registry);
 }

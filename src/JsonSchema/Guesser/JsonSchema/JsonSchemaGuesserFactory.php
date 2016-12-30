@@ -1,36 +1,31 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Model\ClassGenerator;
-use Joli\Jane\Generator\Model\GetterSetterGenerator;
-use Joli\Jane\Generator\Model\PropertyGenerator;
-use Joli\Jane\Generator\Naming;
-
-use Joli\Jane\Guesser\ChainGuesserFactory;
-use Joli\Jane\JsonSchemaMerger;
-use Joli\Jane\Reference\Resolver;
-use Symfony\Component\Serializer\SerializerInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesser;
+use Joli\Jane\JsonSchema\Guesser\ReferenceGuesser;
+use Joli\Jane\JsonSchema\JsonSchemaMerger;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class JsonSchemaGuesserFactory
 {
-    public static function create(SerializerInterface $serializer)
+    public static function create(DenormalizerInterface $denormalizer)
     {
-        $chainGuesser          = ChainGuesserFactory::create($serializer);
-        $naming                = new Naming();
+        $chainGuesser          = new ChainGuesser();
         $merger                = new JsonSchemaMerger();
 
+        $chainGuesser->addGuesser(new ReferenceGuesser($denormalizer));
         $chainGuesser->addGuesser(new DateTimeGuesser());
         $chainGuesser->addGuesser(new SimpleTypeGuesser());
         $chainGuesser->addGuesser(new ArrayGuesser());
         $chainGuesser->addGuesser(new MultipleGuesser());
-        $chainGuesser->addGuesser(new ObjectGuesser($naming, $serializer));
+        $chainGuesser->addGuesser(new ObjectGuesser($denormalizer));
         $chainGuesser->addGuesser(new DefinitionGuesser());
         $chainGuesser->addGuesser(new ItemsGuesser());
         $chainGuesser->addGuesser(new AnyOfGuesser());
-        $chainGuesser->addGuesser(new AllOfGuesser($serializer));
+        $chainGuesser->addGuesser(new AllOfGuesser($denormalizer));
         $chainGuesser->addGuesser(new OneOfGuesser());
-        $chainGuesser->addGuesser(new ObjectOneOfGuesser($merger, $serializer));
+        $chainGuesser->addGuesser(new ObjectOneOfGuesser($merger, $denormalizer));
         $chainGuesser->addGuesser(new PatternPropertiesGuesser());
         $chainGuesser->addGuesser(new AdditionalItemsGuesser());
         $chainGuesser->addGuesser(new AdditionalPropertiesGuesser());

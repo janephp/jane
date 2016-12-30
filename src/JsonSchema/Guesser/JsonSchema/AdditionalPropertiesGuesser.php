@@ -1,14 +1,14 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\Guess\MapType;
-use Joli\Jane\Guesser\Guess\Type;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\TypeGuesserInterface;
-use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\PropertyInfo\Type;
 
 class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -36,13 +36,21 @@ class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterf
 
     /**
      * {@inheritDoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
         if ($object->getAdditionalProperties() === true) {
-            return new MapType($object, new Type($object, 'mixed'));
+            return [new Type(Type::BUILTIN_TYPE_OBJECT, true, \ArrayObject::class, true, new Type(Type::BUILTIN_TYPE_STRING))];
         }
 
-        return new MapType($object, $this->chainGuesser->guessType($object->getAdditionalProperties(), $name, $classes));
+        $types = [];
+
+        foreach ($this->chainGuesser->guessTypes($object->getAdditionalProperties(), $name, $registry) as $type) {
+            $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, true, \ArrayObject::class, true, new Type(Type::BUILTIN_TYPE_STRING), $type);
+        }
+
+        return $types;
     }
 }

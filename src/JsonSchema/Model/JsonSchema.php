@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Model;
+namespace Joli\Jane\JsonSchema\Model;
 
 class JsonSchema
 {

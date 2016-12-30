@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
 
 interface ChainGuesserAwareInterface
 {

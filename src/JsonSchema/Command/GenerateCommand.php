@@ -1,14 +1,27 @@
 <?php
 
-namespace Joli\Jane\Command;
+namespace Joli\Jane\JsonSchema\Command;
 
-use Joli\Jane\Generator\GeneratorConfig;
-use Joli\Jane\Generator\SchemaConfig;
+use Joli\Jane\AstGenerator\Generator\Model\Mutable;
+use Joli\Jane\AstGenerator\Generator\SchemaGenerator;
+use Joli\Jane\AstGenerator\Writer\NamespaceWriter;
+use Joli\Jane\JsonReference\ReferenceNormalizer;
+use Joli\Jane\JsonSchema\Generator;
+use Joli\Jane\JsonSchema\Guesser\JsonSchema\JsonSchemaGuesserFactory;
+use Joli\Jane\JsonSchema\Normalizer\JsonSchemaNormalizer;
+use Joli\Jane\JsonSchema\Registry\Builder;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Joli\Jane\JsonSchema\Registry\Schema;
+use PhpParser\PrettyPrinter\Standard;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 class GenerateCommand extends Command
 {
@@ -39,32 +52,29 @@ class GenerateCommand extends Command
             throw new \RuntimeException(sprintf('Invalid config file specified or invalid return type in file %s', $configFile));
         }
 
-        $configuration = new GeneratorConfig();
+        $schemas = [];
 
         if (array_key_exists('json-schema-file', $options)) {
             $schema = $options['json-schema-file'];
             unset($options['json-schema-file']);
 
-            $configuration->addSchemaConfig($this->resolveConfiguration($schema, $options));
+            $schemas[] = $this->resolveConfiguration($schema, $options);
         } else {
             foreach ($options as $schema => $schemaOptions) {
-                $configuration->addSchemaConfig($this->resolveConfiguration($schema, $schemaOptions));
+                $schemas[] = $this->resolveConfiguration($schema, $schemaOptions);
             }
         }
 
-        $jane = \Joli\Jane\Jane::build();
-        $files = $jane->generate($configuration);
+        $registry = $this->getRegistryBuilder()->build($schemas);
 
-        foreach ($files as $file) {
-            $output->writeln(sprintf('Generated %s', $file));
-        }
+        $this->getGenerator($registry)->generate($schemas);
     }
 
     /**
      * @param       $schema
      * @param array $options
      *
-     * @return SchemaConfig
+     * @return Schema
      */
     protected function resolveConfiguration($schema, array $options = [])
     {
@@ -82,6 +92,58 @@ class GenerateCommand extends Command
 
         $options = $optionsResolver->resolve($options);
 
-        return new SchemaConfig($schema, $options['root-class'], $options['namespace'], $options['directory'], $options['reference'], $options['date-format']);
+        return new Schema($schema, $options['namespace'], $options['directory'], $options['root-class']);
+    }
+
+    /**
+     * @return Builder
+     */
+    protected function getRegistryBuilder()
+    {
+        return new Builder($this->getGuesser(), $this->getSerializer());
+    }
+
+    /**
+     * @param Registry $registry
+     *
+     * @return Generator
+     */
+    protected function getGenerator(Registry $registry)
+    {
+        $writer = new NamespaceWriter(new Standard());
+
+        foreach ($registry->getSchemas() as $schema) {
+            $writer->registerNamespace($schema->getNamespace(), $schema->getDirectory());
+        }
+
+        return new Generator($this->getSchemaGenerator($registry), $writer);
+    }
+
+    protected function getSerializer()
+    {
+        return new Serializer([
+            new ReferenceNormalizer(),
+            new JsonSchemaNormalizer(),
+        ], [
+            new JsonEncoder(new JsonEncode(), new JsonDecode())
+        ]);
+    }
+
+    protected function getGuesser()
+    {
+        return JsonSchemaGuesserFactory::create($this->getSerializer());
+    }
+
+    protected function getSchemaGenerator(Registry $registry)
+    {
+        $generator = new SchemaGenerator($registry);
+        $generator->setPopoGenerator($this->getPopoGenerator($registry));
+
+        return $generator;
+    }
+
+    protected function getPopoGenerator(Registry $registry)
+    {
+        return new Mutable($registry);
     }
 }

@@ -1,11 +1,12 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Guesser\Guess\DateTimeType;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\TypeGuesserInterface;
-use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\PropertyInfo\Type;
 
 class DateTimeGuesser implements GuesserInterface, TypeGuesserInterface
 {
@@ -27,9 +28,11 @@ class DateTimeGuesser implements GuesserInterface, TypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        return new DateTimeType($object, $this->dateFormat);
+        return [new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)];
     }
 }

@@ -1,11 +1,12 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Guesser\Guess\Type;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\TypeGuesserInterface;
-use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\PropertyInfo\Type;
 
 class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
 {
@@ -18,11 +19,11 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
     ];
 
     protected $phpTypesMapping = [
-        'boolean' => 'bool',
-        'integer' => 'int',
-        'number' => 'float',
-        'string' => 'string',
-        'null' => 'null',
+        'boolean' => Type::BUILTIN_TYPE_BOOL,
+        'integer' => Type::BUILTIN_TYPE_INT,
+        'number' => Type::BUILTIN_TYPE_FLOAT,
+        'string' => Type::BUILTIN_TYPE_STRING,
+        'null' => Type::BUILTIN_TYPE_NULL,
     ];
 
     protected $excludeFormat = [
@@ -50,9 +51,11 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        return new Type($object, $this->phpTypesMapping[$object->getType()]);
+        return [new Type($this->phpTypesMapping[$object->getType()], true)];
     }
 }

@@ -1,19 +1,21 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
 
-use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Runtime\Reference;
-use Symfony\Component\Serializer\SerializerInterface;
+use Joli\Jane\JsonReference\Reference;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Schema;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
+class ReferenceGuesser implements ModelGuesserInterface, GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
     use ChainGuesserAwareTrait;
     use GuesserResolverTrait;
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(DenormalizerInterface $denormalizer)
     {
-        $this->serializer = $serializer;
+        $this->denormalizer = $denormalizer;
     }
 
     /**
@@ -29,16 +31,25 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
      *
      * @param Reference $object
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
         if ($object->isInCurrentDocument()) {
             return [];
         }
 
-        return $this->chainGuesser->guessClass(
+        $modelSchemaName = (string) $object->getMergedUri()->withFragment('');
+
+        if ($registry->getSchema($modelSchemaName) === null) {
+            $originSchema = $registry->getSchema((string)$object->getOriginUri()->withFragment(''));
+
+            $registry->addSchema(new Schema($modelSchemaName, $originSchema->getNamespace(), $originSchema->getDirectory(), $name));
+        }
+
+        return $this->chainGuesser->registerModel(
             $this->resolve($object, JsonSchema::class),
             $name,
-            (string) $object->getMergedUri()
+            (string) $object->getMergedUri(),
+            $registry
         );
     }
 
@@ -47,19 +58,21 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
      *
      * @param Reference $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
         $resolved = $this->resolve($object, JsonSchema::class);
+        $schema = $registry->getSchema((string) $object->getMergedUri()->withFragment(''));
+
+        if ($schema === null) {
+            $schema = $registry->getSchema((string) $object->getOriginUri()->withFragment(''));
+        }
+
         $classKey = (string) $object->getMergedUri();
 
-        if ((string)$object->getMergedUri() === (string)$object->getMergedUri()->withFragment('')) {
-            $classKey .= '#';
+        if ($schema->getModelByReference($classKey) !== null) {
+            $name = $schema->getModelByReference($classKey)->getName();
         }
 
-        if (array_key_exists($classKey, $classes)) {
-            $name = $classes[$classKey]->getName();
-        }
-
-        return $this->chainGuesser->guessType($resolved, $name, $classes);
+        return $this->chainGuesser->guessTypes($resolved, $name, $registry);
     }
 }

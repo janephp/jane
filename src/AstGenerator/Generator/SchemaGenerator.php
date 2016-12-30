@@ -1,11 +1,11 @@
 <?php
 
-namespace Joli\Jane\AstGenerator;
+namespace Joli\Jane\AstGenerator\Generator;
 
 use Joli\Jane\AstGenerator\Extractor\ClassInfoExtractorInterface;
 use Joli\Jane\AstGenerator\Extractor\ClassNamespaceExtractorInterface;
-use Joli\Jane\AstGenerator\Generator\AstGeneratorInterface;
 use Joli\Jane\AstGenerator\Generator\Exception\NotSupportedGeneratorException;
+use Joli\Jane\AstGenerator\Naming;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
 
@@ -71,8 +71,8 @@ class SchemaGenerator implements AstGeneratorInterface
 
         $namespaces = [];
 
-        $getOrCreateNamespace = &function ($namespace) use (&$namespaces) {
-            if (array_key_exists($namespace, $namespaces)) {
+        $getOrCreateNamespace = function ($namespace) use (&$namespaces) {
+            if (!array_key_exists($namespace, $namespaces)) {
                 $namespaces[$namespace] = new Stmt\Namespace_(new Name($namespace));
             }
 

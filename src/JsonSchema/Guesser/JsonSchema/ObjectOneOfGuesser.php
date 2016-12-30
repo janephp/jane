@@ -1,70 +1,71 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\ClassGuesserInterface;
-use Joli\Jane\Guesser\Guess\MultipleType;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\GuesserResolverTrait;
-use Joli\Jane\Guesser\TypeGuesserInterface;
-use Joli\Jane\JsonSchemaMerger;
-use Joli\Jane\Model\JsonSchema;
-use Joli\Jane\Runtime\Reference;
-use Symfony\Component\Serializer\SerializerInterface;
+use Joli\Jane\JsonReference\Reference;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\GuesserResolverTrait;
+use Joli\Jane\JsonSchema\Guesser\ModelGuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\JsonSchemaMerger;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, ClassGuesserInterface, ChainGuesserAwareInterface
+class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, ModelGuesserInterface, ChainGuesserAwareInterface
 {
     use ChainGuesserAwareTrait;
     use GuesserResolverTrait;
 
     /**
-     * @var \Joli\Jane\JsonSchemaMerger
+     * @var \Joli\Jane\JsonSchema\JsonSchemaMerger
      */
     private $jsonSchemaMerger;
 
-    public function __construct(JsonSchemaMerger $jsonSchemaMerger, SerializerInterface $serializer)
+    public function __construct(JsonSchemaMerger $jsonSchemaMerger, DenormalizerInterface $denormalizer)
     {
         $this->jsonSchemaMerger = $jsonSchemaMerger;
-        $this->serializer = $serializer;
+        $this->denormalizer = $denormalizer;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
-        $classes = [];
-
         foreach ($object->getOneOf() as $key => $oneOf) {
             $oneOfName = $name.'Sub';
             $oneOfResolved = $oneOf;
 
             if ($oneOf instanceof Reference) {
-                $oneOfName = array_pop(explode('/', $oneOf->getFragment()));
+                $oneOfName = array_pop(explode('/', $oneOf->getMergedUri()->getFragment()));
                 $oneOfResolved = $this->resolve($oneOf, JsonSchema::class);
             }
 
             $merged = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($merged, $oneOfName, $reference . '/oneOf/' . $key));
-        }
 
-        return $classes;
+            $this->chainGuesser->registerModel($merged, $oneOfName, $reference . '/oneOf/' . $key, $registry);
+        }
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        $type = new MultipleType($object);
+        $types = [];
 
         foreach ($object->getOneOf() as $oneOf) {
-            $type->addType($this->chainGuesser->guessType($oneOf, $name, $classes));
+            $types = array_merge($types, $this->chainGuesser->guessTypes($oneOf, $name, $registry));
         }
 
-        return $type;
+        return $types;
     }
 
     /**

@@ -1,14 +1,14 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
 
-use Joli\Jane\Runtime\Reference;
+use Joli\Jane\JsonReference\Reference;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 trait GuesserResolverTrait
 {
     /** @var DenormalizerInterface */
-    protected $serializer;
+    protected $denormalizer;
 
     /**
      * Resolve a reference with a denormalizer
@@ -21,8 +21,8 @@ trait GuesserResolverTrait
     public function resolve(Reference $reference, $class)
     {
         return $reference->resolve(function ($data) use($reference, $class) {
-            return $this->serializer->denormalize($data, $class, 'json', [
-                'schema-origin' => (string) $reference->getMergedUri()->withFragment('')
+            return $this->denormalizer->denormalize($data, $class, 'json', [
+                'document-origin' => (string) $reference->getMergedUri()->withFragment('')
             ]);
         });
     }

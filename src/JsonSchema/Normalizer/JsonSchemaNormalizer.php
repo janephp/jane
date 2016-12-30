@@ -1,17 +1,22 @@
 <?php
 
-namespace Joli\Jane\Normalizer;
+namespace Joli\Jane\JsonSchema\Normalizer;
 
-use Joli\Jane\Runtime\Reference;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
-class JsonSchemaNormalizer extends SerializerAwareNormalizer implements DenormalizerInterface, NormalizerInterface
+class JsonSchemaNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
+    use DenormalizerAwareTrait;
+    use NormalizerAwareTrait;
+
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\JsonSchema.Model\\JsonSchema') {
+        if ($type !== 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema') {
             return false;
         }
 
@@ -20,7 +25,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Model\JsonSchema) {
+        if ($data instanceof \Joli\Jane\JsonSchema\Model\JsonSchema) {
             return true;
         }
 
@@ -29,10 +34,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (isset($data->{'$ref'})) {
-            return new Reference($data->{'$ref'}, $context['schema-origin']);
-        }
-        $object = new \Joli\Jane\Model\JsonSchema();
+        $object = new \Joli\Jane\JsonSchema\Model\JsonSchema();
         if (property_exists($data, 'id')) {
             $object->setId($data->{'id'});
         }
@@ -78,19 +80,19 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value = $data->{'additionalItems'};
             }
             if (is_object($data->{'additionalItems'})) {
-                $value = $this->serializer->deserialize($data->{'additionalItems'}, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $value = $this->denormalizer->denormalize($data->{'additionalItems'}, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setAdditionalItems($value);
         }
         if (property_exists($data, 'items')) {
             $value_1 = $data->{'items'};
             if (is_object($data->{'items'})) {
-                $value_1 = $this->serializer->deserialize($data->{'items'}, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $value_1 = $this->denormalizer->denormalize($data->{'items'}, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             if (is_array($data->{'items'})) {
                 $values = [];
                 foreach ($data->{'items'} as $value_2) {
-                    $values[] = $this->serializer->deserialize($value_2, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                    $values[] = $this->denormalizer->denormalize($value_2, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
                 }
                 $value_1 = $values;
             }
@@ -124,28 +126,28 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value_4 = $data->{'additionalProperties'};
             }
             if (is_object($data->{'additionalProperties'})) {
-                $value_4 = $this->serializer->deserialize($data->{'additionalProperties'}, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $value_4 = $this->denormalizer->denormalize($data->{'additionalProperties'}, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setAdditionalProperties($value_4);
         }
         if (property_exists($data, 'definitions')) {
             $values_2 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'definitions'} as $key => $value_5) {
-                $values_2[$key] = $this->serializer->deserialize($value_5, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $values_2[$key] = $this->denormalizer->denormalize($value_5, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setDefinitions($values_2);
         }
         if (property_exists($data, 'properties')) {
             $values_3 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'properties'} as $key_1 => $value_6) {
-                $values_3[$key_1] = $this->serializer->deserialize($value_6, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $values_3[$key_1] = $this->denormalizer->denormalize($value_6, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setProperties($values_3);
         }
         if (property_exists($data, 'patternProperties')) {
             $values_4 = new \ArrayObject([], \ArrayObject::ARRAY_AS_PROPS);
             foreach ($data->{'patternProperties'} as $key_2 => $value_7) {
-                $values_4[$key_2] = $this->serializer->deserialize($value_7, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $values_4[$key_2] = $this->denormalizer->denormalize($value_7, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setPatternProperties($values_4);
         }
@@ -154,7 +156,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             foreach ($data->{'dependencies'} as $key_3 => $value_8) {
                 $value_9 = $value_8;
                 if (is_object($value_8)) {
-                    $value_9 = $this->serializer->deserialize($value_8, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                    $value_9 = $this->denormalizer->denormalize($value_8, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
                 }
                 if (is_array($value_8)) {
                     $values_6 = [];
@@ -194,26 +196,26 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
         if (property_exists($data, 'allOf')) {
             $values_9 = [];
             foreach ($data->{'allOf'} as $value_14) {
-                $values_9[] = $this->serializer->deserialize($value_14, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $values_9[] = $this->denormalizer->denormalize($value_14, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setAllOf($values_9);
         }
         if (property_exists($data, 'anyOf')) {
             $values_10 = [];
             foreach ($data->{'anyOf'} as $value_15) {
-                $values_10[] = $this->serializer->deserialize($value_15, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $values_10[] = $this->denormalizer->denormalize($value_15, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setAnyOf($values_10);
         }
         if (property_exists($data, 'oneOf')) {
             $values_11 = [];
             foreach ($data->{'oneOf'} as $value_16) {
-                $values_11[] = $this->serializer->deserialize($value_16, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context);
+                $values_11[] = $this->denormalizer->denormalize($value_16, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context);
             }
             $object->setOneOf($values_11);
         }
         if (property_exists($data, 'not')) {
-            $object->setNot($this->serializer->deserialize($data->{'not'}, 'Joli\\Jane\\JsonSchema.Model\\JsonSchema', 'raw', $context));
+            $object->setNot($this->denormalizer->denormalize($data->{'not'}, 'Joli\\Jane\\JsonSchema\\Model\\JsonSchema', 'json', $context));
         }
 
         return $object;
@@ -267,19 +269,19 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value = $object->getAdditionalItems();
             }
             if (is_object($object->getAdditionalItems())) {
-                $value = $this->serializer->serialize($object->getAdditionalItems(), 'raw', $context);
+                $value = $this->normalizer->normalize($object->getAdditionalItems(), 'json', $context);
             }
             $data->{'additionalItems'} = $value;
         }
         if (null !== $object->getItems()) {
             $value_1 = $object->getItems();
             if (is_object($object->getItems())) {
-                $value_1 = $this->serializer->serialize($object->getItems(), 'raw', $context);
+                $value_1 = $this->normalizer->normalize($object->getItems(), 'json', $context);
             }
             if (is_array($object->getItems())) {
                 $values = [];
                 foreach ($object->getItems() as $value_2) {
-                    $values[] = $this->serializer->serialize($value_2, 'raw', $context);
+                    $values[] = $this->normalizer->normalize($value_2, 'json', $context);
                 }
                 $value_1 = $values;
             }
@@ -313,28 +315,28 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
                 $value_4 = $object->getAdditionalProperties();
             }
             if (is_object($object->getAdditionalProperties())) {
-                $value_4 = $this->serializer->serialize($object->getAdditionalProperties(), 'raw', $context);
+                $value_4 = $this->normalizer->normalize($object->getAdditionalProperties(), 'json', $context);
             }
             $data->{'additionalProperties'} = $value_4;
         }
         if (null !== $object->getDefinitions()) {
             $values_2 = new \stdClass();
             foreach ($object->getDefinitions() as $key => $value_5) {
-                $values_2->{$key} = $this->serializer->serialize($value_5, 'raw', $context);
+                $values_2->{$key} = $this->normalizer->normalize($value_5, 'json', $context);
             }
             $data->{'definitions'} = $values_2;
         }
         if (null !== $object->getProperties()) {
             $values_3 = new \stdClass();
             foreach ($object->getProperties() as $key_1 => $value_6) {
-                $values_3->{$key_1} = $this->serializer->serialize($value_6, 'raw', $context);
+                $values_3->{$key_1} = $this->normalizer->normalize($value_6, 'json', $context);
             }
             $data->{'properties'} = $values_3;
         }
         if (null !== $object->getPatternProperties()) {
             $values_4 = new \stdClass();
             foreach ($object->getPatternProperties() as $key_2 => $value_7) {
-                $values_4->{$key_2} = $this->serializer->serialize($value_7, 'raw', $context);
+                $values_4->{$key_2} = $this->normalizer->normalize($value_7, 'json', $context);
             }
             $data->{'patternProperties'} = $values_4;
         }
@@ -343,7 +345,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
             foreach ($object->getDependencies() as $key_3 => $value_8) {
                 $value_9 = $value_8;
                 if (is_object($value_8)) {
-                    $value_9 = $this->serializer->serialize($value_8, 'raw', $context);
+                    $value_9 = $this->normalizer->normalize($value_8, 'json', $context);
                 }
                 if (is_array($value_8)) {
                     $values_6 = [];
@@ -383,26 +385,26 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
         if (null !== $object->getAllOf()) {
             $values_9 = [];
             foreach ($object->getAllOf() as $value_14) {
-                $values_9[] = $this->serializer->serialize($value_14, 'raw', $context);
+                $values_9[] = $this->normalizer->normalize($value_14, 'json', $context);
             }
             $data->{'allOf'} = $values_9;
         }
         if (null !== $object->getAnyOf()) {
             $values_10 = [];
             foreach ($object->getAnyOf() as $value_15) {
-                $values_10[] = $this->serializer->serialize($value_15, 'raw', $context);
+                $values_10[] = $this->normalizer->normalize($value_15, 'json', $context);
             }
             $data->{'anyOf'} = $values_10;
         }
         if (null !== $object->getOneOf()) {
             $values_11 = [];
             foreach ($object->getOneOf() as $value_16) {
-                $values_11[] = $this->serializer->serialize($value_16, 'raw', $context);
+                $values_11[] = $this->normalizer->normalize($value_16, 'json', $context);
             }
             $data->{'oneOf'} = $values_11;
         }
         if (null !== $object->getNot()) {
-            $data->{'not'} = $this->serializer->serialize($object->getNot(), 'raw', $context);
+            $data->{'not'} = $this->normalizer->normalize($object->getNot(), 'json', $context);
         }
 
         return $data;

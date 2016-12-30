@@ -1,17 +1,20 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
+
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\PropertyInfo\Type;
 
 interface TypeGuesserInterface
 {
     /**
      * Return all types guessed
      *
-     * @param mixed                                 $object
-     * @param string                                $name
-     * @param \Joli\Jane\Guesser\Guess\ClassGuess[] $classes
+     * @param mixed    $object
+     * @param string   $name
+     * @param Registry $registry
      *
-     * @return \Joli\Jane\Guesser\Guess\Type
+     * @return Type[]
      */
-    public function guessType($object, $name, $classes);
+    public function guessTypes($object, $name, Registry $registry);
 }

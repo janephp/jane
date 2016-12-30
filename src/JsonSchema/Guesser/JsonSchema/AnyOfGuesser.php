@@ -1,24 +1,24 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\ClassGuesserInterface;
-use Joli\Jane\Guesser\Guess\MultipleType;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\ModelGuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
 
+use Joli\Jane\JsonSchema\Registry\Registry;
 use Joli\Jane\Model\JsonSchema;
 
-class AnyOfGuesser implements GuesserInterface, ClassGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
+class AnyOfGuesser implements GuesserInterface, ModelGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
     use ChainGuesserAwareTrait;
 
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
         $classes = [];
 
@@ -31,20 +31,22 @@ class AnyOfGuesser implements GuesserInterface, ClassGuesserInterface, TypeGuess
 
     /**
      * {@inheritDoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        if (count($object->getAnyOf()) == 1) {
-            return $this->chainGuesser->guessType($object->getAnyOf()[0], $name, $classes);
+        if (count($object->getAnyOf()) === 1) {
+            return $this->chainGuesser->guessTypes($object->getAnyOf()[0], $name, $registry);
         }
 
-        $type = new MultipleType($object);
+        $types = [];
 
         foreach ($object->getAnyOf() as $anyOfObject) {
-            $type->addType($this->chainGuesser->guessType($anyOfObject, $name, $classes));
+            $types = array_merge($types, $this->chainGuesser->guessTypes($anyOfObject, $name, $registry));
         }
 
-        return $type;
+        return $types;
     }
 
     /**

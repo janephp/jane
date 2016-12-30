@@ -1,30 +1,28 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Context\Context;
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\ClassGuesserInterface;
-use Joli\Jane\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\ModelGuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Registry\Registry;
 use Joli\Jane\Model\JsonSchema;
 
-class DefinitionGuesser implements ChainGuesserAwareInterface, GuesserInterface, ClassGuesserInterface
+class DefinitionGuesser implements ChainGuesserAwareInterface, GuesserInterface, ModelGuesserInterface
 {
     use ChainGuesserAwareTrait;
 
     /**
      * {@inheritDoc}
+     *
+     * @param JsonSchema $object
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
-        $classes = [];
-
         foreach ($object->getDefinitions() as $key => $definition) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($definition, $key, $reference . '/definitions/' . $key));
+            $this->chainGuesser->registerModel($definition, $key, $reference . '/definitions/' . $key, $registry);
         }
-
-        return $classes;
     }
 
     /**

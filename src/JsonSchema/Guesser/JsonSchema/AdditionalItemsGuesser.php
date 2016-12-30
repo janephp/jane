@@ -1,24 +1,26 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Generator\Context\Context;
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\ClassGuesserInterface;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\ModelGuesserInterface;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Registry;
 
-class AdditionalItemsGuesser implements ChainGuesserAwareInterface, GuesserInterface, ClassGuesserInterface
+class AdditionalItemsGuesser implements ChainGuesserAwareInterface, GuesserInterface, ModelGuesserInterface
 {
     use ChainGuesserAwareTrait;
 
     /**
      * {@inheritDoc}
+     *
+     * @param JsonSchema
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
-        return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'AdditionalItems', $reference . '/additionalItems');
+        return $this->chainGuesser->registerModel($object->getAdditionalItems(), $name . 'AdditionalItems', $reference . '/additionalItems', $registry);
     }
 
     /**

@@ -1,10 +1,11 @@
 <?php
 
-namespace Joli\Jane\Guesser;
+namespace Joli\Jane\JsonSchema\Guesser;
 
-use Joli\Jane\Guesser\Guess\Type;
+use Joli\Jane\JsonSchema\Registry\Registry;
+use Symfony\Component\PropertyInfo\Type;
 
-class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, ClassGuesserInterface
+class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, ModelGuesserInterface
 {
     /**
      * @var GuesserInterface[]
@@ -23,29 +24,25 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function registerModel($object, $name, $reference, Registry $registry)
     {
-        $classes = [];
-
         foreach ($this->guessers as $guesser) {
-            if (!($guesser instanceof ClassGuesserInterface)) {
+            if (!($guesser instanceof ModelGuesserInterface)) {
                 continue;
             }
 
             if ($guesser->supportObject($object)) {
-                $classes = array_merge($classes, $guesser->guessClass($object, $name, $reference));
+                $guesser->registerModel($object, $name, $reference, $registry);
             }
         }
-
-        return $classes;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        $type = null;
+        $types = [];
 
         foreach ($this->guessers as $guesser) {
             if (!($guesser instanceof TypeGuesserInterface)) {
@@ -53,21 +50,17 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                return $guesser->guessType($object, $name, $classes);
+                $types = array_merge($types, $guesser->guessTypes($object, $name, $registry));
             }
         }
 
-        if ($type === null) {
-            return new Type($object, 'mixed');
-        }
-
-        return $type;
+        return $types;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessProperties($object, $name, $classes)
+    public function guessProperties($object, $name, Registry $registry)
     {
         $properties = [];
 
@@ -77,7 +70,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                $properties = array_merge($properties, $guesser->guessProperties($object, $name, $classes));
+                $properties = array_merge($properties, $guesser->guessProperties($object, $name, $registry));
             }
         }
 

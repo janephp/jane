@@ -1,13 +1,13 @@
 <?php
 
-namespace Joli\Jane\Guesser\JsonSchema;
+namespace Joli\Jane\JsonSchema\Guesser\JsonSchema;
 
-use Joli\Jane\Guesser\ChainGuesserAwareInterface;
-use Joli\Jane\Guesser\ChainGuesserAwareTrait;
-use Joli\Jane\Guesser\Guess\MultipleType;
-use Joli\Jane\Guesser\GuesserInterface;
-use Joli\Jane\Guesser\TypeGuesserInterface;
-use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareInterface;
+use Joli\Jane\JsonSchema\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\JsonSchema\Guesser\GuesserInterface;
+use Joli\Jane\JsonSchema\Guesser\TypeGuesserInterface;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Registry\Registry;
 
 class MultipleGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -24,17 +24,16 @@ class MultipleGuesser implements GuesserInterface, TypeGuesserInterface, ChainGu
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessTypes($object, $name, Registry $registry)
     {
-        $typeGuess = new MultipleType($object);
+        $types = [];
         $fakeSchema = clone $object;
 
         foreach ($object->getType() as $type) {
             $fakeSchema->setType($type);
-
-            $typeGuess->addType($this->chainGuesser->guessType($fakeSchema, $name, $classes));
+            $types[] = array_merge($types, $this->chainGuesser->guessTypes($fakeSchema, $name, $registry));
         }
 
-        return $typeGuess;
+        return $types;
     }
 }

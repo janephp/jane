@@ -1,8 +1,8 @@
 <?php
 
-namespace Joli\Jane;
+namespace Joli\Jane\JsonSchema;
 
-use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\JsonSchema\Model\JsonSchema;
 
 class JsonSchemaMerger
 {

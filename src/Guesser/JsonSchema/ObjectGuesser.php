@@ -49,7 +49,9 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
      */
     public function guessClass($object, $name, $reference, Registry $registry)
     {
-        $registry->getSchema($reference)->addClass($reference, new ClassGuess($object, $this->naming->getClassName($name)));
+        if (!$registry->hasClass($reference)) {
+            $registry->getSchema($reference)->addClass($reference, new ClassGuess($object, $this->naming->getClassName($name)));
+        }
 
         foreach ($object->getProperties() as $key => $property) {
             $this->chainGuesser->guessClass($property, $key, $reference . '/properties/' . $key, $registry);

@@ -19,10 +19,13 @@ class Schema
     private $rootName;
 
     /** @var ClassGuess[] List of classes associated to this schema */
-    private $classes;
+    private $classes = [];
 
     /** @var string[] A list of references this schema is registered to */
     private $references;
+
+    /** @var mixed Parsed schema */
+    private $parsed;
 
     /**
      * Schema constructor.
@@ -102,5 +105,21 @@ class Schema
     public function hasReference($reference)
     {
         return in_array($reference, $this->references, true);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParsed()
+    {
+        return $this->parsed;
+    }
+
+    /**
+     * @param mixed $parsed
+     */
+    public function setParsed($parsed)
+    {
+        $this->parsed = $parsed;
     }
 }

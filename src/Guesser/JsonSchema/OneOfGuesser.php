@@ -31,7 +31,7 @@ class OneOfGuesser implements ChainGuesserAwareInterface, TypeGuesserInterface, 
         $type = new MultipleType($object);
 
         foreach ($object->getOneOf() as $oneOf) {
-            $type->addType($this->chainGuesser->guessType($oneOf, $name, $registry));
+            $type->addType($this->chainGuesser->guessType($oneOf, $name, $registry, $schema));
         }
 
         return $type;

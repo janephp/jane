@@ -20,10 +20,16 @@ trait GuesserResolverTrait
      */
     public function resolve(Reference $reference, $class)
     {
-        return $reference->resolve(function ($data) use($reference, $class) {
-            return $this->serializer->denormalize($data, $class, 'json', [
-                'document-origin' => (string) $reference->getMergedUri()->withFragment('')
-            ]);
-        });
+        $result = $reference;
+
+        do {
+            $result = $result->resolve(function ($data) use($result, $class) {
+                return $this->serializer->denormalize($data, $class, 'json', [
+                    'document-origin' => (string) $result->getMergedUri()->withFragment('')
+                ]);
+            });
+        } while ($result instanceof Reference);
+
+        return $result;
     }
 }

@@ -27,11 +27,6 @@ class ObjectType extends Type
         $this->discriminants = $discriminants;
     }
 
-    public function __toString()
-    {
-        return '\\' . $this->namespace . '\\Model\\'. $this->className;
-    }
-
     /**
      * (@inheritDoc}
      */

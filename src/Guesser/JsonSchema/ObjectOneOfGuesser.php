@@ -42,7 +42,8 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
             $oneOfResolved = $oneOf;
 
             if ($oneOf instanceof Reference) {
-                $oneOfName = array_pop(explode('/', $oneOf->getFragment()));
+                $fragmentParts = explode('/', $oneOf->getMergedUri()->getFragment());
+                $oneOfName = array_pop($fragmentParts);
                 $oneOfResolved = $this->resolve($oneOf, JsonSchema::class);
             }
 
@@ -58,8 +59,18 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
     {
         $type = new MultipleType($object);
 
-        foreach ($object->getOneOf() as $oneOf) {
-            $type->addType($this->chainGuesser->guessType($oneOf, $name, $registry, $schema));
+        foreach ($object->getOneOf() as $key => $oneOf) {
+            $oneOfName = $name.'Sub';
+            $oneOfResolved = $oneOf;
+
+            if ($oneOf instanceof Reference) {
+                $fragmentParts = explode('/', $oneOf->getMergedUri()->getFragment());
+                $oneOfName = array_pop($fragmentParts);
+                $oneOfResolved = $this->resolve($oneOf, JsonSchema::class);
+            }
+
+            $merged = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
+            $type->addType($this->chainGuesser->guessType($merged, $oneOfName, $registry, $schema));
         }
 
         return $type;

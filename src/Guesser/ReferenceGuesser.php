@@ -45,7 +45,7 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
         }
 
         return $this->chainGuesser->guessClass(
-            $this->resolve($object, JsonSchema::class),
+            $this->resolve($object, $this->getSchemaClass()),
             $name,
             (string) $object->getMergedUri(),
             $registry
@@ -72,5 +72,13 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
         }
 
         return $this->chainGuesser->guessType($resolved, $name, $registry, $schema);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSchemaClass()
+    {
+        return JsonSchema::class;
     }
 }

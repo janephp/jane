@@ -52,7 +52,7 @@ class PatternPropertiesGuesser implements GuesserInterface, TypeGuesserInterface
         $type = new PatternMultipleType($object);
 
         foreach ($object->getPatternProperties() as $pattern => $patternProperty) {
-            $type->addType($pattern, $this->chainGuesser->guessType($patternProperty, $name, $registry, $schema), $pattern);
+            $type->addType($pattern, $this->chainGuesser->guessType($patternProperty, $name, $registry, $schema));
         }
 
         return $type;

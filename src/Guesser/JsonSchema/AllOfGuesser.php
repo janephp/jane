@@ -80,4 +80,12 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
 
         return $properties;
     }
+
+    /**
+     * @return string
+     */
+    protected function getSchemaClass()
+    {
+        return JsonSchema::class;
+    }
 }

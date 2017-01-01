@@ -27,7 +27,7 @@ trait PropertyGenerator
      *
      * @return Stmt\Property
      */
-    protected function createProperty($name, Type $type, $default = null)
+    protected function createProperty($name, Type $type, $namespace, $default = null)
     {
         $propertyName = $this->getNaming()->getPropertyName($name);
         $property     = new Stmt\PropertyProperty($propertyName);
@@ -39,7 +39,7 @@ trait PropertyGenerator
         return new Stmt\Property(Stmt\Class_::MODIFIER_PROTECTED, [
             $property
         ], [
-            'comments' => [$this->createPropertyDoc($type)]
+            'comments' => [$this->createPropertyDoc($type, $namespace)]
         ]);
     }
 
@@ -50,13 +50,13 @@ trait PropertyGenerator
      *
      * @return Doc
      */
-    protected function createPropertyDoc(Type $type)
+    protected function createPropertyDoc(Type $type, $namespace)
     {
         return new Doc(sprintf(<<<EOD
 /**
  * @var %s
  */
 EOD
-        , $type->__toString()));
+        , $type->getDocTypeHint($namespace)));
     }
 }

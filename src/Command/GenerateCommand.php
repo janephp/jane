@@ -2,6 +2,8 @@
 
 namespace Joli\Jane\Command;
 
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -73,9 +75,18 @@ class GenerateCommand extends Command
         }
 
         $options = $this->resolveConfiguration($options);
+        $registry = new Registry();
+
+        if (array_key_exists('json-schema-file', $options)) {
+            $registry->addSchema($this->resolveSchema($options['json-schema-file'], $options));
+        } else {
+            foreach ($options['mapping'] as $schema => $schemaOptions) {
+                $registry->addSchema($this->resolveSchema($schema, $schemaOptions));
+            }
+        }
 
         $jane    = \Joli\Jane\Jane::build($options);
-        $files   = $jane->generate($options['json-schema-file'], $options['root-class'], $options['namespace'], $options['directory']);
+        $files   = $jane->generate($registry);
 
         foreach ($files as $file) {
             $output->writeln(sprintf("Generated %s", $file));
@@ -90,13 +101,41 @@ class GenerateCommand extends Command
             'date-format' => \DateTime::RFC3339,
         ]);
 
-        $optionsResolver->setRequired([
+        if (array_key_exists('json-schema-file', $options)) {
+            $optionsResolver->setRequired([
+                'json-schema-file',
+                'root-class',
+                'namespace',
+                'directory',
+            ]);
+        } else {
+            $optionsResolver->setRequired([
+                'mapping'
+            ]);
+        }
+
+        return $optionsResolver->resolve($options);
+    }
+
+    protected function resolveSchema($schema, array $options = [])
+    {
+        $optionsResolver = new OptionsResolver();
+
+        // To support old schema
+        $optionsResolver->setDefined([
             'json-schema-file',
+            'reference',
+            'date-format',
+        ]);
+
+        $optionsResolver->setRequired([
             'root-class',
             'namespace',
             'directory',
         ]);
 
-        return $optionsResolver->resolve($options);
+        $options = $optionsResolver->resolve($options);
+
+        return new Schema($schema, $options['namespace'], $options['directory'], $options['root-class']);
     }
 }

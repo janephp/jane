@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Tests\Expected\Normalizer;
+namespace Joli\Jane\Tests\Expected\Schema2\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -10,7 +10,7 @@ class FooNormalizer extends SerializerAwareNormalizer implements DenormalizerInt
 {
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Foo') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Schema2\\Model\\Foo') {
             return false;
         }
 
@@ -19,7 +19,7 @@ class FooNormalizer extends SerializerAwareNormalizer implements DenormalizerInt
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Foo) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Schema2\Model\Foo) {
             return true;
         }
 
@@ -28,7 +28,7 @@ class FooNormalizer extends SerializerAwareNormalizer implements DenormalizerInt
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $object = new \Joli\Jane\Tests\Expected\Model\Foo();
+        $object = new \Joli\Jane\Tests\Expected\Schema2\Model\Foo();
         if (property_exists($data, 'foo')) {
             $object->setFoo($data->{'foo'});
         }

@@ -8,6 +8,7 @@ use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
 
 class AdditionalItemsGuesser implements ChainGuesserAwareInterface, GuesserInterface, ClassGuesserInterface
 {
@@ -16,9 +17,9 @@ class AdditionalItemsGuesser implements ChainGuesserAwareInterface, GuesserInter
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
-        return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'AdditionalItems', $reference . '/additionalItems');
+        $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'AdditionalItems', $reference . '/additionalItems', $registry);
     }
 
     /**

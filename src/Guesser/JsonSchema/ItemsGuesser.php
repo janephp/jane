@@ -8,6 +8,7 @@ use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
 
 class ItemsGuesser implements GuesserInterface, ClassGuesserInterface, ChainGuesserAwareInterface
 {
@@ -16,21 +17,15 @@ class ItemsGuesser implements GuesserInterface, ClassGuesserInterface, ChainGues
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
         if ($object->getItems() instanceof JsonSchema) {
-            return $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'Item', $reference . '/additionalItems');
+            $this->chainGuesser->guessClass($object->getAdditionalItems(), $name . 'Item', $reference . '/additionalItems', $registry);
+        } else {
+            foreach ($object->getItems() as $key => $item) {
+                $this->chainGuesser->guessClass($item, $name . 'Item' . $key, $reference . '/additionalItems/' . $key, $registry);
+            }
         }
-
-        $classes = [];
-        $count   = 1;
-
-        foreach ($object->getItems() as $item) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($item, $name . 'Item' . $count, $reference . '/additionalItems/' . $count - 1));
-            $count++;
-        }
-
-        return $classes;
     }
 
     /**

@@ -22,7 +22,7 @@ trait GuesserResolverTrait
     {
         return $reference->resolve(function ($data) use($reference, $class) {
             return $this->serializer->denormalize($data, $class, 'json', [
-                'schema-origin' => (string) $reference->getMergedUri()->withFragment('')
+                'document-origin' => (string) $reference->getMergedUri()->withFragment('')
             ]);
         });
     }

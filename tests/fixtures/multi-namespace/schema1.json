@@ -2,7 +2,7 @@
     "type": "object",
     "properties": {
         "foo": {
-            "$ref": "definitions.json#/definitions/Foo"
+            "$ref": "schema2.json#/definitions/Foo"
         }
     }
 }

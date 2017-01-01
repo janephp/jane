@@ -8,6 +8,7 @@ use Joli\Jane\Generator\Normalizer\NormalizerGenerator as NormalizerGeneratorTra
 
 use Joli\Jane\Model\JsonSchema;
 
+use Joli\Jane\Schema;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
@@ -53,7 +54,7 @@ class NormalizerGenerator implements GeneratorInterface
     /**
      * Generate a set of files given a schema
      *
-     * @param mixed   $schema    Schema to generate from
+     * @param Schema  $schema    Schema to generate from
      * @param string  $className Class to generate
      * @param Context $context   Context for generation
      *
@@ -64,9 +65,9 @@ class NormalizerGenerator implements GeneratorInterface
         $files   = [];
         $classes = [];
 
-        foreach ($context->getObjectClassMap() as $class) {
+        foreach ($schema->getClasses() as $class) {
             $methods   = [];
-            $modelFqdn = $context->getNamespace()."\\Model\\".$class->getName();
+            $modelFqdn = $schema->getNamespace()."\\Model\\".$class->getName();
             $methods[] = $this->createSupportsDenormalizationMethod($modelFqdn);
             $methods[] = $this->createSupportsNormalizationMethod($modelFqdn);
             $methods[] = $this->createDenormalizeMethod($modelFqdn, $context, $class->getProperties());
@@ -78,19 +79,19 @@ class NormalizerGenerator implements GeneratorInterface
             );
             $classes[] = $normalizerClass->name;
 
-            $namespace = new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
+            $namespace = new Stmt\Namespace_(new Name($schema->getNamespace()."\\Normalizer"), [
                 new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Runtime\Reference'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\NormalizerInterface'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer'))]),
                 $normalizerClass
             ]);
-            $files[]   = new File($context->getDirectory().'/Normalizer/'.$class->getName().'Normalizer.php', $namespace, self::FILE_TYPE_NORMALIZER);
+            $files[]   = new File($schema->getDirectory().'/Normalizer/'.$class->getName().'Normalizer.php', $namespace, self::FILE_TYPE_NORMALIZER);
         }
 
         $files[] = new File(
-            $context->getDirectory().'/Normalizer/NormalizerFactory.php',
-            new Stmt\Namespace_(new Name($context->getNamespace()."\\Normalizer"), [
+            $schema->getDirectory().'/Normalizer/NormalizerFactory.php',
+            new Stmt\Namespace_(new Name($schema->getNamespace()."\\Normalizer"), [
                 $this->createNormalizerFactoryClass($classes)
             ]),
             self::FILE_TYPE_NORMALIZER

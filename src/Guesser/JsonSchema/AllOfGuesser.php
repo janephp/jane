@@ -11,7 +11,9 @@ use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Registry;
 use Joli\Jane\Runtime\Reference;
+use Joli\Jane\Schema;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, PropertiesGuesserInterface
@@ -27,7 +29,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $type = null;
 
@@ -43,7 +45,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
                     throw new \RuntimeException('an allOf instruction with 2 or more types is strictly impossible, check your schema');
                 }
 
-                $type = $this->chainGuesser->guessType($allOf, $name, $classes);
+                $type = $this->chainGuesser->guessType($allOf, $name, $registry, $schema);
             }
         }
 
@@ -65,7 +67,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     /**
      * {@inheritdoc}
      */
-    public function guessProperties($object, $name, $classes)
+    public function guessProperties($object, $name, Registry $registry)
     {
         $properties = [];
         foreach ($object->getAllOf() as $allOfSchema) {
@@ -73,7 +75,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
                 $allOfSchema = $this->resolve($allOfSchema, JsonSchema::class);
             }
 
-            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $classes));
+            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $registry));
         }
 
         return $properties;

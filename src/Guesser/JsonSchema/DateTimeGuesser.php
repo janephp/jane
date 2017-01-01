@@ -6,6 +6,8 @@ use Joli\Jane\Guesser\Guess\DateTimeType;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class DateTimeGuesser implements GuesserInterface, TypeGuesserInterface
 {
@@ -28,7 +30,7 @@ class DateTimeGuesser implements GuesserInterface, TypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         return new DateTimeType($object, $this->dateFormat);
     }

@@ -5,6 +5,8 @@ namespace Joli\Jane\Generator\Context;
 use Joli\Jane\Generator\File;
 use Joli\Jane\Guesser\Guess\ClassGuess;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 /**
  * Context when generating a library base on a Schema
@@ -12,34 +14,11 @@ use Joli\Jane\Model\JsonSchema;
 class Context
 {
     /**
-     * Root namespace of the class generated
+     * Registry of all classes created on various schema
      *
-     * @var string
+     * @var Registry
      */
-    private $namespace;
-
-    /**
-     * Directory where the code must be generated
-     *
-     * @var string
-     */
-    private $directory;
-
-    /**
-     * The root object use for generating the model,
-     * This is used to resolve reference
-     *
-     * @var object
-     */
-    private $rootReference;
-
-    /**
-     * A reference of all class created for each object,
-     * so passing the same object will use the existing class
-     *
-     * @var ClassGuess[] $objectClassMap
-     */
-    private $objectClassMap;
+    private $registry;
 
     /**
      * Files generated through the run
@@ -49,40 +28,21 @@ class Context
     private $files = [];
 
     /**
-     * List of variables name used, allow to generate unique variable name
-     *
-     * @var string[]
-     */
-    private $variablesName = [];
-
-    /**
-     * Internal reference for generating unique variable name
-     * (in a deterministic way, so the same run will give the same name)
-     *
-     * @var int
-     */
-    private $reference = 0;
-
-    /**
      * Variable scope to have unique variable name per method
      *
      * @var UniqueVariableScope
      */
     private $variableScope;
 
+    private $currentSchema;
+
     /**
-     * @param mixed        $rootReference
-     * @param string       $namespace
-     * @param string       $directory
-     * @param ClassGuess[] $objectClassMap
+     * @param Registry $registry
      */
-    public function __construct($rootReference, $namespace, $directory, $objectClassMap)
+    public function __construct(Registry $registry)
     {
-        $this->rootReference   = $rootReference;
-        $this->namespace       = $namespace;
-        $this->directory       = $directory;
-        $this->objectClassMap  = $objectClassMap;
-        $this->variableScope   = new UniqueVariableScope();
+        $this->registry = $registry;
+        $this->variableScope = new UniqueVariableScope();
     }
 
     public function addFile(File $file)
@@ -99,35 +59,27 @@ class Context
     }
 
     /**
-     * @return string
+     * @return Registry
      */
-    public function getDirectory()
+    public function getRegistry()
     {
-        return $this->directory;
+        return $this->registry;
     }
 
     /**
-     * @return string
+     * @return Schema
      */
-    public function getNamespace()
+    public function getCurrentSchema()
     {
-        return $this->namespace;
+        return $this->currentSchema;
     }
 
     /**
-     * @return object
+     * @param Schema $currentSchema
      */
-    public function getRootReference()
+    public function setCurrentSchema(Schema $currentSchema)
     {
-        return $this->rootReference;
-    }
-
-    /**
-     * @return ClassGuess[]
-     */
-    public function getObjectClassMap()
-    {
-        return $this->objectClassMap;
+        $this->currentSchema = $currentSchema;
     }
 
     /**

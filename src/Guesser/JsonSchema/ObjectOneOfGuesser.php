@@ -11,7 +11,9 @@ use Joli\Jane\Guesser\GuesserResolverTrait;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\JsonSchemaMerger;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
 use Joli\Jane\Runtime\Reference;
+use Joli\Jane\Schema;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, ClassGuesserInterface, ChainGuesserAwareInterface
@@ -33,10 +35,8 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
     /**
      * {@inheritdoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
-        $classes = [];
-
         foreach ($object->getOneOf() as $key => $oneOf) {
             $oneOfName = $name.'Sub';
             $oneOfResolved = $oneOf;
@@ -47,21 +47,19 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
             }
 
             $merged = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($merged, $oneOfName, $reference . '/oneOf/' . $key));
+            $this->chainGuesser->guessClass($merged, $oneOfName, $reference . '/oneOf/' . $key, $registry);
         }
-
-        return $classes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $type = new MultipleType($object);
 
         foreach ($object->getOneOf() as $oneOf) {
-            $type->addType($this->chainGuesser->guessType($oneOf, $name, $classes));
+            $type->addType($this->chainGuesser->guessType($oneOf, $name, $registry, $schema));
         }
 
         return $type;

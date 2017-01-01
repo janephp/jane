@@ -30,7 +30,7 @@ class JsonSchemaNormalizer extends SerializerAwareNormalizer implements Denormal
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (isset($data->{'$ref'})) {
-            return new Reference($data->{'$ref'}, $context['schema-origin']);
+            return new Reference($data->{'$ref'}, $context['document-origin']);
         }
         $object = new \Joli\Jane\Model\JsonSchema();
         if (property_exists($data, 'id')) {

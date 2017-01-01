@@ -1,14 +1,17 @@
 <?php
 
 return [
-    __DIR__ . '/schema1.json' => [
-        'root-class' => 'Test',
-        'namespace' => 'Joli\Jane\Tests\Expected\Schema1',
-        'directory' => __DIR__ . '/generated/Schema1',
+    'mapping' => [
+        'tests/fixtures/multi-namespace/schema1.json' => [
+            'root-class' => 'Test',
+            'namespace' => 'Joli\Jane\Tests\Expected\Schema1',
+            'directory' => __DIR__ . '/generated/Schema1',
+        ],
+        'tests/fixtures/multi-namespace/schema2.json' => [
+            'root-class' => 'Test',
+            'namespace' => 'Joli\Jane\Tests\Expected\Schema2',
+            'directory' => __DIR__ . '/generated/Schema2',
+        ],
     ],
-    __DIR__ . '/schema2.json' => [
-        'root-class' => 'Test',
-        'namespace' => 'Joli\Jane\Tests\Expected\Schema2',
-        'directory' => __DIR__ . '/generated/Schema2',
-    ],
+    'reference' => false
 ];

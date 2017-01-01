@@ -8,6 +8,8 @@ use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class OneOfGuesser implements ChainGuesserAwareInterface, TypeGuesserInterface, GuesserInterface
 {
@@ -24,12 +26,12 @@ class OneOfGuesser implements ChainGuesserAwareInterface, TypeGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $type = new MultipleType($object);
 
         foreach ($object->getOneOf() as $oneOf) {
-            $type->addType($this->chainGuesser->guessType($oneOf, $name, $classes));
+            $type->addType($this->chainGuesser->guessType($oneOf, $name, $registry));
         }
 
         return $type;

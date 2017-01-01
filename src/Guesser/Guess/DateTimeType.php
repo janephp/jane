@@ -21,7 +21,7 @@ class DateTimeType extends ObjectType
 
     public function __construct($object, $format = \DateTime::RFC3339)
     {
-        parent::__construct($object, '\DateTime', []);
+        parent::__construct($object, '\DateTime', '', []);
 
         $this->format = $format;
     }
@@ -66,5 +66,15 @@ class DateTimeType extends ObjectType
                 ])
             )
         );
+    }
+
+    public function getTypeHint($namespace)
+    {
+        return '\DateTime';
+    }
+
+    public function __toString()
+    {
+        return '\DateTime';
     }
 }

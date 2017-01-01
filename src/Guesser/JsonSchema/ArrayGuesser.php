@@ -11,6 +11,8 @@ use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -27,7 +29,7 @@ class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $items = $object->getItems();
 
@@ -36,13 +38,13 @@ class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         }
 
         if (!is_array($items)) {
-            return new ArrayType($object, $this->chainGuesser->guessType($items, $name, $classes));
+            return new ArrayType($object, $this->chainGuesser->guessType($items, $name, $registry, $schema));
         }
 
         $type = new MultipleType($object);
 
         foreach ($items as $item) {
-            $type->addType(new ArrayType($object, $this->chainGuesser->guessType($item, $name, $classes)));
+            $type->addType(new ArrayType($object, $this->chainGuesser->guessType($item, $name, $registry, $schema)));
         }
 
         return $type;

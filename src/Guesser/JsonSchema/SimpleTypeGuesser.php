@@ -6,6 +6,8 @@ use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
 {
@@ -51,7 +53,7 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         return new Type($object, $this->phpTypesMapping[$object->getType()]);
     }

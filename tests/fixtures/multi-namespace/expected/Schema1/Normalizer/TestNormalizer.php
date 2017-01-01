@@ -10,7 +10,7 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
 {
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Test') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Schema1\\Model\\Test') {
             return false;
         }
 
@@ -19,7 +19,7 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Test) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Schema1\Model\Test) {
             return true;
         }
 
@@ -28,9 +28,9 @@ class TestNormalizer extends SerializerAwareNormalizer implements DenormalizerIn
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $object = new \Joli\Jane\Tests\Expected\Model\Test();
+        $object = new \Joli\Jane\Tests\Expected\Schema1\Model\Test();
         if (property_exists($data, 'foo')) {
-            $object->setFoo($this->serializer->deserialize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Foo', 'raw', $context));
+            $object->setFoo($this->serializer->deserialize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Schema2\\Model\\Foo', 'raw', $context));
         }
 
         return $object;

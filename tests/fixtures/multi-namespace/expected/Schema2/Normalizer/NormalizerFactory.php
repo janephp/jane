@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Tests\Expected\Normalizer;
+namespace Joli\Jane\Tests\Expected\Schema2\Normalizer;
 
 class NormalizerFactory
 {

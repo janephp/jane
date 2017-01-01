@@ -1,6 +1,6 @@
 <?php
 
-namespace Joli\Jane\Tests\Expected\Model;
+namespace Joli\Jane\Tests\Expected\Schema2\Model;
 
 class Foo
 {

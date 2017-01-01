@@ -74,7 +74,7 @@ trait DenormalizerGenerator
                         'stmts' => [
                             new Stmt\Return_(new Expr\New_(new Name('Reference'), [
                                 new Expr\PropertyFetch(new Expr\Variable('data'), "{'\$ref'}"),
-                                new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('schema-origin')),
+                                new Expr\ArrayDimFetch(new Expr\Variable('context'), new Scalar\String_('document-origin')),
                             ])),
                         ],
                     ]

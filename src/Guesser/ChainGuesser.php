@@ -3,6 +3,8 @@
 namespace Joli\Jane\Guesser;
 
 use Joli\Jane\Guesser\Guess\Type;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, ClassGuesserInterface
 {
@@ -23,27 +25,23 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
-        $classes = [];
-
         foreach ($this->guessers as $guesser) {
             if (!($guesser instanceof ClassGuesserInterface)) {
                 continue;
             }
 
             if ($guesser->supportObject($object)) {
-                $classes = array_merge($classes, $guesser->guessClass($object, $name, $reference));
+                $guesser->guessClass($object, $name, $reference, $registry);
             }
         }
-
-        return $classes;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $type = null;
 
@@ -53,7 +51,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                return $guesser->guessType($object, $name, $classes);
+                return $guesser->guessType($object, $name, $registry, $schema);
             }
         }
 
@@ -67,7 +65,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessProperties($object, $name, $classes)
+    public function guessProperties($object, $name, Registry $registry)
     {
         $properties = [];
 
@@ -77,7 +75,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                $properties = array_merge($properties, $guesser->guessProperties($object, $name, $classes));
+                $properties = array_merge($properties, $guesser->guessProperties($object, $name, $registry));
             }
         }
 

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'json-schema-file' => __DIR__ . '/schema.json',
+    'json-schema-file' => 'tests/fixtures/multi-files/schema.json',
     'root-class' => 'Test',
     'namespace' => 'Joli\Jane\Tests\Expected',
     'directory' => __DIR__ . '/generated',

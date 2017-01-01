@@ -14,19 +14,22 @@ class ObjectType extends Type
 {
     private $className;
 
+    private $namespace;
+
     private $discriminants;
 
-    public function __construct($object, $className, $discriminants = array())
+    public function __construct($object, $className, $namespace, $discriminants = array())
     {
         parent::__construct($object, 'object');
 
+        $this->namespace = $namespace;
         $this->className = $className;
         $this->discriminants = $discriminants;
     }
 
     public function __toString()
     {
-        return $this->className;
+        return '\\' . $this->namespace . '\\Model\\'. $this->className;
     }
 
     /**
@@ -34,11 +37,9 @@ class ObjectType extends Type
      */
     protected function createDenormalizationValueStatement(Context $context, Expr $input)
     {
-        $fqdn = $context->getNamespace() . '\\Model\\'. $this->className;
-
         return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'serializer'), 'deserialize', [
             new Arg($input),
-            new Arg(new Scalar\String_($fqdn)),
+            new Arg(new Scalar\String_($this->getFqdn(false))),
             new Arg(new Scalar\String_('raw')),
             new Arg(new Expr\Variable('context'))
         ]);
@@ -105,8 +106,29 @@ class ObjectType extends Type
     /**
      * (@inheritDoc}
      */
-    public function getTypeHint()
+    public function getTypeHint($currentNamespace)
     {
-        return $this->className;
+        if ('\\' . $currentNamespace . '\\' . $this->className === $this->getFqdn()) {
+            return $this->className;
+        }
+
+        return $this->getFqdn();
+    }
+
+    /**
+     * (@inheritDoc}
+     */
+    public function getDocTypeHint($namespace)
+    {
+        return $this->getTypeHint($namespace);
+    }
+
+    private function getFqdn($withRoot = true)
+    {
+        if ($withRoot) {
+            return '\\' . $this->namespace . '\\Model\\'. $this->className;
+        }
+
+        return $this->namespace . '\\Model\\'. $this->className;
     }
 }

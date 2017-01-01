@@ -158,8 +158,18 @@ class Type
      *
      * @return null|string|Name
      */
-    public function getTypeHint()
+    public function getTypeHint($namespace)
     {
         return null;
+    }
+
+    /**
+     * Create the typehint statement
+     *
+     * @return null|string|Name
+     */
+    public function getDocTypeHint($namespace)
+    {
+        return (string) $this;
     }
 }

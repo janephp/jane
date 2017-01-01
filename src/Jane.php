@@ -50,58 +50,71 @@ class Jane
     /**
      * Return a list of class guessed.
      *
-     * @param $schemaFilePath
-     * @param $name
-     * @param $namespace
-     * @param $directory
+     * @param $registry
      *
      * @return Context
      */
-    public function createContext($schemaFilePath, $name, $namespace, $directory)
+    public function createContext(Registry $registry)
     {
-        $schema = $this->serializer->deserialize(file_get_contents($schemaFilePath), 'Joli\Jane\Model\JsonSchema', 'json', [
-            'schema-origin' => $schemaFilePath
-        ]);
-        $classes = $this->chainGuesser->guessClass($schema, $name, $schemaFilePath . '#');
+        // List of schemas can evolve, but we don't want to generate new schema dynamically added, so we "clone" the array
+        // to have a fixed list of schemas
+        $schemas = array_values($registry->getSchemas());
 
-        foreach ($classes as $class) {
-            $properties = $this->chainGuesser->guessProperties($class->getObject(), $name, $classes);
+        /** @var Schema $schema */
+        foreach ($schemas as $schema) {
+            $jsonSchema = $this->serializer->deserialize(file_get_contents($schema->getOrigin()), 'Joli\Jane\Model\JsonSchema', 'json', [
+                'document-origin' => $schema->getOrigin()
+            ]);
 
-            foreach ($properties as $property) {
-                $property->setType($this->chainGuesser->guessType($property->getObject(), $property->getName(), $classes));
-            }
-
-            $class->setProperties($properties);
+            $this->chainGuesser->guessClass($jsonSchema, $schema->getRootName(), $schema->getOrigin() . '#', $registry);
         }
 
-        return new Context($schema, $namespace, $directory, $classes);
+        foreach ($registry->getSchemas() as $schema) {
+            foreach ($schema->getClasses() as $class) {
+                $properties = $this->chainGuesser->guessProperties($class->getObject(), $schema->getRootName(), $registry);
+
+                foreach ($properties as $property) {
+                    $property->setType($this->chainGuesser->guessType($property->getObject(), $property->getName(), $registry, $schema));
+                }
+
+                $class->setProperties($properties);
+            }
+        }
+
+
+        return new Context($registry);
     }
 
     /**
      * Generate code.
      *
-     * @param $schemaFilePath
-     * @param $name
-     * @param $namespace
-     * @param $directory
+     * @param Registry $registry
      *
      * @return array
      */
-    public function generate($schemaFilePath, $name, $namespace, $directory)
+    public function generate($registry)
     {
-        $context = $this->createContext($schemaFilePath, $name, $namespace, $directory);
-
-        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'Model'))) {
-            mkdir($directory.DIRECTORY_SEPARATOR.'Model', 0755, true);
-        }
-
-        if (!file_exists(($directory.DIRECTORY_SEPARATOR.'Normalizer'))) {
-            mkdir($directory.DIRECTORY_SEPARATOR.'Normalizer', 0755, true);
-        }
+        $context = $this->createContext($registry);
 
         $prettyPrinter = new Standard();
-        $modelFiles = $this->modelGenerator->generate($context->getRootReference(), $name, $context);
-        $normalizerFiles = $this->normalizerGenerator->generate($context->getRootReference(), $name, $context);
+        $modelFiles = [];
+        $normalizerFiles = [];
+
+        foreach ($registry->getSchemas() as $schema) {
+            if (!file_exists(($schema->getDirectory().DIRECTORY_SEPARATOR.'Model'))) {
+                mkdir($schema->getDirectory().DIRECTORY_SEPARATOR.'Model', 0755, true);
+            }
+
+            if (!file_exists(($schema->getDirectory().DIRECTORY_SEPARATOR.'Normalizer'))) {
+                mkdir($schema->getDirectory().DIRECTORY_SEPARATOR.'Normalizer', 0755, true);
+            }
+
+            $context->setCurrentSchema($schema);
+
+            $modelFiles = array_merge($modelFiles, $this->modelGenerator->generate($schema, $schema->getRootName(), $context));
+            $normalizerFiles = array_merge($normalizerFiles, $this->normalizerGenerator->generate($schema, $schema->getRootName(), $context));
+        }
+
         $generated = [];
 
         foreach ($modelFiles as $file) {
@@ -114,7 +127,9 @@ class Jane
             file_put_contents($file->getFilename(), $prettyPrinter->prettyPrintFile([$file->getNode()]));
         }
 
-        $this->fix($directory);
+        foreach ($registry->getSchemas() as $schema) {
+            $this->fix($schema->getDirectory());
+        }
 
         return $generated;
     }

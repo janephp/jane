@@ -9,6 +9,8 @@ use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -37,12 +39,12 @@ class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterf
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         if ($object->getAdditionalProperties() === true) {
             return new MapType($object, new Type($object, 'mixed'));
         }
 
-        return new MapType($object, $this->chainGuesser->guessType($object->getAdditionalProperties(), $name, $classes));
+        return new MapType($object, $this->chainGuesser->guessType($object->getAdditionalProperties(), $name, $registry, $schema));
     }
 }

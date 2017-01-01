@@ -18,19 +18,22 @@ class ArrayType extends Type
         $this->itemType = $itemType;
     }
 
-    public function __toString()
+    /**
+     * (@inheritDoc}
+     */
+    public function getDocTypeHint($namespace)
     {
         if ($this->itemType instanceof MultipleType) {
             $typesString = [];
 
             foreach ($this->itemType->getTypes() as $type) {
-                $typesString[] = $type->__toString().'[]';
+                $typesString[] = $type->getDocTypeHint($namespace).'[]';
             }
 
             return implode('|', $typesString);
         }
 
-        return $this->itemType->__toString().'[]';
+        return $this->itemType->getDocTypeHint($namespace).'[]';
     }
 
     /**
@@ -92,7 +95,7 @@ class ArrayType extends Type
     /**
      * (@inheritDoc}
      */
-    public function getTypeHint()
+    public function getTypeHint($namespace)
     {
         return 'array';
     }

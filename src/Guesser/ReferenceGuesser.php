@@ -3,7 +3,9 @@
 namespace Joli\Jane\Guesser;
 
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
 use Joli\Jane\Runtime\Reference;
+use Joli\Jane\Schema;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
@@ -29,16 +31,24 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
      *
      * @param Reference $object
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
         if ($object->isInCurrentDocument()) {
             return [];
         }
 
+        $mergedReference = (string) $object->getMergedUri();
+
+        if ($registry->getSchema($mergedReference) === null) {
+            $schema = $registry->getSchema((string)$object->getOriginUri());
+            $schema->addReference((string) $object->getMergedUri()->withFragment(''));
+        }
+
         return $this->chainGuesser->guessClass(
             $this->resolve($object, JsonSchema::class),
             $name,
-            (string) $object->getMergedUri()
+            (string) $object->getMergedUri(),
+            $registry
         );
     }
 
@@ -47,7 +57,7 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
      *
      * @param Reference $object
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $resolved = $this->resolve($object, JsonSchema::class);
         $classKey = (string) $object->getMergedUri();
@@ -56,10 +66,11 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
             $classKey .= '#';
         }
 
-        if (array_key_exists($classKey, $classes)) {
-            $name = $classes[$classKey]->getName();
+        if ($registry->hasClass($classKey)) {
+            $name = $registry->getClass($classKey)->getName();
+            $schema = $registry->getSchema($classKey);
         }
 
-        return $this->chainGuesser->guessType($resolved, $name, $classes);
+        return $this->chainGuesser->guessType($resolved, $name, $registry, $schema);
     }
 }

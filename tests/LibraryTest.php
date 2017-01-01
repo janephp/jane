@@ -4,6 +4,8 @@ namespace Joli\Jane\Tests;
 
 use Joli\Jane\Jane;
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class LibraryTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +24,10 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
      */
     public function testLibrary()
     {
-        $this->jane->generate(__DIR__ . '/data/json-schema.json', 'JsonSchema', 'Joli\\Jane', __DIR__ . "/generated");
+        $registry = new Registry();
+        $registry->addSchema(new Schema('tests/data/json-schema.json', 'Joli\\Jane', __DIR__ . "/generated", 'JsonSchema'));
+
+        $this->jane->generate($registry);
 
         $this->assertTrue(file_exists(__DIR__ . "/generated/Model/JsonSchema.php"));
         $this->assertTrue(file_exists(__DIR__ . "/generated/Normalizer/JsonSchemaNormalizer.php"));
@@ -49,7 +54,7 @@ class LibraryTest extends \PHPUnit_Framework_TestCase
         $serializer = Jane::buildSerializer();
 
         $json = file_get_contents(__DIR__ . '/data/json-schema.json');
-        $schema = $serializer->deserialize($json, 'Joli\Jane\Model\JsonSchema', 'json', ['schema-origin' => __DIR__ . '/data/json-schema.json']);
+        $schema = $serializer->deserialize($json, 'Joli\Jane\Model\JsonSchema', 'json', ['document-origin' => 'tests/data/json-schema.json']);
         $newJson = $serializer->serialize($schema, 'json');
 
         $this->assertEquals(json_decode($json), json_decode($newJson));

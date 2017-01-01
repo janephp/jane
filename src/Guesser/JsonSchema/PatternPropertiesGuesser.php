@@ -12,6 +12,8 @@ use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class PatternPropertiesGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -45,12 +47,12 @@ class PatternPropertiesGuesser implements GuesserInterface, TypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $type = new PatternMultipleType($object);
 
         foreach ($object->getPatternProperties() as $pattern => $patternProperty) {
-            $type->addType($pattern, $this->chainGuesser->guessType($patternProperty, $name, $classes), $pattern);
+            $type->addType($pattern, $this->chainGuesser->guessType($patternProperty, $name, $registry, $schema), $pattern);
         }
 
         return $type;

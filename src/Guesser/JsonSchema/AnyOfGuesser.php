@@ -10,6 +10,8 @@ use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 
 use Joli\Jane\Model\JsonSchema;
+use Joli\Jane\Registry;
+use Joli\Jane\Schema;
 
 class AnyOfGuesser implements GuesserInterface, ClassGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
 {
@@ -18,30 +20,26 @@ class AnyOfGuesser implements GuesserInterface, ClassGuesserInterface, TypeGuess
     /**
      * {@inheritDoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
-        $classes = [];
-
         foreach ($object->getAnyOf() as $anyOfObject) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($anyOfObject, $name.'AnyOf', $reference . '/anyOf'));
+            $this->chainGuesser->guessClass($anyOfObject, $name.'AnyOf', $reference . '/anyOf', $registry);
         }
-
-        return $classes;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         if (count($object->getAnyOf()) == 1) {
-            return $this->chainGuesser->guessType($object->getAnyOf()[0], $name, $classes);
+            return $this->chainGuesser->guessType($object->getAnyOf()[0], $name, $registry, $schema);
         }
 
         $type = new MultipleType($object);
 
         foreach ($object->getAnyOf() as $anyOfObject) {
-            $type->addType($this->chainGuesser->guessType($anyOfObject, $name, $classes));
+            $type->addType($this->chainGuesser->guessType($anyOfObject, $name, $registry, $schema));
         }
 
         return $type;

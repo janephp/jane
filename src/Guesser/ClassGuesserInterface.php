@@ -2,6 +2,8 @@
 
 namespace Joli\Jane\Guesser;
 
+use Joli\Jane\Registry;
+
 interface ClassGuesserInterface
 {
     /**
@@ -10,11 +12,10 @@ interface ClassGuesserInterface
      * This guesser should create a Model and the associated File
      * The file must be inject into the context
      *
-     * @param mixed $object
-     * @param string $name
-     * @param string $reference Json ref to the class
-     *
-     * @return \Joli\Jane\Guesser\Guess\ClassGuess[] An array of class, key represent the hash of object mapped, and the value is the information about the class to be generated
+     * @param mixed    $object
+     * @param string   $name
+     * @param string   $reference Json ref to the class
+     * @param Registry $registry  Registry
      */
-    public function guessClass($object, $name, $reference);
+    public function guessClass($object, $name, $reference, Registry $registry);
 }

@@ -4,6 +4,7 @@ namespace Joli\Jane\Generator\Model;
 
 use Joli\Jane\Generator\Naming;
 use Joli\Jane\Guesser\Guess\Type;
+use Joli\Jane\Schema;
 use PhpParser\Comment\Doc;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
@@ -24,10 +25,11 @@ trait GetterSetterGenerator
      *
      * @param $name
      * @param Type $type
+     * @param string $namespace
      *
      * @return Stmt\ClassMethod
      */
-    protected function createGetter($name, Type $type)
+    protected function createGetter($name, Type $type, $namespace)
     {
         return new Stmt\ClassMethod(
             // getProperty
@@ -42,7 +44,7 @@ trait GetterSetterGenerator
                     ),
                 ],
             ], [
-                'comments' => [$this->createGetterDoc($type)],
+                'comments' => [$this->createGetterDoc($type, $namespace)],
             ]
         );
     }
@@ -52,10 +54,11 @@ trait GetterSetterGenerator
      *
      * @param $name
      * @param Type $type
+     * @param string $namespace
      *
      * @return Stmt\ClassMethod
      */
-    protected function createSetter($name, Type $type)
+    protected function createSetter($name, Type $type, $namespace)
     {
         return new Stmt\ClassMethod(
             // setProperty
@@ -65,7 +68,7 @@ trait GetterSetterGenerator
                 'type' => Stmt\Class_::MODIFIER_PUBLIC,
                 // ($property)
                 'params' => [
-                    new Param($this->getNaming()->getPropertyName($name), new Expr\ConstFetch(new Name('null')), $type->getTypeHint()),
+                    new Param($this->getNaming()->getPropertyName($name), new Expr\ConstFetch(new Name('null')), $type->getTypeHint($namespace)),
                 ],
                 'stmts' => [
                     // $this->property = $property;
@@ -79,7 +82,7 @@ trait GetterSetterGenerator
                     new Stmt\Return_(new Expr\Variable('this')),
                 ],
             ], [
-                'comments' => [$this->createSetterDoc($name, $type)],
+                'comments' => [$this->createSetterDoc($name, $type, $namespace)],
             ]
         );
     }
@@ -88,17 +91,18 @@ trait GetterSetterGenerator
      * Return doc for get method.
      *
      * @param Type $type
+     * @param string $namespace
      *
      * @return Doc
      */
-    protected function createGetterDoc(Type $type)
+    protected function createGetterDoc(Type $type, $namespace)
     {
         return new Doc(sprintf(<<<EOD
 /**
  * @return %s
  */
 EOD
-        , $type->__toString()));
+        , $type->getDocTypeHint($namespace)));
     }
 
     /**
@@ -106,10 +110,11 @@ EOD
      *
      * @param $name
      * @param Type $type
+     * @param string $namespace
      *
      * @return Doc
      */
-    protected function createSetterDoc($name, Type $type)
+    protected function createSetterDoc($name, Type $type, $namespace)
     {
         return new Doc(sprintf(<<<EOD
 /**
@@ -118,6 +123,6 @@ EOD
  * @return self
  */
 EOD
-        , $type->__toString(), '$'.$this->getNaming()->getPropertyName($name)));
+        , $type->getDocTypeHint($namespace), '$'.$this->getNaming()->getPropertyName($name)));
     }
 }

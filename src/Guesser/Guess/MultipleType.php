@@ -52,12 +52,12 @@ class MultipleType extends Type
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function __toString()
+    public function getDocTypeHint($namespace)
     {
-        $stringTypes = array_map(function ($type) {
-            return $type->__toString();
+        $stringTypes = array_map(function ($type) use ($namespace) {
+            return $type->getDocTypeHint($namespace);
         }, $this->types);
 
         return implode('|', $stringTypes);
@@ -66,18 +66,18 @@ class MultipleType extends Type
     /**
      * {@inheritdoc}
      */
-    public function getTypeHint()
+    public function getTypeHint($namespace)
     {
         // We have exactly two types: one null and an object
         if (count($this->types) === 2) {
             list($type1, $type2) = $this->types;
 
             if ($this->isOptionalObjectType($type1, $type2)) {
-                return $type2->getTypeHint();
+                return $type2->getTypeHint($namespace);
             }
 
             if ($this->isOptionalObjectType($type2, $type1)) {
-                return $type1->getTypeHint();
+                return $type1->getTypeHint($namespace);
             }
         }
 

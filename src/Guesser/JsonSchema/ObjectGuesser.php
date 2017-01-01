@@ -15,7 +15,9 @@ use Joli\Jane\Guesser\PropertiesGuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Reference\Resolver;
+use Joli\Jane\Registry;
 use Joli\Jane\Runtime\Reference;
+use Joli\Jane\Schema;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
@@ -45,21 +47,19 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     /**
      * {@inheritdoc}
      */
-    public function guessClass($object, $name, $reference)
+    public function guessClass($object, $name, $reference, Registry $registry)
     {
-        $classes = [$reference => new ClassGuess($object, $this->naming->getClassName($name))];
+        $registry->getSchema($reference)->addClass($reference, new ClassGuess($object, $this->naming->getClassName($name)));
 
         foreach ($object->getProperties() as $key => $property) {
-            $classes = array_merge($classes, $this->chainGuesser->guessClass($property, $key, $reference . '/properties/' . $key));
+            $this->chainGuesser->guessClass($property, $key, $reference . '/properties/' . $key, $registry);
         }
-
-        return $classes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function guessProperties($object, $name, $classes)
+    public function guessProperties($object, $name, Registry $registry)
     {
         $properties = [];
 
@@ -82,7 +82,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, $classes)
+    public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $discriminants = [];
         $required = $object->getRequired() ?: [];
@@ -111,6 +111,6 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             }
         }
 
-        return new ObjectType($object, $this->naming->getClassName($name), $discriminants);
+        return new ObjectType($object, $this->naming->getClassName($name), $schema->getNamespace(), $discriminants);
     }
 }

@@ -95,7 +95,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             }
 
             if ($property instanceof Reference) {
-                $property = $this->resolve($property, JsonSchema::class);
+                $property = $this->resolve($property, $this->getSchemaClass());
             }
 
             if ($property->getEnum() !== null) {

@@ -13,7 +13,6 @@ class Test
      */
     protected $nullOrString;
 
-
     public function getOnlyNull()
     {
         return $this->onlyNull;

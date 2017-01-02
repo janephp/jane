@@ -36,11 +36,11 @@ class Schema
      */
     public function __construct($origin, $namespace, $directory, $rootName)
     {
-        $this->origin = $origin;
+        $this->origin = $this->fixPath($origin);
         $this->namespace = $namespace;
         $this->directory = $directory;
         $this->rootName = $rootName;
-        $this->references = [$origin];
+        $this->references = [$this->origin];
     }
 
     /**
@@ -121,5 +121,30 @@ class Schema
     public function setParsed($parsed)
     {
         $this->parsed = $parsed;
+    }
+
+    private function fixPath($path)
+    {
+        $path = preg_replace('~/{2,}~','/', $path);
+
+        if ($path === '/') {
+            return '/';
+        }
+
+        $pathParts = [];
+        foreach(explode('/',rtrim($path,'/')) as $part) {
+            if ('.' === $part) {
+                continue;
+            }
+
+            if ('..' === $part && count($pathParts) > 0) {
+                array_pop($pathParts);
+                continue;
+            }
+
+            $pathParts[] = $part;
+        }
+
+        return implode('/',$pathParts);
     }
 }

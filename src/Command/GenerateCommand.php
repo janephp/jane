@@ -18,7 +18,7 @@ class GenerateCommand extends Command
     {
         $this->setName('generate');
         $this->setDescription('Generate a set of class and normalizers given a specific Json Schema file');
-        $this->addOption('config-file', 'c', InputOption::VALUE_OPTIONAL, 'File to use for jane configuration', '.jane');
+        $this->addOption('config-file', 'c', InputOption::VALUE_OPTIONAL, 'File to use for jane configuration');
         $this->addOption('no-reference', null, InputOption::VALUE_NONE, 'Don\'t use the reference system in your generated schema');
         $this->addOption('date-format', 'd', InputOption::VALUE_OPTIONAL, 'Date time format to use for date time field');
         $this->addArgument('json-schema-file', InputArgument::OPTIONAL, 'Location of the Json Schema file');
@@ -34,7 +34,7 @@ class GenerateCommand extends Command
     {
         $options = [];
 
-        if ($input->hasOption('config-file')) {
+        if ($input->hasOption('config-file') && null !== $input->getOption('config-file')) {
             $configFile = $input->getOption('config-file');
 
             if (!file_exists($configFile)) {

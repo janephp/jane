@@ -79,7 +79,7 @@ Here is a quick presentation on how this library transforms a Json Schema file i
  3. Once all things are guessed, classes and their properties are transformed into an AST (by using the [PHP-Parser library from nikic](https://github.com/nikic/PHP-Parser));
  4. Then the AST is written into PHP files.
 
-## Sponsor
+## Sponsor
 
 [![Jolicode](https://jolicode.com/bundles/jolisite/images/logo.svg?19)](https://jolicode.com)
 

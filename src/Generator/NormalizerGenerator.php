@@ -81,6 +81,7 @@ class NormalizerGenerator implements GeneratorInterface
 
             $namespace = new Stmt\Namespace_(new Name($schema->getNamespace()."\\Normalizer"), [
                 new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Runtime\Reference'))]),
+                new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Exception\InvalidArgumentException'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\NormalizerInterface'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer'))]),

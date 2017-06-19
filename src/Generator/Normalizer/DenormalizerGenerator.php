@@ -83,6 +83,15 @@ trait DenormalizerGenerator
             ];
         }
 
+        array_unshift($statements, new Stmt\If_(
+            new Expr\BooleanNot(new Expr\FuncCall(new Name('is_object'), [new Arg(new Expr\Variable('data'))])),
+            [
+                'stmts' => [
+                    new Stmt\Throw_(new Expr\New_(new Name('InvalidArgumentException')))
+                ]
+            ]
+        ));
+
         foreach ($properties as $property) {
             $propertyVar = new Expr\PropertyFetch(new Expr\Variable('data'), sprintf("{'%s'}", $property->getName()));
             list($denormalizationStatements, $outputVar) = $property->getType()->createDenormalizationStatement($context, $propertyVar);

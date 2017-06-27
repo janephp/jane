@@ -23,6 +23,7 @@ class GenerateCommand extends Command
         $this->addOption('config-file', 'c', InputOption::VALUE_OPTIONAL, 'File to use for jane configuration');
         $this->addOption('no-reference', null, InputOption::VALUE_NONE, 'Don\'t use the reference system in your generated schema');
         $this->addOption('date-format', 'd', InputOption::VALUE_OPTIONAL, 'Date time format to use for date time field');
+        $this->addOption('fixer-config-file', null, InputOption::VALUE_REQUIRED, 'File to use for php-cs-fixer configuration');
         $this->addArgument('json-schema-file', InputArgument::OPTIONAL, 'Location of the Json Schema file');
         $this->addArgument('root-class', InputArgument::OPTIONAL, 'Name of the root entity you want to generate');
         $this->addArgument('namespace', InputArgument::OPTIONAL, 'Namespace prefix to use for generated files');
@@ -74,7 +75,7 @@ class GenerateCommand extends Command
             }
         }
 
-        $options = $this->resolveConfiguration($options);
+        $options  = $this->resolveConfiguration($options);
         $registry = new Registry();
 
         if (array_key_exists('json-schema-file', $options)) {
@@ -85,8 +86,20 @@ class GenerateCommand extends Command
             }
         }
 
-        $jane    = \Joli\Jane\Jane::build($options);
-        $files   = $jane->generate($registry);
+        $jane = \Joli\Jane\Jane::build($options);
+
+        if ($input->hasOption('fixer-config-file') && null !== $input->getOption('fixer-config-file')) {
+            $fixerConfigFile = $input->getOption('fixer-config-file');
+
+            if (!file_exists($fixerConfigFile)) {
+                throw new \RuntimeException(sprintf('Fixer config file %s could not be found', $fixerConfigFile));
+            }
+
+            $configFile = require $fixerConfigFile;
+            $jane->setFixerConfig($configFile);
+        }
+
+        $files = $jane->generate($registry);
 
         foreach ($files as $file) {
             $output->writeln(sprintf("Generated %s", $file));

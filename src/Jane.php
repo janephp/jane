@@ -48,6 +48,11 @@ class Jane
         $this->fixerConfig = $fixerConfig;
     }
 
+    public function setFixerConfig(ConfigInterface $fixerConfig)
+    {
+        $this->fixerConfig = $fixerConfig;
+    }
+
     /**
      * Return a list of class guessed.
      *

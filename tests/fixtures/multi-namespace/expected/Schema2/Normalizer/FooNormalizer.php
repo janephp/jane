@@ -4,10 +4,13 @@ namespace Joli\Jane\Tests\Expected\Schema2\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
-class FooNormalizer extends SerializerAwareNormalizer implements DenormalizerInterface, NormalizerInterface
+class FooNormalizer implements DenormalizerInterface, NormalizerInterface, SerializerAwareInterface
 {
+    use SerializerAwareTrait;
+
     public function supportsDenormalization($data, $type, $format = null)
     {
         if ($type !== 'Joli\\Jane\\Tests\\Expected\\Schema2\\Model\\Foo') {

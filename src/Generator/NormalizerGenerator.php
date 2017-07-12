@@ -83,7 +83,8 @@ class NormalizerGenerator implements GeneratorInterface
                 new Stmt\Use_([new Stmt\UseUse(new Name('Joli\Jane\Runtime\Reference'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\DenormalizerInterface'))]),
                 new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\NormalizerInterface'))]),
-                new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer'))]),
+                new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\SerializerAwareInterface'))]),
+                new Stmt\Use_([new Stmt\UseUse(new Name('Symfony\Component\Serializer\SerializerAwareTrait'))]),
                 $normalizerClass
             ]);
             $files[]   = new File($schema->getDirectory().'/Normalizer/'.$class->getName().'Normalizer.php', $namespace, self::FILE_TYPE_NORMALIZER);

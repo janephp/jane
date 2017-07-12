@@ -21,12 +21,19 @@ trait NormalizerGenerator
 
     protected function createNormalizerClass($name, $methods)
     {
+        $traits = [
+            new Stmt\TraitUse([new Name('SerializerAwareTrait')]),
+        ];
+
         return new Stmt\Class_(
             new Name($this->getNaming()->getClassName($name)),
             [
-                'stmts' => array_merge($methods),
-                'implements' => [new Name('DenormalizerInterface'), new Name('NormalizerInterface')],
-                'extends' => new Name('SerializerAwareNormalizer'),
+                'stmts' => array_merge($traits, $methods),
+                'implements' => [
+                    new Name('DenormalizerInterface'),
+                    new Name('NormalizerInterface'),
+                    new Name('SerializerAwareInterface'),
+                ],
             ]
         );
     }

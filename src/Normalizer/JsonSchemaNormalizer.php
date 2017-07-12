@@ -5,10 +5,13 @@ namespace Joli\Jane\Normalizer;
 use Joli\Jane\Runtime\Reference;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
-class JsonSchemaNormalizer extends SerializerAwareNormalizer implements DenormalizerInterface, NormalizerInterface
+class JsonSchemaNormalizer implements DenormalizerInterface, NormalizerInterface, SerializerAwareInterface
 {
+    use SerializerAwareTrait;
+
     public function supportsDenormalization($data, $type, $format = null)
     {
         if ($type !== 'Joli\\Jane\\Model\\JsonSchema') {

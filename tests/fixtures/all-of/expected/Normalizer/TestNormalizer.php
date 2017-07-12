@@ -2,6 +2,7 @@
 
 namespace Joli\Jane\Tests\Expected\Normalizer;
 
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -31,6 +32,9 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Seri
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        if (!is_object($data)) {
+            throw new InvalidArgumentException();
+        }
         $object = new \Joli\Jane\Tests\Expected\Model\Test();
         if (property_exists($data, 'child')) {
             $object->setChild($this->serializer->deserialize($data->{'child'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Childtype', 'raw', $context));

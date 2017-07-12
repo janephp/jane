@@ -22,7 +22,8 @@ trait NormalizerGenerator
     protected function createNormalizerClass($name, $methods)
     {
         $traits = [
-            new Stmt\TraitUse([new Name('SerializerAwareTrait')]),
+            new Stmt\TraitUse([new Name('DenormalizerAwareTrait')]),
+            new Stmt\TraitUse([new Name('NormalizerAwareTrait')]),
         ];
 
         return new Stmt\Class_(
@@ -32,7 +33,8 @@ trait NormalizerGenerator
                 'implements' => [
                     new Name('DenormalizerInterface'),
                     new Name('NormalizerInterface'),
-                    new Name('SerializerAwareInterface'),
+                    new Name('DenormalizerAwareInterface'),
+                    new Name('NormalizerAwareInterface'),
                 ],
             ]
         );

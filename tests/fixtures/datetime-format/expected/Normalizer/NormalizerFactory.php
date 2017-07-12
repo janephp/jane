@@ -8,7 +8,6 @@ class NormalizerFactory
     {
         $normalizers   = [];
         $normalizers[] = new \Joli\Jane\Runtime\Normalizer\ReferenceNormalizer();
-        $normalizers[] = new \Joli\Jane\Runtime\Normalizer\ArrayDenormalizer();
         $normalizers[] = new TestNormalizer();
 
         return $normalizers;

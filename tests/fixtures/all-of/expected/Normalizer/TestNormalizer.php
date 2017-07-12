@@ -3,14 +3,17 @@
 namespace Joli\Jane\Tests\Expected\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerAwareTrait;
 
-class TestNormalizer implements DenormalizerInterface, NormalizerInterface, SerializerAwareInterface
+class TestNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
-    use SerializerAwareTrait;
+    use DenormalizerAwareTrait;
+    use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -37,10 +40,10 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Seri
         }
         $object = new \Joli\Jane\Tests\Expected\Model\Test();
         if (property_exists($data, 'child')) {
-            $object->setChild($this->serializer->deserialize($data->{'child'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Childtype', 'raw', $context));
+            $object->setChild($this->denormalizer->denormalize($data->{'child'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Childtype', 'json', $context));
         }
         if (property_exists($data, 'parent')) {
-            $object->setParent($this->serializer->deserialize($data->{'parent'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Parenttype', 'raw', $context));
+            $object->setParent($this->denormalizer->denormalize($data->{'parent'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Parenttype', 'json', $context));
         }
 
         return $object;
@@ -50,10 +53,10 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Seri
     {
         $data = new \stdClass();
         if (null !== $object->getChild()) {
-            $data->{'child'} = $this->serializer->serialize($object->getChild(), 'raw', $context);
+            $data->{'child'} = $this->normalizer->normalize($object->getChild(), 'json', $context);
         }
         if (null !== $object->getParent()) {
-            $data->{'parent'} = $this->serializer->serialize($object->getParent(), 'raw', $context);
+            $data->{'parent'} = $this->normalizer->normalize($object->getParent(), 'json', $context);
         }
 
         return $data;

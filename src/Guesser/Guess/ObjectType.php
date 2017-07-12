@@ -32,10 +32,10 @@ class ObjectType extends Type
      */
     protected function createDenormalizationValueStatement(Context $context, Expr $input)
     {
-        return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'serializer'), 'deserialize', [
+        return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'denormalizer'), 'denormalize', [
             new Arg($input),
             new Arg(new Scalar\String_($this->getFqdn(false))),
-            new Arg(new Scalar\String_('raw')),
+            new Arg(new Scalar\String_('json')),
             new Arg(new Expr\Variable('context'))
         ]);
     }
@@ -45,9 +45,9 @@ class ObjectType extends Type
      */
     protected function createNormalizationValueStatement(Context $context, Expr $input)
     {
-        return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'serializer'), 'serialize', [
+        return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizer'), 'normalize', [
             new Arg($input),
-            new Arg(new Scalar\String_('raw')),
+            new Arg(new Scalar\String_('json')),
             new Arg(new Expr\Variable('context'))
         ]);
     }

@@ -3,14 +3,17 @@
 namespace Joli\Jane\Tests\Expected\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerAwareTrait;
 
-class TestNormalizer implements DenormalizerInterface, NormalizerInterface, SerializerAwareInterface
+class TestNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
-    use SerializerAwareTrait;
+    use DenormalizerAwareTrait;
+    use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -37,7 +40,7 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Seri
         }
         $object = new \Joli\Jane\Tests\Expected\Model\Test();
         if (property_exists($data, 'foo')) {
-            $object->setFoo($this->serializer->deserialize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Foo', 'raw', $context));
+            $object->setFoo($this->denormalizer->denormalize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Foo', 'json', $context));
         }
 
         return $object;
@@ -47,7 +50,7 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Seri
     {
         $data = new \stdClass();
         if (null !== $object->getFoo()) {
-            $data->{'foo'} = $this->serializer->serialize($object->getFoo(), 'raw', $context);
+            $data->{'foo'} = $this->normalizer->normalize($object->getFoo(), 'json', $context);
         }
 
         return $data;

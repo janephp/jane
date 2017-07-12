@@ -36,7 +36,15 @@ class GenerateCommand extends Command
     {
         $options = [];
 
-        if ($input->hasOption('config-file') && null !== $input->getOption('config-file')) {
+        $configFile = null;
+
+        if (!$input->hasOption('config-file') && file_exists('.jane')) {
+            $configFile = '.jane';
+        } elseif($input->hasOption('config-file') && null !== $input->getOption('config-file')) {
+            $configFile = $input->getOption('config-file');
+        }
+
+        if ($configFile) {
             $configFile = $input->getOption('config-file');
 
             if (!file_exists($configFile)) {

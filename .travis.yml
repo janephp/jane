@@ -30,7 +30,7 @@ install:
     - travis_retry composer update ${COMPOSER_FLAGS} --prefer-source --no-interaction
 
 script:
-    - $TEST_COMMAND
+    - travis_wait $TEST_COMMAND
 
 after_success:
     - if [[ "$COVERAGE" = true ]]; then wget https://scrutinizer-ci.com/ocular.phar; fi

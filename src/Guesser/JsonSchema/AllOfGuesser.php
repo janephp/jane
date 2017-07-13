@@ -32,19 +32,21 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     public function guessType($object, $name, Registry $registry, Schema $schema)
     {
         $type = null;
+        $allOfType = null;
 
         foreach ($object->getAllOf() as $allOf) {
             $allOfSchema = $allOf;
 
             if ($allOfSchema instanceof Reference) {
-                $allOfSchema = $this->resolve($allOfSchema, JsonSchema::class);
+                $allOfSchema = $this->resolve($allOfSchema, $this->getSchemaClass());
             }
 
             if (null !== $allOfSchema->getType()) {
-                if (null !== $type) {
+                if (null !== $type && $allOfType !== $allOfSchema->getType()) {
                     throw new \RuntimeException('an allOf instruction with 2 or more types is strictly impossible, check your schema');
                 }
 
+                $allOfType = $allOfSchema->getType();
                 $type = $this->chainGuesser->guessType($allOf, $name, $registry, $schema);
             }
         }
@@ -72,7 +74,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         $properties = [];
         foreach ($object->getAllOf() as $allOfSchema) {
             if ($allOfSchema instanceof Reference) {
-                $allOfSchema = $this->resolve($allOfSchema, JsonSchema::class);
+                $allOfSchema = $this->resolve($allOfSchema, $this->getSchemaClass());
             }
 
             $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $registry));

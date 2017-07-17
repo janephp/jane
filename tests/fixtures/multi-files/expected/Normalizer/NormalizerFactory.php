@@ -8,7 +8,7 @@ class NormalizerFactory
     {
         $normalizers   = [];
         $normalizers[] = new TestNormalizer();
-        $normalizers[] = new TestfooNormalizer();
+        $normalizers[] = new TestFooNormalizer();
 
         return $normalizers;
     }

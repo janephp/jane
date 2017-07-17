@@ -9,7 +9,7 @@ class Test
      */
     protected $string;
     /**
-     * @var TestsubObject
+     * @var TestSubObject
      */
     protected $subObject;
 
@@ -34,7 +34,7 @@ class Test
     }
 
     /**
-     * @return TestsubObject
+     * @return TestSubObject
      */
     public function getSubObject()
     {
@@ -42,11 +42,11 @@ class Test
     }
 
     /**
-     * @param TestsubObject $subObject
+     * @param TestSubObject $subObject
      *
      * @return self
      */
-    public function setSubObject(TestsubObject $subObject = null)
+    public function setSubObject(TestSubObject $subObject = null)
     {
         $this->subObject = $subObject;
 

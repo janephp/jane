@@ -26,12 +26,12 @@ class OneOfGuesser implements ChainGuesserAwareInterface, TypeGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         $type = new MultipleType($object);
 
-        foreach ($object->getOneOf() as $oneOf) {
-            $type->addType($this->chainGuesser->guessType($oneOf, $name, $registry, $schema));
+        foreach ($object->getOneOf() as $oneOfKey => $oneOf) {
+            $type->addType($this->chainGuesser->guessType($oneOf, $name, $reference . '/oneOf/' . $oneOfKey, $registry));
         }
 
         return $type;

@@ -6,6 +6,14 @@
     "properties": {
         "string": {
             "type": "string"
+        },
+        "subObject": {
+            "type": "object",
+            "properties": {
+                "foo": {
+                    "type": "string"
+                }
+            }
         }
     }
 }

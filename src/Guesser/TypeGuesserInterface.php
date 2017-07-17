@@ -16,7 +16,9 @@ interface TypeGuesserInterface
      * @param Registry $registry
      * @param Schema   $schema
      *
+     * @internal
+     *
      * @return Type
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema);
+    public function guessType($object, $name, $reference, Registry $registry);
 }

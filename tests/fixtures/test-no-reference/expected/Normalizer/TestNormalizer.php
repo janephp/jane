@@ -42,6 +42,9 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
         if (property_exists($data, 'string')) {
             $object->setString($data->{'string'});
         }
+        if (property_exists($data, 'subObject')) {
+            $object->setSubObject($this->denormalizer->denormalize($data->{'subObject'}, 'Joli\\Jane\\Tests\\Expected\\Model\\TestsubObject', 'json', $context));
+        }
 
         return $object;
     }
@@ -51,6 +54,9 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
         $data = new \stdClass();
         if (null !== $object->getString()) {
             $data->{'string'} = $object->getString();
+        }
+        if (null !== $object->getSubObject()) {
+            $data->{'subObject'} = $this->normalizer->normalize($object->getSubObject(), 'json', $context);
         }
 
         return $data;

@@ -8,6 +8,7 @@ use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\Guess\ClassGuess;
 use Joli\Jane\Guesser\Guess\ObjectType;
 use Joli\Jane\Guesser\Guess\Property;
+use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\GuesserResolverTrait;
@@ -54,14 +55,14 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
         }
 
         foreach ($object->getProperties() as $key => $property) {
-            $this->chainGuesser->guessClass($property, $key, $reference . '/properties/' . $key, $registry);
+            $this->chainGuesser->guessClass($property, $name . $key, $reference . '/properties/' . $key, $registry);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function guessProperties($object, $name, Registry $registry)
+    public function guessProperties($object, $name, $reference, Registry $registry)
     {
         $properties = [];
 
@@ -75,7 +76,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             $type = $propertyObj->getType();
             $nullable = $type == 'null' || (is_array($type) && in_array('null', $type));
 
-            $properties[] = new Property($property, $key, $nullable);
+            $properties[] = new Property($property, $key, $reference . '/properties/' . $key, $nullable);
         }
 
         return $properties;
@@ -84,7 +85,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         $discriminants = [];
         $required = $object->getRequired() ?: [];
@@ -113,7 +114,11 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
             }
         }
 
-        return new ObjectType($object, $this->naming->getClassName($name), $schema->getNamespace(), $discriminants);
+        if ($registry->hasClass($reference)) {
+            return new ObjectType($object, $registry->getClass($reference)->getName(), $registry->getSchema($reference)->getNamespace(), $discriminants);
+        }
+
+        return new Type($object, 'object');
     }
 
     /**

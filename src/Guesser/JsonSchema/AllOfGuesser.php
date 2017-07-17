@@ -15,7 +15,6 @@ use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Registry;
 use Joli\Jane\Runtime\Reference;
-use Joli\Jane\Schema;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, PropertiesGuesserInterface, ClassGuesserInterface
@@ -65,12 +64,12 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         $type = null;
         $allOfType = null;
 
-        foreach ($object->getAllOf() as $allOf) {
+        foreach ($object->getAllOf() as $allOfIndex => $allOf) {
             $allOfSchema = $allOf;
 
             if ($allOfSchema instanceof Reference) {
@@ -83,7 +82,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
                 }
 
                 $allOfType = $allOfSchema->getType();
-                $type = $this->chainGuesser->guessType($allOf, $name, $registry, $schema);
+                $type = $this->chainGuesser->guessType($allOf, $name, $reference . '/allOf/' . $allOfIndex, $registry);
             }
         }
 
@@ -105,15 +104,15 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     /**
      * {@inheritdoc}
      */
-    public function guessProperties($object, $name, Registry $registry)
+    public function guessProperties($object, $name, $reference, Registry $registry)
     {
         $properties = [];
-        foreach ($object->getAllOf() as $allOfSchema) {
+        foreach ($object->getAllOf() as $allOfIndex => $allOfSchema) {
             if ($allOfSchema instanceof Reference) {
                 $allOfSchema = $this->resolve($allOfSchema, $this->getSchemaClass());
             }
 
-            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $registry));
+            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $reference . '/allOf/' . $allOfIndex, $registry));
         }
 
         return $properties;

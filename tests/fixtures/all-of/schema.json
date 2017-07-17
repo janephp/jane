@@ -4,6 +4,21 @@
     "description": "Testing allOf",
     "type": "object",
     "definitions": {
+        "otherchildtype": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/parenttype"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "childProperty": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
         "childtype": {
             "type": "object",
             "allOf": [

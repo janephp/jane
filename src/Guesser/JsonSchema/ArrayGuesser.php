@@ -48,13 +48,13 @@ class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         }
 
         if (!is_array($items)) {
-            return new ArrayType($object, $this->chainGuesser->guessType($items, $name, $registry, $schema));
+            return new ArrayType($object, $this->chainGuesser->guessType($items, $name . 'Item', $registry, $schema));
         }
 
         $type = new MultipleType($object);
 
         foreach ($items as $item) {
-            $type->addType(new ArrayType($object, $this->chainGuesser->guessType($item, $name, $registry, $schema)));
+            $type->addType(new ArrayType($object, $this->chainGuesser->guessType($item, $name . 'Item', $registry, $schema)));
         }
 
         return $type;

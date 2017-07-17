@@ -18,17 +18,17 @@ trait GuesserResolverTrait
      *
      * @return mixed
      */
-    public function resolve(Reference $reference, $class)
+    public function resolve($reference, $class)
     {
         $result = $reference;
 
-        do {
+        while ($result instanceof Reference) {
             $result = $result->resolve(function ($data) use($result, $class) {
                 return $this->serializer->denormalize($data, $class, 'json', [
                     'document-origin' => (string) $result->getMergedUri()->withFragment('')
                 ]);
             });
-        } while ($result instanceof Reference);
+        }
 
         return $result;
     }

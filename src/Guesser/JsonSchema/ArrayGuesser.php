@@ -4,19 +4,29 @@ namespace Joli\Jane\Guesser\JsonSchema;
 
 use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\Guess\ArrayType;
 use Joli\Jane\Guesser\Guess\MultipleType;
 use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
-
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Registry;
 use Joli\Jane\Schema;
 
-class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
+class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
 {
     use ChainGuesserAwareTrait;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessClass($object, $name, $reference, Registry $registry)
+    {
+        if (is_a($object->getItems(), $this->getSchemaClass())) {
+            $this->chainGuesser->guessClass($object->getItems(), $name . 'Item', $reference . '/items', $registry);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -48,5 +58,13 @@ class ArrayGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
         }
 
         return $type;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSchemaClass()
+    {
+        return Schema::class;
     }
 }

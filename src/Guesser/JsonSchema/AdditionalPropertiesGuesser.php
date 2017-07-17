@@ -4,6 +4,7 @@ namespace Joli\Jane\Guesser\JsonSchema;
 
 use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
+use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\Guess\MapType;
 use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
@@ -12,9 +13,19 @@ use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Registry;
 use Joli\Jane\Schema;
 
-class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface
+class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
 {
     use ChainGuesserAwareTrait;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessClass($object, $name, $reference, Registry $registry)
+    {
+        if (is_a($object->getAdditionalProperties(), $this->getSchemaClass())) {
+            $this->chainGuesser->guessClass($object->getAdditionalProperties(), $name . 'Item', $reference . '/additionalProperties', $registry);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -46,5 +57,13 @@ class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterf
         }
 
         return new MapType($object, $this->chainGuesser->guessType($object->getAdditionalProperties(), $name, $registry, $schema));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSchemaClass()
+    {
+        return Schema::class;
     }
 }

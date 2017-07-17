@@ -2,15 +2,15 @@
 
 namespace Joli\Jane\Tests\Expected\Model;
 
-class Test
+class TestsubObject
 {
     /**
-     * @var Testfoo
+     * @var string
      */
     protected $foo;
 
     /**
-     * @return Testfoo
+     * @return string
      */
     public function getFoo()
     {
@@ -18,11 +18,11 @@ class Test
     }
 
     /**
-     * @param Testfoo $foo
+     * @param string $foo
      *
      * @return self
      */
-    public function setFoo(Testfoo $foo = null)
+    public function setFoo($foo = null)
     {
         $this->foo = $foo;
 

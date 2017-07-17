@@ -10,14 +10,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class TestNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class OtherchildtypeNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Test') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Otherchildtype') {
             return false;
         }
 
@@ -26,7 +26,7 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Test) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Otherchildtype) {
             return true;
         }
 
@@ -38,9 +38,12 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
         if (!is_object($data)) {
             throw new InvalidArgumentException();
         }
-        $object = new \Joli\Jane\Tests\Expected\Model\Test();
-        if (property_exists($data, 'foo')) {
-            $object->setFoo($this->denormalizer->denormalize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Testfoo', 'json', $context));
+        $object = new \Joli\Jane\Tests\Expected\Model\Otherchildtype();
+        if (property_exists($data, 'inheritedProperty')) {
+            $object->setInheritedProperty($data->{'inheritedProperty'});
+        }
+        if (property_exists($data, 'childProperty')) {
+            $object->setChildProperty($data->{'childProperty'});
         }
 
         return $object;
@@ -49,8 +52,11 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
     public function normalize($object, $format = null, array $context = [])
     {
         $data = new \stdClass();
-        if (null !== $object->getFoo()) {
-            $data->{'foo'} = $this->normalizer->normalize($object->getFoo(), 'json', $context);
+        if (null !== $object->getInheritedProperty()) {
+            $data->{'inheritedProperty'} = $object->getInheritedProperty();
+        }
+        if (null !== $object->getChildProperty()) {
+            $data->{'childProperty'} = $object->getChildProperty();
         }
 
         return $data;

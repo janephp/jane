@@ -47,12 +47,12 @@ class PatternPropertiesGuesser implements GuesserInterface, TypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         $type = new PatternMultipleType($object);
 
         foreach ($object->getPatternProperties() as $pattern => $patternProperty) {
-            $type->addType($pattern, $this->chainGuesser->guessType($patternProperty, $name, $registry, $schema));
+            $type->addType($pattern, $this->chainGuesser->guessType($patternProperty, $name, $reference . '/patternProperties/' . $pattern, $registry));
         }
 
         return $type;

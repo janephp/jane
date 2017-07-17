@@ -15,6 +15,11 @@ class Property
     private $type;
 
     /**
+     * @var string
+     */
+    private $reference;
+
+    /**
      * @var mixed
      */
     private $object;
@@ -24,10 +29,11 @@ class Property
      */
     private $nullable;
 
-    public function __construct($object, $name, $nullable = false, $type = null)
+    public function __construct($object, $name, $reference, $nullable = false, $type = null)
     {
         $this->name = $name;
         $this->object = $object;
+        $this->reference = $reference;
         $this->nullable = $nullable;
         $this->type = $type;
     }
@@ -48,6 +54,14 @@ class Property
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReference()
+    {
+        return $this->reference;
     }
 
     /**

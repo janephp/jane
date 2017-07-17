@@ -2,7 +2,7 @@
 
 namespace Joli\Jane\Tests\Expected\Model;
 
-class Foo
+class Testfoo
 {
     /**
      * @var string

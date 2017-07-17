@@ -10,14 +10,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class FooNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class TestfooNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Foo') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Testfoo') {
             return false;
         }
 
@@ -26,7 +26,7 @@ class FooNormalizer implements DenormalizerInterface, NormalizerInterface, Denor
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Foo) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Testfoo) {
             return true;
         }
 
@@ -38,7 +38,7 @@ class FooNormalizer implements DenormalizerInterface, NormalizerInterface, Denor
         if (!is_object($data)) {
             throw new InvalidArgumentException();
         }
-        $object = new \Joli\Jane\Tests\Expected\Model\Foo();
+        $object = new \Joli\Jane\Tests\Expected\Model\Testfoo();
         if (property_exists($data, 'foo')) {
             $object->setFoo($data->{'foo'});
         }

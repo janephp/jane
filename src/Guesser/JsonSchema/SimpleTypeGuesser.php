@@ -53,7 +53,7 @@ class SimpleTypeGuesser implements GuesserInterface, TypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         return new Type($object, $this->phpTypesMapping[$object->getType()]);
     }

@@ -2,15 +2,16 @@
 
 return [
     'mapping' => [
-        'tests/fixtures/multi-namespace/schema1.json' => [
-            'root-class' => 'Test',
-            'namespace' => 'Joli\Jane\Tests\Expected\Schema1',
-            'directory' => __DIR__ . '/generated/Schema1',
-        ],
+        // Order of schema matters for naming
         'tests/fixtures/multi-namespace/schema2.json' => [
             'root-class' => 'Test',
             'namespace' => 'Joli\Jane\Tests\Expected\Schema2',
             'directory' => __DIR__ . '/generated/Schema2',
+        ],
+        'tests/fixtures/multi-namespace/schema1.json' => [
+            'root-class' => 'Test',
+            'namespace' => 'Joli\Jane\Tests\Expected\Schema1',
+            'directory' => __DIR__ . '/generated/Schema1',
         ],
     ],
     'reference' => false

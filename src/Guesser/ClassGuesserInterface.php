@@ -16,6 +16,8 @@ interface ClassGuesserInterface
      * @param string   $name
      * @param string   $reference Json ref to the class
      * @param Registry $registry  Registry
+     *
+     * @internal
      */
     public function guessClass($object, $name, $reference, Registry $registry);
 }

@@ -8,6 +8,7 @@ class NormalizerFactory
     {
         $normalizers   = [];
         $normalizers[] = new TestNormalizer();
+        $normalizers[] = new TestsubObjectNormalizer();
 
         return $normalizers;
     }

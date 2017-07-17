@@ -55,7 +55,7 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
     /**
      * {@inheritdoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         $type = new MultipleType($object);
 
@@ -70,7 +70,7 @@ class ObjectOneOfGuesser implements GuesserInterface, TypeGuesserInterface, Clas
             }
 
             $merged = $this->jsonSchemaMerger->merge($object, $oneOfResolved);
-            $type->addType($this->chainGuesser->guessType($merged, $oneOfName, $registry, $schema));
+            $type->addType($this->chainGuesser->guessType($merged, $oneOfName, $reference . '/oneOf/' . $key, $registry));
         }
 
         return $type;

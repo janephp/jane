@@ -10,6 +10,8 @@ interface GuesserInterface
      * @param $object
      *
      * @return mixed
+     *
+     * @internal
      */
     public function supportObject($object);
 }

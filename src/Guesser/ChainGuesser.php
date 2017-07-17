@@ -41,7 +41,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
     /**
      * {@inheritDoc}
      */
-    public function guessType($object, $name, Registry $registry, Schema $schema)
+    public function guessType($object, $name, $reference, Registry $registry)
     {
         $type = null;
 
@@ -51,7 +51,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                return $guesser->guessType($object, $name, $registry, $schema);
+                return $guesser->guessType($object, $name, $reference, $registry);
             }
         }
 
@@ -63,9 +63,9 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function guessProperties($object, $name, Registry $registry)
+    public function guessProperties($object, $name, $reference, Registry $registry)
     {
         $properties = [];
 
@@ -75,7 +75,7 @@ class ChainGuesser implements TypeGuesserInterface, PropertiesGuesserInterface, 
             }
 
             if ($guesser->supportObject($object)) {
-                $properties = array_merge($properties, $guesser->guessProperties($object, $name, $registry));
+                $properties = array_merge($properties, $guesser->guessProperties($object, $name, $reference, $registry));
             }
         }
 

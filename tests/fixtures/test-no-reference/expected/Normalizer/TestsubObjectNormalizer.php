@@ -10,14 +10,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class TestNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class TestsubObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\Test') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\TestsubObject') {
             return false;
         }
 
@@ -26,7 +26,7 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\Test) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Model\TestsubObject) {
             return true;
         }
 
@@ -38,9 +38,9 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
         if (!is_object($data)) {
             throw new InvalidArgumentException();
         }
-        $object = new \Joli\Jane\Tests\Expected\Model\Test();
+        $object = new \Joli\Jane\Tests\Expected\Model\TestsubObject();
         if (property_exists($data, 'foo')) {
-            $object->setFoo($this->denormalizer->denormalize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Testfoo', 'json', $context));
+            $object->setFoo($data->{'foo'});
         }
 
         return $object;
@@ -50,7 +50,7 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
     {
         $data = new \stdClass();
         if (null !== $object->getFoo()) {
-            $data->{'foo'} = $this->normalizer->normalize($object->getFoo(), 'json', $context);
+            $data->{'foo'} = $object->getFoo();
         }
 
         return $data;

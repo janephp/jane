@@ -27,11 +27,17 @@ class ClassGuess
      */
     private $properties;
 
-    public function __construct($object, $name, $options = [])
+    /**
+     * @var string Reference of the class
+     */
+    private $reference;
+
+    public function __construct($object, $reference, $name, $options = [])
     {
         $this->name = $name;
         $this->object = $object;
         $this->options = $options;
+        $this->reference = $reference;
     }
 
     /**
@@ -48,6 +54,14 @@ class ClassGuess
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReference()
+    {
+        return $this->reference;
     }
 
     /**

@@ -46,7 +46,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
 
         if ($hasSubObject) {
             if (!$registry->hasClass($reference)) {
-                $registry->getSchema($reference)->addClass($reference, new ClassGuess($object, $this->naming->getClassName($name)));
+                $registry->getSchema($reference)->addClass($reference, new ClassGuess($object, $reference, $this->naming->getClassName($name)));
             }
 
             foreach ($object->getAllOf() as $allOfIndex => $allOf) {

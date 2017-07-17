@@ -40,7 +40,7 @@ class TestNormalizer implements DenormalizerInterface, NormalizerInterface, Deno
         }
         $object = new \Joli\Jane\Tests\Expected\Model\Test();
         if (property_exists($data, 'foo')) {
-            $object->setFoo($this->denormalizer->denormalize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\Testfoo', 'json', $context));
+            $object->setFoo($this->denormalizer->denormalize($data->{'foo'}, 'Joli\\Jane\\Tests\\Expected\\Model\\TestFoo', 'json', $context));
         }
 
         return $object;

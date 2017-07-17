@@ -125,7 +125,7 @@ class Schema
 
     private function fixPath($path)
     {
-        $path = preg_replace('~/{2,}~','/', $path);
+        $path = preg_replace('#([^:]){1}/{2,}#','$1/', $path);
 
         if ($path === '/') {
             return '/';

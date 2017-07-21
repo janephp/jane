@@ -82,11 +82,15 @@ class Schema
 
     public function getClass($reference)
     {
-        if (!array_key_exists($reference, $this->classes)) {
-            return null;
+        if (array_key_exists($reference, $this->classes)) {
+            return $this->classes[$reference];
         }
 
-        return $this->classes[$reference];
+        if (array_key_exists($reference . '#', $this->classes)) {
+            return $this->classes[$reference . '#'];
+        }
+
+        return null;
     }
 
     /**

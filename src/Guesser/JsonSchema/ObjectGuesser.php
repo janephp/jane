@@ -55,7 +55,7 @@ class ObjectGuesser implements GuesserInterface, PropertiesGuesserInterface, Typ
         }
 
         foreach ($object->getProperties() as $key => $property) {
-            $this->chainGuesser->guessClass($property, $name . $key, $reference . '/properties/' . $key, $registry);
+            $this->chainGuesser->guessClass($property, $name . ucfirst($key), $reference . '/properties/' . $key, $registry);
         }
     }
 

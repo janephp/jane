@@ -10,14 +10,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class TestsubObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+class TestSubObjectNormalizer implements DenormalizerInterface, NormalizerInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
     use NormalizerAwareTrait;
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\TestsubObject') {
+        if ($type !== 'Joli\\Jane\\Tests\\Expected\\Model\\TestSubObject') {
             return false;
         }
 
@@ -26,7 +26,7 @@ class TestsubObjectNormalizer implements DenormalizerInterface, NormalizerInterf
 
     public function supportsNormalization($data, $format = null)
     {
-        if ($data instanceof \Joli\Jane\Tests\Expected\Model\TestsubObject) {
+        if ($data instanceof \Joli\Jane\Tests\Expected\Model\TestSubObject) {
             return true;
         }
 
@@ -38,7 +38,7 @@ class TestsubObjectNormalizer implements DenormalizerInterface, NormalizerInterf
         if (!is_object($data)) {
             throw new InvalidArgumentException();
         }
-        $object = new \Joli\Jane\Tests\Expected\Model\TestsubObject();
+        $object = new \Joli\Jane\Tests\Expected\Model\TestSubObject();
         if (property_exists($data, 'foo')) {
             $object->setFoo($data->{'foo'});
         }

@@ -108,13 +108,11 @@ class NormalizerGenerator implements GeneratorInterface
     {
         $statements = [
             new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_()),
+            new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Symfony\Component\Serializer\Normalizer\ArrayDenormalizer'))),
         ];
 
         if ($this->useReference) {
-            $statements = [
-                new Expr\Assign(new Expr\Variable('normalizers'), new Expr\Array_()),
-                new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Joli\Jane\Runtime\Normalizer\ReferenceNormalizer'))),
-            ];
+            $statements[] = new Expr\Assign(new Expr\ArrayDimFetch(new Expr\Variable('normalizers')), new Expr\New_(new Name('\Joli\Jane\Runtime\Normalizer\ReferenceNormalizer')));
         }
 
         foreach ($classes as $class) {

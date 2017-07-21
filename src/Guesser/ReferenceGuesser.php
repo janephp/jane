@@ -47,7 +47,7 @@ class ReferenceGuesser implements ClassGuesserInterface, GuesserInterface, TypeG
         return $this->chainGuesser->guessClass(
             $this->resolve($object, $this->getSchemaClass()),
             $name,
-            (string) $object->getMergedUri(),
+            (string) $object->getMergedUri()->withFragment('') === (string) $object->getMergedUri() ? (string) $object->getMergedUri()->withFragment('') . '#' : (string) $object->getMergedUri(),
             $registry
         );
     }

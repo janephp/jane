@@ -71,8 +71,15 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
 
         foreach ($object->getAllOf() as $allOfIndex => $allOf) {
             $allOfSchema = $allOf;
+            $allOfReference = $reference . '/allOf/' . $allOfIndex;
 
             if ($allOfSchema instanceof Reference) {
+                $allOfReference = (string) $allOf->getMergedUri();
+
+                if ((string)$allOf->getMergedUri() === (string)$allOf->getMergedUri()->withFragment('')) {
+                    $allOfReference .= '#';
+                }
+
                 $allOfSchema = $this->resolve($allOfSchema, $this->getSchemaClass());
             }
 
@@ -82,7 +89,7 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
                 }
 
                 $allOfType = $allOfSchema->getType();
-                $type = $this->chainGuesser->guessType($allOf, $name, $reference . '/allOf/' . $allOfIndex, $registry);
+                $type = $this->chainGuesser->guessType($allOf, $name, $allOfReference, $registry);
             }
         }
 
@@ -108,11 +115,19 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     {
         $properties = [];
         foreach ($object->getAllOf() as $allOfIndex => $allOfSchema) {
+            $allOfReference = $reference . '/allOf/' . $allOfIndex;
+
             if ($allOfSchema instanceof Reference) {
+                $allOfReference = (string) $allOfSchema->getMergedUri();
+
+                if ((string)$allOfSchema->getMergedUri() === (string)$allOfSchema->getMergedUri()->withFragment('')) {
+                    $allOfReference .= '#';
+                }
+
                 $allOfSchema = $this->resolve($allOfSchema, $this->getSchemaClass());
             }
 
-            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $reference . '/allOf/' . $allOfIndex, $registry));
+            $properties = array_merge($properties, $this->chainGuesser->guessProperties($allOfSchema, $name, $allOfReference, $registry));
         }
 
         return $properties;

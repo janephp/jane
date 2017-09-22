@@ -9,7 +9,6 @@ use Joli\Jane\Generator\NormalizerGenerator;
 use Joli\Jane\Guesser\ChainGuesser;
 use Joli\Jane\Guesser\JsonSchema\JsonSchemaGuesserFactory;
 use Joli\Jane\Normalizer\NormalizerFactory;
-use Joli\Jane\Runtime\Encoder\RawEncoder;
 use PhpCsFixer\Cache\NullCacheManager;
 use PhpCsFixer\Differ\NullDiffer;
 use PhpCsFixer\Error\ErrorsManager;

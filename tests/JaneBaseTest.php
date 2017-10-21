@@ -15,7 +15,7 @@ class JaneBaseTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider schemaProvider
      */
-    public function testRessources(SplFileInfo $testDirectory)
+    public function testRessources($name, SplFileInfo $testDirectory)
     {
         // 1. Cleanup generated
         $filesystem = new Filesystem();
@@ -71,7 +71,7 @@ class JaneBaseTest extends \PHPUnit_Framework_TestCase
         $finder->depth('< 1');
         $data = array();
         foreach ($finder as $directory) {
-            $data[] = [$directory];
+            $data[] = [$directory->getFilename(), $directory];
         }
 
         return $data;

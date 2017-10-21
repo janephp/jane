@@ -11,7 +11,6 @@ use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\TypeGuesserInterface;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Registry;
-use Joli\Jane\Schema;
 
 class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuesserAwareInterface, ClassGuesserInterface
 {
@@ -64,6 +63,6 @@ class AdditionalPropertiesGuesser implements GuesserInterface, TypeGuesserInterf
      */
     protected function getSchemaClass()
     {
-        return Schema::class;
+        return JsonSchema::class;
     }
 }

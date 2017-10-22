@@ -18,6 +18,10 @@ class NormalizerFactory
         $normalizers[] = new OtherchildtypeNormalizer();
         $normalizers[] = new ChildtypeNormalizer();
         $normalizers[] = new ParenttypeNormalizer();
+        $normalizers[] = new FooNormalizer();
+        $normalizers[] = new BarNormalizer();
+        $normalizers[] = new BazNormalizer();
+        $normalizers[] = new BazBazNormalizer();
 
         return $normalizers;
     }

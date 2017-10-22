@@ -7,6 +7,7 @@ use Joli\Jane\Guesser\ChainGuesserAwareInterface;
 use Joli\Jane\Guesser\ChainGuesserAwareTrait;
 use Joli\Jane\Guesser\ClassGuesserInterface;
 use Joli\Jane\Guesser\Guess\ClassGuess;
+use Joli\Jane\Guesser\Guess\ObjectType;
 use Joli\Jane\Guesser\Guess\Type;
 use Joli\Jane\Guesser\GuesserInterface;
 use Joli\Jane\Guesser\GuesserResolverTrait;
@@ -68,6 +69,11 @@ class AllOfGuesser implements GuesserInterface, TypeGuesserInterface, ChainGuess
     {
         $type = null;
         $allOfType = null;
+
+        // Mainly a merged class
+        if ($registry->hasClass($reference)) {
+            return new ObjectType($object, $registry->getClass($reference)->getName(), $registry->getSchema($reference)->getNamespace());
+        }
 
         foreach ($object->getAllOf() as $allOfIndex => $allOf) {
             $allOfSchema = $allOf;

@@ -180,7 +180,7 @@ EOH
                     )
                 );
         }
-        $resolverOptions = array('allow-risky' => true);
+        $resolverOptions = ['allow-risky' => 'yes'];
         $resolver = new ConfigurationResolver($fixerConfig, $resolverOptions, $directory, new ToolInfo());
 
         $finder = new Finder();

@@ -3,8 +3,9 @@
 namespace Joli\Jane\Generator\Context\Tests;
 
 use Joli\Jane\Generator\Context\UniqueVariableScope;
+use PHPUnit\Framework\TestCase;
 
-class UniqueVariableScopeTest extends \PHPUnit_Framework_TestCase
+class UniqueVariableScopeTest extends TestCase
 {
     public function testUniqueVariable()
     {

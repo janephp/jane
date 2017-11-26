@@ -3,14 +3,14 @@
 namespace Joli\Jane\tests;
 
 use Joli\Jane\Command\GenerateCommand;
-use Joli\Jane\Jane;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class JaneBaseTest extends \PHPUnit_Framework_TestCase
+class JaneBaseTest extends TestCase
 {
     /**
      * @dataProvider schemaProvider

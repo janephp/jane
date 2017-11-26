@@ -27,7 +27,7 @@ class MapType extends ArrayType
     /**
      * {@inheritDoc}
      */
-    protected function createArrayValueStatement()
+    protected function createArrayValueStatement(): Expr
     {
         return new Expr\New_(new Name('\ArrayObject'), [
             new Expr\Array_(),
@@ -38,7 +38,7 @@ class MapType extends ArrayType
     /**
      * {@inheritDoc}
      */
-    protected function createNormalizationArrayValueStatement()
+    protected function createNormalizationArrayValueStatement(): Expr
     {
         return new Expr\New_(new Name('\stdClass'));
     }
@@ -46,7 +46,7 @@ class MapType extends ArrayType
     /**
      * {@inheritDoc}
      */
-    protected function createLoopKeyStatement(Context $context)
+    protected function createLoopKeyStatement(Context $context): Expr
     {
         return new Expr\Variable($context->getUniqueVariableName('key'));
     }
@@ -54,7 +54,7 @@ class MapType extends ArrayType
     /**
      * {@inheritDoc}
      */
-    protected function createLoopOutputAssignement(Expr $valuesVar, $loopKeyVar)
+    protected function createLoopOutputAssignement(Expr $valuesVar, $loopKeyVar): Expr
     {
         return new Expr\ArrayDimFetch($valuesVar, $loopKeyVar);
     }
@@ -62,7 +62,7 @@ class MapType extends ArrayType
     /**
      * {@inheritDoc}
      */
-    protected function createNormalizationLoopOutputAssignement(Expr $valuesVar, $loopKeyVar)
+    protected function createNormalizationLoopOutputAssignement(Expr $valuesVar, $loopKeyVar): Expr
     {
         return new Expr\PropertyFetch($valuesVar, $loopKeyVar);
     }

@@ -29,8 +29,14 @@ trait GetterSetterGenerator
      *
      * @return Stmt\ClassMethod
      */
-    protected function createGetter($name, Type $type, $namespace)
+    protected function createGetter($name, Type $type, $namespace, $required = false)
     {
+        $returnType = $type->getTypeHint($namespace);
+
+        if ($returnType && !$required) {
+            $returnType = '?' . $returnType;
+        }
+
         return new Stmt\ClassMethod(
             // getProperty
             $this->getNaming()->getPrefixedMethodName('get', $name),
@@ -43,6 +49,7 @@ trait GetterSetterGenerator
                         new Expr\PropertyFetch(new Expr\Variable('this'), $this->getNaming()->getPropertyName($name))
                     ),
                 ],
+                'returnType' => $returnType
             ], [
                 'comments' => [$this->createGetterDoc($type, $namespace)],
             ]
@@ -58,8 +65,14 @@ trait GetterSetterGenerator
      *
      * @return Stmt\ClassMethod
      */
-    protected function createSetter($name, Type $type, $namespace)
+    protected function createSetter($name, Type $type, $namespace, $required = false)
     {
+        $setType = $type->getTypeHint($namespace);
+
+        if ($setType && !$required) {
+            $setType = '?' . $setType;
+        }
+
         return new Stmt\ClassMethod(
             // setProperty
             $this->getNaming()->getPrefixedMethodName('set', $name),
@@ -68,7 +81,7 @@ trait GetterSetterGenerator
                 'type' => Stmt\Class_::MODIFIER_PUBLIC,
                 // ($property)
                 'params' => [
-                    new Param($this->getNaming()->getPropertyName($name), new Expr\ConstFetch(new Name('null')), $type->getTypeHint($namespace)),
+                    new Param($this->getNaming()->getPropertyName($name), null, $setType),
                 ],
                 'stmts' => [
                     // $this->property = $property;
@@ -81,6 +94,7 @@ trait GetterSetterGenerator
                     // return $this;
                     new Stmt\Return_(new Expr\Variable('this')),
                 ],
+                'returnType' => 'self'
             ], [
                 'comments' => [$this->createSetterDoc($name, $type, $namespace)],
             ]

@@ -29,7 +29,7 @@ class DateTimeType extends ObjectType
     /**
      * (@inheritDoc}.
      */
-    protected function createDenormalizationValueStatement(Context $context, Expr $input)
+    protected function createDenormalizationValueStatement(Context $context, Expr $input): Expr
     {
         // \DateTime::createFromFormat($format, $data)
         return new Expr\StaticCall(new Name('\DateTime'), 'createFromFormat', [
@@ -41,7 +41,7 @@ class DateTimeType extends ObjectType
     /**
      * (@inheritDoc}.
      */
-    protected function createNormalizationValueStatement(Context $context, Expr $input)
+    protected function createNormalizationValueStatement(Context $context, Expr $input): Expr
     {
         // $object->format($format);
         return new Expr\MethodCall($input, 'format', [
@@ -52,7 +52,7 @@ class DateTimeType extends ObjectType
     /**
      * (@inheritDoc}.
      */
-    public function createConditionStatement(Expr $input)
+    public function createConditionStatement(Expr $input): Expr
     {
         return new Expr\BinaryOp\LogicalAnd(new Expr\FuncCall(
             new Name('is_string'), [

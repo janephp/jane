@@ -30,7 +30,7 @@ class ObjectType extends Type
     /**
      * (@inheritDoc}
      */
-    protected function createDenormalizationValueStatement(Context $context, Expr $input)
+    protected function createDenormalizationValueStatement(Context $context, Expr $input): Expr
     {
         return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'denormalizer'), 'denormalize', [
             new Arg($input),
@@ -43,7 +43,7 @@ class ObjectType extends Type
     /**
      * (@inheritDoc}
      */
-    protected function createNormalizationValueStatement(Context $context, Expr $input)
+    protected function createNormalizationValueStatement(Context $context, Expr $input): Expr
     {
         return new Expr\MethodCall(new Expr\PropertyFetch(new Expr\Variable('this'), 'normalizer'), 'normalize', [
             new Arg($input),
@@ -55,7 +55,7 @@ class ObjectType extends Type
     /**
      * (@inheritDoc}
      */
-    public function createConditionStatement(Expr $input)
+    public function createConditionStatement(Expr $input): Expr
     {
         $conditionStatement = parent::createConditionStatement($input);
 

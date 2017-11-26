@@ -6,8 +6,9 @@ use Joli\Jane\Jane;
 use Joli\Jane\Model\JsonSchema;
 use Joli\Jane\Registry;
 use Joli\Jane\Schema;
+use PHPUnit\Framework\TestCase;
 
-class LibraryTest extends \PHPUnit_Framework_TestCase
+class LibraryTest extends TestCase
 {
     /**
      * @var Jane

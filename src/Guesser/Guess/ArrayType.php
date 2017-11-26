@@ -39,7 +39,7 @@ class ArrayType extends Type
     /**
      * (@inheritDoc}
      */
-    public function createDenormalizationStatement(Context $context, Expr $input)
+    public function createDenormalizationStatement(Context $context, Expr $input): array
     {
         $valuesVar     = new Expr\Variable($context->getUniqueVariableName('values'));
         $statements    = [
@@ -67,7 +67,7 @@ class ArrayType extends Type
     /**
      * (@inheritDoc}
      */
-    public function createNormalizationStatement(Context $context, Expr $input)
+    public function createNormalizationStatement(Context $context, Expr $input): array
     {
         $valuesVar     = new Expr\Variable($context->getUniqueVariableName('values'));
         $statements    = [
@@ -92,35 +92,32 @@ class ArrayType extends Type
         return [$statements, $valuesVar];
     }
 
-    /**
-     * (@inheritDoc}
-     */
     public function getTypeHint($namespace)
     {
         return 'array';
     }
 
-    protected function createArrayValueStatement()
+    protected function createArrayValueStatement(): Expr
     {
         return new Expr\Array_();
     }
 
-    protected function createNormalizationArrayValueStatement()
+    protected function createNormalizationArrayValueStatement(): Expr
     {
         return new Expr\Array_();
     }
 
-    protected function createLoopKeyStatement(Context $context)
+    protected function createLoopKeyStatement(Context $context): ?Expr
     {
         return null;
     }
 
-    protected function createLoopOutputAssignement(Expr $valuesVar, $loopKeyVar)
+    protected function createLoopOutputAssignement(Expr $valuesVar, $loopKeyVar): Expr
     {
         return new Expr\ArrayDimFetch($valuesVar);
     }
 
-    protected function createNormalizationLoopOutputAssignement(Expr $valuesVar, $loopKeyVar)
+    protected function createNormalizationLoopOutputAssignement(Expr $valuesVar, $loopKeyVar): Expr
     {
         return new Expr\ArrayDimFetch($valuesVar);
     }

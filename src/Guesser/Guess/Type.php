@@ -20,6 +20,17 @@ class Type
     const TYPE_ARRAY   = 'array';
     const TYPE_OBJECT  = 'object';
 
+    protected $phpMapping = [
+        self::TYPE_BOOLEAN => 'bool',
+        self::TYPE_INTEGER => 'int',
+        self::TYPE_FLOAT   => 'float',
+        self::TYPE_STRING  => 'string',
+        self::TYPE_NULL    => null,
+        self::TYPE_MIXED   => null,
+        self::TYPE_ARRAY   => 'array',
+        self::TYPE_OBJECT  => null,
+    ];
+
     protected $conditionMapping = [
         self::TYPE_BOOLEAN => 'is_bool',
         self::TYPE_INTEGER => 'is_int',
@@ -46,9 +57,9 @@ class Type
 
     protected $object;
 
-    public function __construct($object, $name)
+    public function __construct($object, string $name)
     {
-        $this->name   = $name;
+        $this->name = $name;
         $this->object = null;
     }
 
@@ -67,66 +78,27 @@ class Type
         return $this->name;
     }
 
-    /**
-     * Return the denormalization used for this type
-     *
-     * @param Context  $context
-     * @param Expr     $input
-     *
-     * @return Expr[], Expr First array contain all the expr need to transform the input value, second statement is the expr of assignement
-     */
-    public function createDenormalizationStatement(Context $context, Expr $input)
+    public function createDenormalizationStatement(Context $context, Expr $input): array
     {
         return [[], $this->createDenormalizationValueStatement($context, $input)];
     }
 
-    /**
-     * Return the normalization used for this type
-     *
-     * @param Context  $context
-     * @param Expr     $input
-     *
-     * @return Expr[], Expr First array contain all the expr need to transform the input value, second statement is the expr of assignement
-     */
-    public function createNormalizationStatement(Context $context, Expr $input)
+    public function createNormalizationStatement(Context $context, Expr $input): array
     {
         return [[], $this->createNormalizationValueStatement($context, $input)];
     }
 
-    /**
-     * Create the denormalization Value Statement (Expr of assignement)
-     *
-     * @param Context  $context
-     * @param Expr     $input
-     *
-     * @return Expr
-     */
-    protected function createDenormalizationValueStatement(Context $context, Expr $input)
+    protected function createDenormalizationValueStatement(Context $context, Expr $input): Expr
     {
         return $input;
     }
 
-    /**
-     * Create the normalization Value Statement (Expr of assignement)
-     *
-     * @param Context  $context
-     * @param Expr     $input
-     *
-     * @return Expr
-     */
-    protected function createNormalizationValueStatement(Context $context, Expr $input)
+    protected function createNormalizationValueStatement(Context $context, Expr $input): Expr
     {
         return $input;
     }
 
-    /**
-     * Create the condition Statement
-     *
-     * @param Expr $input
-     *
-     * @return Expr
-     */
-    public function createConditionStatement(Expr $input)
+    public function createConditionStatement(Expr $input): Expr
     {
         return new Expr\FuncCall(
             new Name($this->conditionMapping[$this->name]),
@@ -136,14 +108,7 @@ class Type
         );
     }
 
-    /**
-     * Create the condition Statement
-     *
-     * @param Expr $input
-     *
-     * @return Expr
-     */
-    public function createNormalizationConditionStatement(Expr $input)
+    public function createNormalizationConditionStatement(Expr $input): Expr
     {
         return new Expr\FuncCall(
             new Name($this->normalizationConditionMapping[$this->name]),
@@ -154,18 +119,14 @@ class Type
     }
 
     /**
-     * Create the typehint statement
-     *
      * @return null|string|Name
      */
     public function getTypeHint($namespace)
     {
-        return null;
+        return $this->phpMapping[$this->name];
     }
 
     /**
-     * Create the typehint statement
-     *
      * @return null|string|Name
      */
     public function getDocTypeHint($namespace)

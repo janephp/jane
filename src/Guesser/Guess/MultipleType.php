@@ -72,11 +72,11 @@ class MultipleType extends Type
         if (count($this->types) === 2) {
             list($type1, $type2) = $this->types;
 
-            if ($this->isOptionalObjectType($type1, $type2)) {
+            if ($this->isOptionalType($type1)) {
                 return $type2->getTypeHint($namespace);
             }
 
-            if ($this->isOptionalObjectType($type2, $type1)) {
+            if ($this->isOptionalType($type2)) {
                 return $type1->getTypeHint($namespace);
             }
         }
@@ -84,15 +84,15 @@ class MultipleType extends Type
         return null;
     }
 
-    private function isOptionalObjectType(Type $nullType, Type $objectType)
+    private function isOptionalType(Type $nullType)
     {
-        return 'null' === $nullType->getName() && $objectType instanceof ObjectType;
+        return 'null' === $nullType->getName();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDenormalizationStatement(Context $context, Expr $input)
+    public function createDenormalizationStatement(Context $context, Expr $input): array
     {
         $output     = new Expr\Variable($context->getUniqueVariableName('value'));
         $statements = [
@@ -119,7 +119,7 @@ class MultipleType extends Type
     /**
      * {@inheritdoc}
      */
-    public function createNormalizationStatement(Context $context, Expr $input)
+    public function createNormalizationStatement(Context $context, Expr $input): array
     {
         $output     = new Expr\Variable($context->getUniqueVariableName('value'));
         $statements = [
